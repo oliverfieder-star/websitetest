@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Erzeugt eine Einzeldatei-Fassung der Seite mit eingebetteten Bildern.
+"""Erzeugt eine Einzeldatei-Fassung der Seite mit eingebetteten Schriften.
 
 Nützlich zum Verschicken, Hochladen oder Ansehen ohne Ordnerstruktur:
 
-    python3 build-artifact.py            -> dist/riva-sei.html
+    python3 build-artifact.py            -> dist/mainfranken-digital.html
 """
 
 import base64
@@ -12,21 +12,21 @@ import re
 
 ROOT = pathlib.Path(__file__).parent
 SRC = ROOT / "index.html"
-OUT = ROOT / "dist" / "riva-sei.html"
+OUT = ROOT / "dist" / "mainfranken-digital.html"
 
 
 def data_uri(rel_path: str) -> str:
     raw = (ROOT / rel_path).read_bytes()
-    return "data:image/jpeg;base64," + base64.b64encode(raw).decode("ascii")
+    return "data:font/woff2;base64," + base64.b64encode(raw).decode("ascii")
 
 
 def main() -> None:
     html = SRC.read_text(encoding="utf-8")
 
     def replace(match: "re.Match[str]") -> str:
-        return 'src="' + data_uri(match.group(1)) + '"'
+        return 'url("' + data_uri(match.group(1)) + '")'
 
-    html = re.sub(r'src="(assets/[^"]+)"', replace, html)
+    html = re.sub(r'url\("(assets/fonts/[^"]+\.woff2)"\)', replace, html)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(html, encoding="utf-8")
