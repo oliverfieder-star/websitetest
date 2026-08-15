@@ -11,6 +11,7 @@ impressum.html          Platzhalter
 datenschutz.html        Platzhalter
 assets/                 die beiden Schreibtisch-Fotos
 bilder-aufbereiten.py   erzeugt WebP und drückt die JPGs unter 300 kB
+einzeldatei.py          baut alles zu einer einzigen HTML-Datei zusammen
 ```
 
 Kein Framework, kein Build-Step, keine externen Abhängigkeiten. Der Ordner
@@ -19,6 +20,22 @@ lässt sich unverändert auf jeden Hoster legen.
 Ansehen: `python3 -m http.server 8000` im Projektordner, dann
 `http://localhost:8000`. (Direkt per Doppelklick geht auch, dann greifen
 allerdings die relativen Pfade je nach Browser nicht überall.)
+
+## Einzeldatei zum Verschicken
+
+```
+python3 einzeldatei.py     ->  dist/mainfranken-digital.html
+```
+
+Legt CSS und JavaScript inline und die beiden Fotos als `data:`-URI ins
+Markup. Das Ergebnis lädt nichts nach, läuft offline und per Doppelklick.
+Fehlt ein Foto in `assets/`, kommt an seine Stelle ein sichtbar markierter
+Platzhalter und das Skript sagt es beim Bauen an — nach dem Hinlegen der
+Dateien einfach noch einmal laufen lassen. Ohne Fotos wiegt die Datei rund
+60 kB, mit zwei komprimierten Fotos etwa 450 kB.
+
+Die Verweise auf `impressum.html` und `datenschutz.html` bleiben relativ;
+die beiden Seiten stecken nicht mit in der Einzeldatei.
 
 ## Der Bildübergang
 
