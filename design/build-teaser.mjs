@@ -20,8 +20,10 @@ const teaser = {
     "{{IMG_WERKSTATT_HELL}}": () => uri("design/assets/werkstatt-hell.jpg", "image/jpeg"),
   },
   "richtung-b-werkfilm.html": {
-    "{{VID_HOBEL}}": () => uri("public/media/hobel.mp4", "video/mp4"),
-    "{{VID_FENSTER}}": () => uri("public/media/fenster-scrub.mp4", "video/mp4"),
+    "{{VID_HOBEL_MP4}}": () => uri("public/media/hobel.mp4", "video/mp4"),
+    "{{VID_HOBEL_WEBM}}": () => uri("public/media/hobel.webm", "video/webm"),
+    "{{VID_FENSTER_MP4}}": () => uri("public/media/fenster-scrub.mp4", "video/mp4"),
+    "{{VID_FENSTER_WEBM}}": () => uri("public/media/fenster-scrub.webm", "video/webm"),
   },
   "richtung-c-material-licht.html": {
     "{{IMG_EICHE}}": () => uri("design/assets/eiche-makro.jpg", "image/jpeg"),

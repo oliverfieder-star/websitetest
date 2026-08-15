@@ -39,7 +39,7 @@ jobs:
           ffmpeg -y -i /tmp/hobel.mp4 -frames:v 1 -q:v 3 public/media/hobel-poster.jpg
 
           # Richtung A — helle Werkstatt / Richtung C — Material-Makros
-          curl -fsSL -o design/assets/werkstatt-hell.png "$base/hf_20260815_154834_58294f8c-8499-4a10-8559-2420b9adae05.png"
+          curl -fsSL -o design/assets/werkstatt-hell.png "$base/hf_20260815_160524_79362229-31a1-4f19-84f7-93bb67dd3441.png"
           curl -fsSL -o design/assets/kalkputz.png       "$base/hf_20260815_154834_8e40d282-3f44-4f74-9320-565587c8a175.png"
           curl -fsSL -o design/assets/eiche-makro.png    "$base/hf_20260815_154834_2be93d3b-7542-46b9-89a8-f4363b68ef86.png"
 

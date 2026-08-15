@@ -185,7 +185,7 @@ header .tel:hover { color: var(--stahl); }
 
 <!-- Vorspann: Higgsfield-Film in Letterbox, mündet in den Hero -->
 <div id="vorspann" role="presentation">
-  <video muted playsinline preload="auto" src="{{VID_HOBEL}}"></video>
+  <video muted playsinline preload="auto"><source src="{{VID_HOBEL_WEBM}}" type="video/webm" /><source src="{{VID_HOBEL_MP4}}" type="video/mp4" /></video>
   <div class="balken oben"></div>
   <div class="balken unten"></div>
   <div class="titelkarten" aria-hidden="true">
@@ -203,7 +203,7 @@ header .tel:hover { color: var(--stahl); }
 
 <main>
   <section class="hero" aria-label="Einstieg">
-    <video muted playsinline preload="auto" src="{{VID_HOBEL}}" id="hero-video"></video>
+    <video muted playsinline preload="auto" id="hero-video"><source src="{{VID_HOBEL_WEBM}}" type="video/webm" /><source src="{{VID_HOBEL_MP4}}" type="video/mp4" /></video>
     <div class="inhalt">
       <p class="rolle">Mainfranken Digital — KI fürs Handwerk</p>
       <h1>Ihr Betrieb,<br />in <i>Ruhe</i> gebracht.</h1>
@@ -219,7 +219,7 @@ header .tel:hover { color: var(--stahl); }
   <!-- Kapitel: der Film wird mit dem Scrollrad geschnitten -->
   <section class="kapitel" id="kapitel" aria-label="Kapitel 1">
     <div class="buehne">
-      <video muted playsinline preload="auto" src="{{VID_FENSTER}}" id="scrub-video"></video>
+      <video muted playsinline preload="auto" id="scrub-video"><source src="{{VID_FENSTER_WEBM}}" type="video/webm" /><source src="{{VID_FENSTER_MP4}}" type="video/mp4" /></video>
       <p class="timecode" id="timecode">TC 00:00:00</p>
       <div class="tafel" data-von="0.05" data-bis="0.38">
         <div>
