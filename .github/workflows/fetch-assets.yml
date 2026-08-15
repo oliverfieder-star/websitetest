@@ -1,6 +1,7 @@
-# Holt die von Higgsfield generierten Bilder in das Repo.
+# Holt die von Higgsfield generierten Medien in das Repo.
 # Die Build-Umgebung erreicht den Higgsfield-CDN nicht direkt; der
-# GitHub-Runner schon. Einmalig manuell ausgelöst (workflow_dispatch).
+# GitHub-Runner schon. Videos werden zusätzlich keyframe-dicht
+# re-enkodiert (-g 6), damit Scroll-Scrubbing butterweich läuft.
 name: fetch-assets
 
 on:
@@ -17,19 +18,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Bilder laden
+      - name: Medien laden
         run: |
-          mkdir -p public/images
           base="https://d8j0ntlcm91z4.cloudfront.net/user_3HwhP6y3EJ5uDvH1ffTg5H1lYGM"
-          curl -fsSL -o public/images/hero.png        "$base/hf_20260815_151259_6e018f12-9cae-4099-953c-23513831ffc9.png"
-          curl -fsSL -o public/images/hero-depth.png  "$base/hf_20260815_151436_50955a20-2cb8-4fc4-afd7-79312abda533.png"
-          curl -fsSL -o public/images/praezision.png  "$base/hf_20260815_151259_5e8b7b1e-b44f-40cb-ac70-682b7ea4ae95.png"
-          curl -fsSL -o public/images/werkstatt.png   "$base/hf_20260815_151259_e6a503da-f7bf-47ee-8640-4c32f865f988.png"
-          ls -la public/images
+          mkdir -p public/media design/assets
+
+          # Richtung B — Werkfilm (Videos)
+          curl -fsSL -o /tmp/hobel.mp4   "$base/hf_20260815_154830_b90e45ac-9d05-48f0-9864-56e05090d333.mp4"
+          curl -fsSL -o /tmp/fenster.mp4 "$base/hf_20260815_154846_4f3a49fe-17f8-4b31-9817-12b33416bb67.mp4"
+
+          # Scrub-Fassungen: dichte Keyframes, stumm, 1280 breit
+          ffmpeg -y -i /tmp/hobel.mp4   -an -vf scale=1280:-2 -g 6 -crf 27 -pix_fmt yuv420p -movflags +faststart public/media/hobel-scrub.mp4
+          ffmpeg -y -i /tmp/fenster.mp4 -an -vf scale=1280:-2 -g 6 -crf 27 -pix_fmt yuv420p -movflags +faststart public/media/fenster-scrub.mp4
+          # Abspiel-Fassungen (Vorspann), etwas kleiner
+          ffmpeg -y -i /tmp/hobel.mp4   -an -vf scale=1280:-2 -crf 26 -pix_fmt yuv420p -movflags +faststart public/media/hobel.mp4
+          ffmpeg -y -i /tmp/fenster.mp4 -an -vf scale=1280:-2 -crf 26 -pix_fmt yuv420p -movflags +faststart public/media/fenster.mp4
+          # Poster
+          ffmpeg -y -i /tmp/hobel.mp4 -frames:v 1 -q:v 3 public/media/hobel-poster.jpg
+
+          # Richtung A — helle Werkstatt / Richtung C — Material-Makros
+          curl -fsSL -o design/assets/werkstatt-hell.png "$base/hf_20260815_154834_58294f8c-8499-4a10-8559-2420b9adae05.png"
+          curl -fsSL -o design/assets/kalkputz.png       "$base/hf_20260815_154834_8e40d282-3f44-4f74-9320-565587c8a175.png"
+          curl -fsSL -o design/assets/eiche-makro.png    "$base/hf_20260815_154834_2be93d3b-7542-46b9-89a8-f4363b68ef86.png"
+
+          ls -la public/media design/assets
       - name: Committen
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/images
-          git commit -m "Higgsfield-Bildmaterial hinzufuegen (hero, depth, praezision, werkstatt)"
+          git add public/media design/assets
+          git commit -m "Higgsfield-Medien: Werkfilm-Clips (Scrub-Fassung), helle Werkstatt, Material-Makros"
           git push
