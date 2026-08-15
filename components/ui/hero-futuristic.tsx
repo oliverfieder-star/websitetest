@@ -20,10 +20,12 @@ import {
   abs,
   blendScreen,
   float,
+  length,
   mod,
   mx_cell_noise_float,
   oneMinus,
   smoothstep,
+  sub,
   texture,
   uniform,
   uv,
@@ -41,6 +43,23 @@ const DEPTHMAP = { src: "/images/hero-depth.jpg" };
 const WIDTH = 300;
 const HEIGHT = 200;
 
+/** Boot-Sweep: eine schnelle, helle Lesewelle beim Laden, die dann
+ *  stetig (cos startet bei 1) in den ruhigen Dauer-Scan übergeht. */
+const INTRO_DAUER = 2.2;
+
+function easeInOut(t: number) {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+function scanProgress(t: number) {
+  if (t < INTRO_DAUER) return easeInOut(t / INTRO_DAUER);
+  return 0.5 + 0.5 * Math.cos((t - INTRO_DAUER) * 0.4);
+}
+
+function scanBoost(t: number) {
+  return t < INTRO_DAUER ? 1.7 - 0.7 * (t / INTRO_DAUER) : 1;
+}
+
 extend(THREE as unknown as Parameters<typeof extend>[0]);
 
 const PostProcessing = ({
@@ -52,6 +71,7 @@ const PostProcessing = ({
 }) => {
   const { gl, scene, camera } = useThree();
   const progressRef = useRef<{ value: number }>({ value: 0 });
+  const boostRef = useRef<{ value: number }>({ value: 1 });
 
   const render = useMemo(() => {
     const postProcessing = new THREE.PostProcessing(
@@ -62,7 +82,9 @@ const PostProcessing = ({
     const bloomPass = bloom(scenePassColor, strength, 0.5, threshold);
 
     const uScanProgress = uniform(0);
+    const uBoost = uniform(1);
     progressRef.current = uScanProgress;
+    boostRef.current = uBoost;
 
     // Amber-Scanlinie statt Rot: das Werkstattlicht liest das Bild.
     const uvY = uv().y;
@@ -70,7 +92,7 @@ const PostProcessing = ({
     const scanLine = smoothstep(0, scanWidth, abs(uvY.sub(uScanProgress)));
     const amberOverlay = vec3(1.0, 0.62, 0.25)
       .mul(oneMinus(scanLine))
-      .mul(0.35);
+      .mul(float(0.35).mul(uBoost));
 
     const withScanEffect = mix(
       scenePassColor,
@@ -78,14 +100,19 @@ const PostProcessing = ({
       smoothstep(0.9, 1.0, oneMinus(scanLine))
     );
 
-    const final = withScanEffect.add(bloomPass);
-    postProcessing.outputNode = final;
+    // Cinematische Vignette
+    const vignette = oneMinus(
+      smoothstep(0.55, 1.25, length(sub(uv(), vec2(0.5))).mul(1.5)).mul(0.45)
+    );
+
+    postProcessing.outputNode = withScanEffect.add(bloomPass).mul(vignette);
     return postProcessing;
   }, [camera, gl, scene, strength, threshold]);
 
   useFrame(({ clock }) => {
-    progressRef.current.value =
-      Math.sin(clock.getElapsedTime() * 0.4) * 0.5 + 0.5;
+    const t = clock.getElapsedTime();
+    progressRef.current.value = scanProgress(t);
+    boostRef.current.value = scanBoost(t);
     render.renderAsync();
   }, 1);
 
@@ -105,8 +132,9 @@ const Scene = () => {
   const { material, uniforms } = useMemo(() => {
     const uPointer = uniform(new THREE.Vector2(0));
     const uProgress = uniform(0);
+    const uBoost = uniform(1);
 
-    const strength = 0.01;
+    const strength = 0.02;
 
     const tDepthMap = texture(depthMap);
     const tMap = texture(
@@ -128,7 +156,7 @@ const Scene = () => {
     const flow = oneMinus(smoothstep(0, 0.02, abs(tDepthMap.sub(uProgress))));
 
     // Punktraster in Amber statt Rot: die "Lesespur" der KI.
-    const mask = dot.mul(flow).mul(vec3(10, 5.2, 1.6));
+    const mask = dot.mul(flow).mul(vec3(10, 5.2, 1.6)).mul(uBoost);
 
     const final = blendScreen(tMap, mask);
 
@@ -138,33 +166,42 @@ const Scene = () => {
       opacity: 0,
     });
 
-    return { material, uniforms: { uPointer, uProgress } };
+    return { material, uniforms: { uPointer, uProgress, uBoost } };
   }, [rawMap, depthMap]);
 
   const [w, h] = useAspect(WIDTH, HEIGHT);
+  const zielPointer = useRef(new THREE.Vector2(0, 0));
 
   useFrame(({ clock }) => {
-    uniforms.uProgress.value =
-      Math.sin(clock.getElapsedTime() * 0.4) * 0.5 + 0.5;
-    if (meshRef.current?.material) {
-      const mat = meshRef.current.material as { opacity?: number };
-      if (typeof mat.opacity === "number") {
-        mat.opacity = THREE.MathUtils.lerp(mat.opacity, visible ? 1 : 0, 0.07);
-      }
+    const t = clock.getElapsedTime();
+    uniforms.uProgress.value = scanProgress(t);
+    uniforms.uBoost.value = scanBoost(t);
+
+    const mesh = meshRef.current;
+    if (!mesh) return;
+
+    // Weiches Erscheinen
+    const mat = mesh.material as { opacity?: number };
+    if (typeof mat.opacity === "number") {
+      mat.opacity = THREE.MathUtils.lerp(mat.opacity, visible ? 1 : 0, 0.07);
     }
+
+    // Zeiger sanft nachziehen: Parallax + leichte Neigung
+    uniforms.uPointer.value.lerp(zielPointer.current, 0.06);
+    mesh.rotation.y = uniforms.uPointer.value.x * 0.05;
+    mesh.rotation.x = -uniforms.uPointer.value.y * 0.04;
+
+    // Ken-Burns-Drift
+    const k = 1.05 * (1.02 + 0.035 * Math.sin(t * 0.07));
+    mesh.scale.set(w * k, h * k, 1);
   });
 
   useFrame(({ pointer }) => {
-    uniforms.uPointer.value = pointer;
+    zielPointer.current.set(pointer.x, pointer.y);
   });
 
-  const scaleFactor = 1.05;
   return (
-    <mesh
-      ref={meshRef}
-      scale={[w * scaleFactor, h * scaleFactor, 1]}
-      material={material}
-    >
+    <mesh ref={meshRef} scale={[w * 1.05, h * 1.05, 1]} material={material}>
       <planeGeometry />
     </mesh>
   );

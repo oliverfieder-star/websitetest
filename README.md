@@ -73,3 +73,13 @@ Suche nach `PLATZHALTER`:
 
 Die deutschen Texte sind Entwurfsfassungen und werden wörtlich durch die
 gelieferten Endtexte ersetzt.
+
+## Einzeldatei-Vorschau
+
+```bash
+node scripts/build-preview.mjs   # -> preview/mainfranken-digital.html (~2 MB)
+```
+
+Bündelt den Standalone-Hero (three.js) und bettet Bilder und Schrift als
+Data-URIs ein — eine Datei, direkt im Browser zu öffnen, läuft offline.
+Quelle der Wahrheit bleibt die Next.js-App; die Vorschau wird aus ihr gebaut.
