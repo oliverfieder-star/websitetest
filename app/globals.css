@@ -1,26 +1,126 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ═══════════════════════════════════════════════════════════════
+   Mainfranken Digital — Werklicht
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+   Cinematisches Dunkel (Graphit mit Blauanteil), ein warmes
+   Amber als einzige laute Farbe (das Licht in der Werkstatt),
+   große kompakte Display-Typo. Der Hero scannt ein echtes
+   Handwerksmotiv — die KI liest das Handwerk, sie ersetzt es nicht.
+   ═══════════════════════════════════════════════════════════════ */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  --color-nacht: #0a0e14;
+  --color-flaeche: #10151e;
+  --color-flaeche-2: #161d29;
+  --color-amber: #e8a34d;
+  --color-amber-hell: #ffc97a;
+  --color-schrift: #f5f2ea;
+  --color-gedimmt: #a7aebb;
+  --color-linie: rgba(245, 242, 234, 0.1);
+  --color-tinte: #171310;
+
+  --font-display: var(--font-space-grotesk);
+  --font-body: var(--font-inter);
+
+  --animate-marquee: marquee 36s linear infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-nacht);
+  color: var(--color-schrift);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-amber);
+  color: var(--color-tinte);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-amber);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Hero-Texteinblendung (aus der Vorlage übernommen, entschärft) */
+.fade-in {
+  animation: fade-in-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.fade-in-subtitle {
+  animation: fade-in-up 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(0.6em); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* Statischer Hero-Fallback: Scanlinie als CSS-Animation */
+.scanline {
+  position: absolute;
+  inset-inline: 0;
+  height: 18%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(232, 163, 77, 0.18) 45%,
+    rgba(232, 163, 77, 0.3) 50%,
+    rgba(232, 163, 77, 0.18) 55%,
+    transparent
+  );
+  animation: scan 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes scan {
+  0%, 100% { top: -20%; }
+  50%      { top: 102%; }
+}
+
+/* Sanftes Aufdecken beim Scrollen */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in,
+  .fade-in-subtitle,
+  .scanline {
+    animation: none;
+  }
+  .scanline { display: none; }
+  .fade-in, .fade-in-subtitle { opacity: 1 !important; }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+/* Marquee anhalten bei Hover/Fokus (Barrierefreiheit) */
+.marquee-wrap:hover .animate-marquee,
+.marquee-wrap:focus-within .animate-marquee {
+  animation-play-state: paused;
 }

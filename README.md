@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mainfranken Digital — Website
 
-## Getting Started
+Landingpage für Mainfranken Digital: eine Ein-Personen-Beratung, die
+Handwerksbetrieben in Bayern Büroabläufe mit KI und Automatisierung abnimmt.
 
-First, run the development server:
+**Stack:** Next.js (App Router, statischer Export) · TypeScript · Tailwind CSS v4
+· shadcn-Projektstruktur · three.js (WebGPU/TSL) über React Three Fiber ·
+Bildmaterial generiert mit Higgsfield (Cinema Studio 2.5 + Nano Banana Tiefenkarte).
+
+## Entwickeln
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # statischer Export nach out/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Design: „Werklicht"
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Cinematisches Dunkel (Graphit mit Blauanteil), ein warmes Amber als einzige
+laute Farbe, große kompakte Display-Typografie (Space Grotesk) mit ruhiger
+Grotesk für den Fließtext (Inter, beide via `next/font` selbst gehostet).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Der Hero adaptiert die 21st.dev-Komponente „hero-futuristic": Ein von
+Higgsfield generiertes Handwerksmotiv wird über seine Tiefenkarte von einer
+Amber-Scanlinie und einem Punktraster „gelesen" — die KI liest das Handwerk,
+sie ersetzt es nicht. Details:
 
-## Learn More
+- `components/ui/hero-futuristic.tsx` — WebGPU-Renderer mit automatischem
+  WebGL2-Fallback (`forceWebGL`, wenn `navigator.gpu` fehlt). Bei
+  `prefers-reduced-motion` oder ohne 3D-Kontext rendert ein Standbild mit
+  CSS-Scanlinie. Texturen: `public/images/hero.jpg` + `hero-depth.jpg`.
+- Wortweiser Titel-Reveal, Marquee der Büroaufgaben (pausiert bei Hover,
+  Fokus und reduzierter Bewegung), Scroll-Reveals über IntersectionObserver.
 
-To learn more about Next.js, take a look at the following resources:
+## Projektstruktur (shadcn-Konvention)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/                  Layout, Seite, globale Styles (Tailwind v4 @theme)
+components/ui/        wiederverwendbare UI-Bausteine (hero-futuristic,
+                      accordion, marquee) — Standardpfad der shadcn CLI;
+                      `npx shadcn@latest add <komponente>` legt neue
+                      Komponenten genau hier ab
+components/           seitenspezifische Bausteine (Header, Rechner, Formular)
+lib/utils.ts          cn()-Helfer (clsx + tailwind-merge)
+components.json       shadcn-CLI-Konfiguration (Aliase @/components, @/lib)
+public/images/        Higgsfield-Assets (JPEG-optimiert)
+.github/workflows/    fetch-assets.yml — lädt neue Higgsfield-Generierungen
+                      in den Branch (die Build-Umgebung erreicht den CDN nicht)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Fachlich fix
 
-## Deploy on Vercel
+- **Förderrechner** (`components/foerderrechner.tsx`):
+  `zuschuss = min(volumen × 0,5, 7500)` — Deckelung ist Pflicht;
+  `eigenanteil = volumen − zuschuss`; Eingabe 4.000–60.000 €, Standard
+  15.000 €. Unter 4.000 € keine Förderung, daher beginnt der Regler dort.
+- **Preise:** Digital-Check 1.900 € netto; Umsetzungsprojekt ab 15.000 €,
+  effektiv ab 7.500 € nach Förderung.
+- **Nichts erfunden:** keine Kundennamen, Referenzen, Erfahrungsjahre,
+  Erfolgsquoten, Testimonials.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Platzhalter (vor Veröffentlichung ersetzen)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Suche nach `PLATZHALTER`:
+
+- **Telefonnummer** — Header, Hero, Kontakt, Footer (danach als `tel:`-Links verdrahten)
+- **E-Mail** — Kontakt, Footer und Konstante `EMAIL` in
+  `components/kontakt-form.tsx` (solange der Platzhalter drinsteht, verweist
+  das Formular ehrlich aufs Telefon)
+- **Förderprogramm** — Name und Link (Fördersektion, zweimal)
+- **Erreichbarkeit, Ort, Impressum, Datenschutz**
+
+Die deutschen Texte sind Entwurfsfassungen und werden wörtlich durch die
+gelieferten Endtexte ersetzt.
