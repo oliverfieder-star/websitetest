@@ -1,0 +1,32 @@
+# Holt die von Higgsfield generierten Bilder in das Repo.
+# Die Build-Umgebung erreicht den Higgsfield-CDN nicht direkt; der
+# GitHub-Runner schon. Einmalig manuell ausgelöst (workflow_dispatch).
+name: fetch-assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bilder laden
+        run: |
+          mkdir -p public/images
+          base="https://d8j0ntlcm91z4.cloudfront.net/user_3HwhP6y3EJ5uDvH1ffTg5H1lYGM"
+          curl -fsSL -o public/images/hero.png        "$base/hf_20260815_151259_6e018f12-9cae-4099-953c-23513831ffc9.png"
+          curl -fsSL -o public/images/hero-depth.png  "$base/hf_20260815_151436_50955a20-2cb8-4fc4-afd7-79312abda533.png"
+          curl -fsSL -o public/images/praezision.png  "$base/hf_20260815_151259_5e8b7b1e-b44f-40cb-ac70-682b7ea4ae95.png"
+          curl -fsSL -o public/images/werkstatt.png   "$base/hf_20260815_151259_e6a503da-f7bf-47ee-8640-4c32f865f988.png"
+          ls -la public/images
+      - name: Committen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/images
+          git commit -m "Higgsfield-Bildmaterial hinzufuegen (hero, depth, praezision, werkstatt)"
+          git push
