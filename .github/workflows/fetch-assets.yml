@@ -5,6 +5,9 @@ name: fetch-assets
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/fetch-assets.yml"
 
 permissions:
   contents: write
