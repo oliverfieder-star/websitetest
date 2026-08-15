@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Richtung B — Werkfilm · Mainfranken Digital</title>
+<style>
+/* ═══ Richtung B — „Werkfilm" ═══════════════════════════════════
+   These: Der Betrieb verdient einen Kinofilm, keinen Flyer.
+   Ein Higgsfield-Vorspann in Letterbox mündet in den Hero;
+   danach wird der Film per Scroll geschnitten (Scrub, Apple-
+   Technik, keyframe-dicht enkodiert). Monochromes Silber/Graphit,
+   Stahlblau als einzige Farbe, Filmkorn. Groß, ruhig, cineastisch.
+   ═══════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("{{FONT_SG}}") format("woff2");
+  font-weight: 300 700; font-display: swap;
+}
+:root {
+  --graphit: #0d0f12;
+  --silber: #e9e7e2;
+  --nebel: #9aa0a8;
+  --stahl: #8fa9bd;
+  --linie: rgba(233, 231, 226, 0.12);
+  --grotesk: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--graphit); color: var(--silber);
+  font-family: var(--grotesk); font-size: 17px; line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--stahl); color: var(--graphit); }
+:focus-visible { outline: 3px solid var(--stahl); outline-offset: 3px; }
+
+/* Filmkorn über allem, sehr leise */
+.korn {
+  position: fixed; inset: -50%; z-index: 90; pointer-events: none; opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@media (prefers-reduced-motion: no-preference) {
+  .korn { animation: koernen 0.9s steps(3) infinite; }
+  @keyframes koernen {
+    0% { transform: translate(0, 0); }
+    33% { transform: translate(-2%, 1%); }
+    66% { transform: translate(1%, -2%); }
+  }
+}
+
+/* ── Vorspann ── */
+#vorspann { position: fixed; inset: 0; z-index: 80; background: #000; overflow: hidden; }
+#vorspann.zu { display: none; }
+#vorspann video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+#vorspann .balken {
+  position: absolute; inset-inline: 0; height: 13vh; background: #000; z-index: 3;
+  transition: height 1.4s cubic-bezier(0.7, 0, 0.2, 1);
+}
+#vorspann .balken.oben { top: 0; } #vorspann .balken.unten { bottom: 0; }
+#vorspann.offen .balken { height: 0; }
+#vorspann .titelkarten {
+  position: absolute; inset: 0; z-index: 2;
+  display: grid; place-items: center; text-align: center; padding: 0 1.5rem;
+}
+.karte {
+  grid-area: 1 / 1; opacity: 0;
+  font-weight: 300; letter-spacing: 0.04em;
+  font-size: clamp(1.1rem, 2.6vw, 1.7rem); color: var(--silber);
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.8);
+}
+.karte.gross {
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  font-size: clamp(2rem, 6.5vw, 5rem); line-height: 1.05;
+}
+.karte.gross i { font-style: normal; color: var(--stahl); }
+@media (prefers-reduced-motion: no-preference) {
+  .karte.k1 { animation: karte 2.4s ease 0.4s both; }
+  .karte.k2 { animation: karte 2.4s ease 2.9s both; }
+  .karte.k3 { animation: karte-bleibt 2.2s ease 5.2s both; }
+  @keyframes karte {
+    0% { opacity: 0; filter: blur(8px); }
+    22%, 72% { opacity: 1; filter: blur(0); }
+    100% { opacity: 0; filter: blur(8px); }
+  }
+  @keyframes karte-bleibt {
+    from { opacity: 0; letter-spacing: 0.2em; filter: blur(10px); }
+    to { opacity: 1; letter-spacing: 0.06em; filter: blur(0); }
+  }
+}
+#vorspann .skip {
+  position: absolute; bottom: calc(13vh + 1.4rem); right: 2rem; z-index: 4;
+  font: 600 12px/1 var(--grotesk); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--nebel); background: rgba(13, 15, 18, 0.5); border: 1px solid var(--linie);
+  border-radius: 999px; padding: 0.75rem 1.3rem; cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+#vorspann .skip:hover { color: var(--silber); border-color: var(--stahl); }
+
+/* ── Kopfzeile ── */
+header {
+  position: fixed; inset-inline: 0; top: 0; z-index: 60;
+  display: flex; align-items: center; gap: 2rem;
+  padding: 1.1rem clamp(1.2rem, 4vw, 3rem);
+  background: linear-gradient(rgba(13, 15, 18, 0.85), transparent);
+}
+.marke { font-weight: 700; font-size: 1.05rem; text-decoration: none; color: var(--silber); text-transform: uppercase; letter-spacing: 0.08em; }
+.marke i { font-style: normal; color: var(--stahl); }
+header .tel { margin-left: auto; font-weight: 600; font-size: 0.9rem; color: var(--silber); text-decoration: none; }
+header .tel:hover { color: var(--stahl); }
+
+/* ── Hero (Standbild nach dem Vorspann) ── */
+.hero { position: relative; height: 100svh; overflow: hidden; display: grid; place-items: end start; }
+.hero video, .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
+.hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--graphit) 4%, transparent 45%), linear-gradient(rgba(13,15,18,0.35), transparent 40%); }
+.hero .inhalt { position: relative; z-index: 2; padding: 0 clamp(1.2rem, 4vw, 3rem) clamp(3rem, 7vh, 5rem); max-width: 60rem; }
+.hero .rolle { font-size: 12px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: var(--stahl); }
+.hero h1 {
+  margin-top: 1rem; font-weight: 700; text-transform: uppercase;
+  font-size: clamp(2.4rem, 7vw, 5.5rem); line-height: 1.02; letter-spacing: 0.01em;
+}
+.hero h1 i { font-style: normal; color: var(--stahl); }
+.hero p.sub { margin-top: 1.2rem; max-width: 34rem; color: var(--nebel); font-size: 1.05rem; }
+.cta { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center; }
+.btn {
+  display: inline-block; background: var(--silber); color: var(--graphit);
+  font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.9rem;
+  padding: 1rem 2rem; border-radius: 2px; text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn:hover { background: #fff; transform: translateY(-2px); }
+.cta p { font-size: 0.9rem; color: var(--nebel); }
+.cta strong { color: var(--silber); white-space: nowrap; }
+
+/* ── Scroll-Film-Kapitel ── */
+.kapitel { position: relative; height: 340vh; }
+.kapitel .buehne { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.kapitel video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.kapitel .buehne::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(13,15,18,0.25), rgba(13,15,18,0.25)); }
+.kapitel .timecode {
+  position: absolute; top: 5.5rem; right: clamp(1.2rem, 4vw, 3rem); z-index: 3;
+  font-size: 12px; letter-spacing: 0.2em; color: var(--nebel);
+  font-variant-numeric: tabular-nums;
+}
+.tafel {
+  position: absolute; inset: 0; z-index: 2;
+  display: grid; place-items: center; text-align: center; padding: 0 1.5rem;
+  opacity: 0; transition: opacity 0.5s ease;
+}
+.tafel.an { opacity: 1; }
+.tafel .nr { font-size: 12px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: var(--stahl); }
+.tafel h2 {
+  margin-top: 1rem; font-weight: 700; text-transform: uppercase;
+  font-size: clamp(1.8rem, 5vw, 3.8rem); line-height: 1.05;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.7);
+}
+.tafel p { margin: 1.2rem auto 0; max-width: 30rem; color: var(--silber); opacity: 0.85; }
+
+/* ── Abspann / Palette ── */
+.abspann { max-width: 72rem; margin: 0 auto; padding: 7rem clamp(1.2rem, 4vw, 3rem); }
+.abspann h2 { font-weight: 700; text-transform: uppercase; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.06; max-width: 44rem; }
+.abspann h2 i { font-style: normal; color: var(--stahl); }
+.abspann p { margin-top: 1.4rem; max-width: 38rem; color: var(--nebel); }
+
+.studie {
+  position: fixed; bottom: 1.2rem; left: 1.2rem; z-index: 95;
+  font-size: 10.5px; letter-spacing: 0.15em; color: var(--nebel);
+  background: rgba(13, 15, 18, 0.75); border: 1px solid var(--linie);
+  padding: 0.5rem 0.8rem; border-radius: 3px; backdrop-filter: blur(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #vorspann { display: none; }
+  .kapitel { height: auto; }
+  .kapitel .buehne { position: static; height: 70svh; }
+  .tafel { opacity: 1; }
+  .tafel + .tafel { display: none; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="korn" aria-hidden="true"></div>
+
+<!-- Vorspann: Higgsfield-Film in Letterbox, mündet in den Hero -->
+<div id="vorspann" role="presentation">
+  <video muted playsinline preload="auto" src="{{VID_HOBEL}}"></video>
+  <div class="balken oben"></div>
+  <div class="balken unten"></div>
+  <div class="titelkarten" aria-hidden="true">
+    <p class="karte k1">Ein Handwerksbetrieb wie Ihrer.</p>
+    <p class="karte k2">Tagsüber Baustelle. Abends Büro.</p>
+    <p class="karte gross k3">Zeit, den Schnitt<br /><i>zu machen.</i></p>
+  </div>
+  <button class="skip" type="button">Überspringen</button>
+</div>
+
+<header>
+  <a class="marke" href="#">Mainfranken<i> Digital</i></a>
+  <a class="tel" href="#">[PLATZHALTER Telefon]</a>
+</header>
+
+<main>
+  <section class="hero" aria-label="Einstieg">
+    <video muted playsinline preload="auto" src="{{VID_HOBEL}}" id="hero-video"></video>
+    <div class="inhalt">
+      <p class="rolle">Mainfranken Digital — KI fürs Handwerk</p>
+      <h1>Ihr Betrieb,<br />in <i>Ruhe</i> gebracht.</h1>
+      <p class="sub">KI und Automatisierung für Handwerksbetriebe in Bayern —
+      geplant wie ein guter Film: Szene für Szene, ohne Hektik.</p>
+      <div class="cta">
+        <a class="btn" href="#kapitel">Weiter im Film</a>
+        <p>oder direkt anrufen: <strong>[PLATZHALTER Telefon]</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kapitel: der Film wird mit dem Scrollrad geschnitten -->
+  <section class="kapitel" id="kapitel" aria-label="Kapitel 1">
+    <div class="buehne">
+      <video muted playsinline preload="auto" src="{{VID_FENSTER}}" id="scrub-video"></video>
+      <p class="timecode" id="timecode">TC 00:00:00</p>
+      <div class="tafel" data-von="0.05" data-bis="0.38">
+        <div>
+          <p class="nr">Kapitel 1</p>
+          <h2>Abends um acht<br />brennt noch Licht.</h2>
+          <p>Weil Angebote, Rechnungen und Stundenzettel warten, bis die Baustelle schweigt.</p>
+        </div>
+      </div>
+      <div class="tafel" data-von="0.45" data-bis="0.75">
+        <div>
+          <p class="nr">Kapitel 2</p>
+          <h2>Wir drehen die<br />Szene <i style="font-style:normal;color:var(--stahl)">neu</i>.</h2>
+          <p>Ihre Büroabläufe werden automatisiert — Schritt für Schritt, während der Betrieb normal weiterläuft.</p>
+        </div>
+      </div>
+      <div class="tafel" data-von="0.82" data-bis="1">
+        <div>
+          <p class="nr">Schlussbild</p>
+          <h2>Der Feierabend gehört<br />wieder dem Feierabend.</h2>
+          <p>Digital-Check 1.900 € netto · Umsetzung ab 15.000 €, effektiv ab 7.500 € nach Förderung.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="abspann">
+    <h2>So fühlt sich die ganze Seite an: <i>ein ruhiger Schnitt nach dem anderen.</i></h2>
+    <p>Jede Sektion ist eine Szene: Leistungen, Förderrechner, Ablauf und Kontakt
+    kommen als Titelkarten im selben monochromen Look — Silber auf Graphit,
+    Stahlblau als einzige Farbe, echtes Filmkorn. Higgsfield liefert die Szenen,
+    der Scroll führt Regie.</p>
+  </section>
+</main>
+
+<p class="studie">STUDIE · RICHTUNG B — WERKFILM</p>
+
+<script>
+(function () {
+  var reduziert = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var vorspann = document.getElementById("vorspann");
+
+  /* ── Vorspann: spielt einmal, Balken öffnen sich, dann Hero ── */
+  if (reduziert) { vorspann.remove(); }
+  else {
+    var intro = vorspann.querySelector("video");
+    intro.play().catch(function () {});
+    var zu = false;
+    function beenden() {
+      if (zu) return; zu = true;
+      vorspann.classList.add("offen");
+      var hv = document.getElementById("hero-video");
+      hv.currentTime = Math.min(intro.currentTime || 5, hv.duration || 5);
+      setTimeout(function () { vorspann.classList.add("zu"); }, 1400);
+    }
+    vorspann.querySelector(".skip").addEventListener("click", beenden);
+    setTimeout(beenden, 7400);
+  }
+
+  /* ── Scroll-Scrub: der Film hängt am Scrollrad ── */
+  var scrub = document.getElementById("scrub-video");
+  var kapitel = document.getElementById("kapitel");
+  var timecode = document.getElementById("timecode");
+  var tafeln = Array.prototype.slice.call(document.querySelectorAll(".tafel"));
+  var ziel = 0;
+
+  function fortschritt() {
+    var r = kapitel.getBoundingClientRect();
+    var strecke = r.height - innerHeight;
+    return Math.max(0, Math.min(1, -r.top / strecke));
+  }
+
+  if (!reduziert) {
+    addEventListener("scroll", function () { ziel = fortschritt(); }, { passive: true });
+    function los() {
+      if (scrub.duration) {
+        var t = ziel * scrub.duration;
+        // sanft nachziehen statt hart springen
+        scrub.currentTime += (t - scrub.currentTime) * 0.22;
+        var s = scrub.currentTime;
+        timecode.textContent = "TC 00:" + String(Math.floor(s)).padStart(2, "0") + ":" +
+          String(Math.floor((s % 1) * 24)).padStart(2, "0");
+      }
+      tafeln.forEach(function (tafel) {
+        var von = Number(tafel.dataset.von), bis = Number(tafel.dataset.bis);
+        tafel.classList.toggle("an", ziel >= von && ziel <= bis);
+      });
+      requestAnimationFrame(los);
+    }
+    scrub.addEventListener("loadedmetadata", function () { ziel = fortschritt(); });
+    requestAnimationFrame(los);
+  }
+})();
+</script>
+</body>
+</html>

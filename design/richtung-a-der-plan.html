@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Richtung A — Der Plan · Mainfranken Digital</title>
+<style>
+/* ═══ Richtung A — „Der Plan" ═══════════════════════════════════
+   These: Ein guter Berater arbeitet wie ein guter Meister —
+   erst der Plan, dann das Werk. Die Seite ist ein Reißbrett:
+   helles Porzellan, Tuschelinien, Maßketten, Kupfer als Stempel.
+   Intro: eine Werkzeichnung zeichnet sich selbst und übergibt
+   an die Fotografie. Ruhig, präzise, hell — bewusst kein
+   Dark-Mode-Tech-Look.
+   ═══════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("{{FONT_SG}}") format("woff2");
+  font-weight: 300 700; font-display: swap;
+}
+:root {
+  --porzellan: #f5f3ed;
+  --papier: #fbfaf6;
+  --tinte: #1a1e24;
+  --grau: #5c636e;
+  --blau: #2b4c7e;      /* Tuscheblau — Linien, Maße */
+  --kupfer: #a65e2e;    /* Stempel — CTA, Marken */
+  --linie: rgba(43, 76, 126, 0.35);
+  --haar: rgba(26, 30, 36, 0.14);
+  --grotesk: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--porzellan); color: var(--tinte);
+  font-family: var(--grotesk); font-size: 17px; line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--blau); color: #fff; }
+:focus-visible { outline: 3px solid var(--kupfer); outline-offset: 3px; }
+
+/* Millimeterpapier-Grund, sehr leise */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(var(--haar) 1px, transparent 1px) 0 0 / 100% 56px,
+    linear-gradient(90deg, var(--haar) 1px, transparent 1px) 0 0 / 56px 100%;
+  opacity: 0.35;
+}
+
+/* ── Intro: die Zeichnung ── */
+#intro {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--papier);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2.5rem; padding: 2rem;
+  transition: transform 1s cubic-bezier(0.7, 0, 0.2, 1);
+}
+#intro.zu { transform: translateY(-101%); }
+#intro svg { width: min(720px, 88vw); height: auto; overflow: visible; }
+#intro .strich {
+  fill: none; stroke: var(--blau); stroke-width: 1.6;
+  stroke-dasharray: var(--l); stroke-dashoffset: var(--l);
+  animation: ziehen 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: var(--d);
+}
+#intro .mass { stroke-width: 0.9; opacity: 0.75; }
+@keyframes ziehen { to { stroke-dashoffset: 0; } }
+#intro .beschriftung {
+  font-family: var(--mono); font-size: 11px; fill: var(--grau);
+  opacity: 0; animation: zeigen 0.5s ease forwards; animation-delay: var(--d);
+}
+@keyframes zeigen { to { opacity: 1; } }
+#intro h1 {
+  font-weight: 500; font-size: clamp(1.4rem, 3.4vw, 2.4rem);
+  letter-spacing: -0.01em; opacity: 0;
+  animation: zeigen 0.9s ease forwards 2.5s;
+}
+#intro h1 em { font-style: normal; color: var(--kupfer); }
+#skip {
+  position: absolute; bottom: 1.8rem; right: 2rem;
+  font: 600 12px/1 var(--mono); letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--grau); background: none; border: 1px solid var(--haar);
+  border-radius: 999px; padding: 0.7rem 1.2rem; cursor: pointer;
+}
+#skip:hover { color: var(--kupfer); border-color: var(--kupfer); }
+
+/* ── Kopfzeile ── */
+header {
+  position: fixed; inset-inline: 0; top: 0; z-index: 50;
+  display: flex; align-items: baseline; gap: 2rem;
+  padding: 1.1rem clamp(1.2rem, 4vw, 3rem);
+  background: color-mix(in srgb, var(--porzellan) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--haar);
+}
+.marke { font-weight: 700; font-size: 1.05rem; text-decoration: none; letter-spacing: -0.01em; }
+.marke i { font-style: normal; color: var(--kupfer); }
+.pos { font-family: var(--mono); font-size: 11px; color: var(--grau); letter-spacing: 0.12em; }
+header .tel { margin-left: auto; font-weight: 600; font-size: 0.9rem; text-decoration: none; }
+header .tel:hover { color: var(--kupfer); }
+
+/* ── Hero ── */
+.hero {
+  min-height: 100svh; display: grid; align-items: center;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  max-width: 76rem; margin: 0 auto;
+  padding: 7rem clamp(1.2rem, 4vw, 3rem) 4rem;
+}
+.hero .plannr { font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; color: var(--blau); text-transform: uppercase; }
+.hero h2 {
+  margin-top: 1.2rem; font-weight: 500; letter-spacing: -0.02em;
+  font-size: clamp(2.4rem, 5.2vw, 4.2rem); line-height: 1.05;
+}
+.hero h2 em { font-style: normal; color: var(--kupfer); }
+.hero .lead { margin-top: 1.6rem; max-width: 34rem; color: var(--grau); font-size: 1.1rem; }
+.cta { margin-top: 2.5rem; display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center; }
+.btn {
+  display: inline-block; background: var(--kupfer); color: #fff;
+  font-weight: 600; padding: 0.95rem 1.9rem; border-radius: 4px;
+  text-decoration: none; transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 10px 28px -14px rgba(166, 94, 46, 0.7);
+}
+.btn:hover { transform: translateY(-2px); }
+.cta p { font-size: 0.9rem; color: var(--grau); }
+.cta strong { color: var(--tinte); white-space: nowrap; }
+
+/* Foto im Zeichnungsrahmen mit Maßkette */
+.blatt { position: relative; }
+.blatt img { display: block; width: 100%; border: 1px solid var(--tinte); }
+.blatt .ecke { position: absolute; width: 14px; height: 14px; border: 1.6px solid var(--blau); }
+.blatt .ecke.olinks { top: -7px; left: -7px; border-right: 0; border-bottom: 0; }
+.blatt .ecke.orechts { top: -7px; right: -7px; border-left: 0; border-bottom: 0; }
+.blatt .ecke.ulinks { bottom: -7px; left: -7px; border-right: 0; border-top: 0; }
+.blatt .ecke.urechts { bottom: -7px; right: -7px; border-left: 0; border-top: 0; }
+.masskette { position: absolute; left: 0; right: 0; bottom: -2.4rem; height: 1.4rem; }
+.masskette .linieh { position: absolute; inset-inline: 0; top: 50%; height: 1px; background: var(--linie); }
+.masskette::before, .masskette::after {
+  content: ""; position: absolute; top: 20%; bottom: 20%; width: 1px; background: var(--linie);
+}
+.masskette::before { left: 0; } .masskette::after { right: 0; }
+.masskette span {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  background: var(--porzellan); padding: 0 0.7rem;
+  font-family: var(--mono); font-size: 11px; color: var(--blau); letter-spacing: 0.1em;
+}
+.blattzeile { margin-top: 3.4rem; font-family: var(--mono); font-size: 11px; color: var(--grau); letter-spacing: 0.08em; }
+
+/* ── Positionen (Leistungen als Stückliste) ── */
+.positionen { max-width: 76rem; margin: 0 auto; padding: 5rem clamp(1.2rem, 4vw, 3rem) 7rem; }
+.trennmass { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 3.5rem; }
+.trennmass .l { flex: 1; height: 1px; background: var(--linie); position: relative; }
+.trennmass .l::before, .trennmass .l::after { content: ""; position: absolute; top: -4px; width: 1px; height: 9px; background: var(--linie); }
+.trennmass .l::before { left: 0; } .trennmass .l::after { right: 0; }
+.trennmass span { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--blau); text-transform: uppercase; }
+.stueckliste { display: grid; gap: 1.6rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+.position { background: var(--papier); border: 1px solid var(--haar); padding: 2.2rem; position: relative; }
+.position .rahmen { position: absolute; inset: 0; pointer-events: none; }
+.position .rahmen rect {
+  fill: none; stroke: var(--blau); stroke-width: 1.5; vector-effect: non-scaling-stroke;
+  stroke-dasharray: 400; stroke-dashoffset: 400;
+  transition: stroke-dashoffset 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.position.in .rahmen rect { stroke-dashoffset: 0; }
+.position .posnr { font-family: var(--mono); font-size: 11px; color: var(--blau); letter-spacing: 0.15em; }
+.position h3 { margin-top: 0.8rem; font-weight: 600; font-size: 1.25rem; }
+.position .preis { margin-top: 1rem; font-weight: 500; font-size: clamp(1.8rem, 3vw, 2.4rem); letter-spacing: -0.01em; }
+.position .preis small { font-size: 0.95rem; color: var(--grau); }
+.position .stempel {
+  display: inline-block; margin-top: 0.7rem; padding: 0.3rem 0.8rem;
+  border: 1.5px solid var(--kupfer); color: var(--kupfer); border-radius: 2px;
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.06em;
+  transform: rotate(-1.5deg);
+}
+.position p.text { margin-top: 1.1rem; color: var(--grau); font-size: 0.97rem; }
+
+/* Studien-Hinweis */
+.studie {
+  position: fixed; bottom: 1.2rem; left: 1.2rem; z-index: 60;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em;
+  color: var(--grau); background: var(--papier); border: 1px solid var(--haar);
+  padding: 0.5rem 0.8rem; border-radius: 3px;
+}
+
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+@media (max-width: 880px) {
+  .hero { grid-template-columns: 1fr; padding-top: 6rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #intro { display: none; }
+  #intro .strich { animation: none; stroke-dashoffset: 0; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .position .rahmen rect { stroke-dashoffset: 0; transition: none; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- Intro: Werkzeichnung eines Dachstuhls zeichnet sich selbst -->
+<div id="intro" role="presentation">
+  <svg viewBox="0 0 720 380" aria-hidden="true">
+    <!-- Bodenplatte -->
+    <path class="strich" d="M80 300 H640" style="--l:560; --d:0.1s" />
+    <!-- Sparren -->
+    <path class="strich" d="M100 300 L360 90 L620 300" style="--l:680; --d:0.5s" />
+    <!-- Kehlbalken -->
+    <path class="strich" d="M205 215 H515" style="--l:310; --d:1.1s" />
+    <!-- Streben -->
+    <path class="strich" d="M260 300 L360 215 L460 300" style="--l:270; --d:1.4s" />
+    <!-- Firstpfosten -->
+    <path class="strich" d="M360 90 V215" style="--l:125; --d:1.6s" />
+    <!-- Maßkette unten -->
+    <path class="strich mass" d="M100 330 H620 M100 322 V338 M620 322 V338 M360 322 V338" style="--l:600; --d:1.9s" />
+    <text class="beschriftung" x="215" y="352" style="--d:2.2s">4.200</text>
+    <text class="beschriftung" x="475" y="352" style="--d:2.2s">4.200</text>
+    <!-- Höhenmaß -->
+    <path class="strich mass" d="M660 90 V300 M652 90 H668 M652 300 H668" style="--l:250; --d:2.0s" />
+    <text class="beschriftung" x="676" y="200" style="--d:2.3s">2.960</text>
+    <!-- Positionsmarken -->
+    <text class="beschriftung" x="340" y="75" style="--d:2.35s">POS. 01 — FIRST</text>
+    <text class="beschriftung" x="150" y="290" style="--d:2.45s">POS. 02 — SCHWELLE</text>
+  </svg>
+  <h1>Erst der Plan. <em>Dann das Werk.</em></h1>
+  <button id="skip" type="button">Überspringen</button>
+</div>
+
+<header>
+  <a class="marke" href="#">Mainfranken<i> Digital</i></a>
+  <span class="pos">Blatt 1 · KI fürs Handwerk</span>
+  <a class="tel" href="#">[PLATZHALTER Telefon]</a>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <p class="plannr">Werkplan · Büro statt Baustelle</p>
+      <h2>Erst der Plan.<br /><em>Dann das Werk.</em></h2>
+      <p class="lead">Mainfranken Digital plant Ihre Büroabläufe wie ein guter
+      Meister sein Gewerk: erst sauber aufgemessen, dann verbindlich
+      umgesetzt — KI und Automatisierung, die zu Ihrem Betrieb passen.</p>
+      <div class="cta">
+        <a class="btn" href="#positionen">Erstgespräch vereinbaren</a>
+        <p>oder direkt anrufen:<br /><strong>[PLATZHALTER Telefon]</strong></p>
+      </div>
+    </div>
+    <div>
+      <div class="blatt">
+        <span class="ecke olinks"></span><span class="ecke orechts"></span>
+        <span class="ecke ulinks"></span><span class="ecke urechts"></span>
+        <img src="{{IMG_WERKSTATT_HELL}}" alt="Helle, aufgeräumte Werkstatt im Morgenlicht" />
+        <div class="masskette" aria-hidden="true">
+          <div class="linieh"></div><span>Ihr Betrieb — aufgemessen</span>
+        </div>
+      </div>
+      <p class="blattzeile">Gez. Mainfranken Digital · Maßstab 1:1 · Änderungen nur nach Rücksprache</p>
+    </div>
+  </section>
+
+  <section class="positionen" id="positionen">
+    <div class="trennmass" aria-hidden="true">
+      <div class="l"></div><span>Stückliste</span><div class="l"></div>
+    </div>
+    <div class="stueckliste">
+      <article class="position">
+        <svg class="rahmen" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 100 100"><rect x="0.5" y="0.5" width="99" height="99" pathLength="400" /></svg>
+        <p class="posnr">POS. 01</p>
+        <h3>Digital-Check</h3>
+        <p class="preis">1.900&nbsp;€ <small>netto</small></p>
+        <p class="text">Ein Tag Aufmaß in Ihrem Büro: Wo geht Zeit verloren,
+        was lässt sich automatisieren, was bleibt besser, wie es ist.
+        Ergebnis: ein schriftlicher Plan mit Prioritäten.</p>
+      </article>
+      <article class="position">
+        <svg class="rahmen" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 100 100"><rect x="0.5" y="0.5" width="99" height="99" pathLength="400" /></svg>
+        <p class="posnr">POS. 02</p>
+        <h3>Umsetzungsprojekt</h3>
+        <p class="preis">ab 15.000&nbsp;€</p>
+        <p class="stempel">GEFÖRDERT: effektiv ab 7.500 €</p>
+        <p class="text">Der Plan wird gebaut: Angebote schneller schreiben,
+        Belege automatisch erfassen, Abläufe automatisieren — abgenommen
+        wird erst, wenn es im Alltag läuft.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<p class="studie">STUDIE · RICHTUNG A — DER PLAN</p>
+
+<script>
+(function () {
+  var intro = document.getElementById("intro");
+  var reduziert = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function schliessen() {
+    intro.classList.add("zu");
+    setTimeout(function () { intro.remove(); }, 1100);
+  }
+  if (reduziert) { intro.remove(); }
+  else {
+    document.getElementById("skip").addEventListener("click", schliessen);
+    setTimeout(schliessen, 4200);
+  }
+
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll(".position, .reveal").forEach(function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>

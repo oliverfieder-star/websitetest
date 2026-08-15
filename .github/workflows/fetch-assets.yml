@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: ffmpeg installieren
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
       - name: Medien laden
         run: |
           base="https://d8j0ntlcm91z4.cloudfront.net/user_3HwhP6y3EJ5uDvH1ffTg5H1lYGM"
