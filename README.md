@@ -1,45 +1,104 @@
-# Riva Sei — Website
+# Mainfranken Digital — Website
 
-Statische One-Page-Website für das Ristorante Riva Sei, Rheinufer 6, 56179 Vallendar.
+Statische Landingpage für eine Ein-Personen-Beratung, die bayerischen
+Handwerksbetrieben KI und Prozessautomatisierung einführt.
 
 ```
-index.html                  komplette Seite (CSS und JS inline, keine Abhängigkeiten)
-assets/terrasse-rhein.jpg   Terrasse mit Blick nach Niederwerth (Bühnenbild)
-assets/haus-riva-sei.jpg    Haus und Aufgang zur Terrasse
-build-artifact.py           erzeugt eine Einzeldatei mit eingebetteten Bildern
+index.html              die Seite
+style.css               Gestaltung, alle Farben und Abstände als Custom Properties
+main.js                 Bildübergang, Förderrechner, Einblenden, Formular
+impressum.html          Platzhalter
+datenschutz.html        Platzhalter
+assets/                 die beiden Schreibtisch-Fotos
+bilder-aufbereiten.py   erzeugt WebP und drückt die JPGs unter 300 kB
 ```
 
-Öffnen: `index.html` im Browser, oder `npx http-server .` im Projektordner.
+Kein Framework, kein Build-Step, keine externen Abhängigkeiten. Der Ordner
+lässt sich unverändert auf jeden Hoster legen.
+
+Ansehen: `python3 -m http.server 8000` im Projektordner, dann
+`http://localhost:8000`. (Direkt per Doppelklick geht auch, dann greifen
+allerdings die relativen Pfade je nach Browser nicht überall.)
+
+## Der Bildübergang
+
+Die Sektion zwischen „Das Problem" und „Der Digital-Check" läuft in drei
+Fassungen, die `main.js` beim Laden und bei jeder Größenänderung neu wählt:
+
+| Fassung      | wann                                        | was passiert |
+|--------------|---------------------------------------------|--------------|
+| `kino`       | ab 62rem Breite und 34rem Höhe              | Sticky-Container über 220vh, Crossfade linear mit dem Scroll |
+| `gestapelt`  | schmalere Fenster                           | beide Bilder untereinander, per IntersectionObserver eingeblendet |
+| `ruhig`      | `prefers-reduced-motion: reduce`            | nur Bild 2, beide Beschriftungen als Text darunter |
+
+Ohne JavaScript bleibt es bei `gestapelt` — das ist der Grundzustand im CSS.
+
+Der Fortschritt im Sticky-Container steuert: 0–30 % nur Bild 1, 30–70 %
+Crossfade plus Scale 1.0 → 1.02 auf beiden Ebenen, ab 70 % nur Bild 2.
+Rückwärtsscrollen kehrt das um, es gibt keinen Timer.
+
+## Der Förderrechner
+
+```js
+const zuschuss    = Math.min(volumen * 0.5, 7500);
+const eigenanteil = volumen - zuschuss;
+```
+
+Die Deckelung bei 7.500 € ist fest verdrahtet. Unterhalb von 4.000 €
+Projektvolumen — erreichbar nur über das Eingabefeld, der Regler beginnt bei
+4.000 — steht der Zuschuss auf 0, weil das Programm dort nicht fördert; die
+Meldung sagt dasselbe. Ohne diese Ausnahme würde der Rechner für 2.000 €
+Volumen 1.000 € Zuschuss anzeigen und der eigenen Meldung widersprechen.
 
 ## Gestaltung
 
-Dunkel als Grundstimmung (Dämmerung am Fluss), hell als Mittagsvariante — beide
-Themes laufen über dieselben CSS-Custom-Properties und folgen der Systemeinstellung.
-Anzeigenschrift Palatino/Iowan Old Style, Fließtext Optima/Candara: zwei Schnitte
-von Hermann Zapf, beide aus der italienischen Renaissance-Antiqua entwickelt.
-Akzentfarbe ist das Bernstein der Terrassenlaternen.
+Tiefblauer Grund, dünne helle Linien, ein feines Raster als fester Hintergrund.
+Ein einziger warmer Akzent in Kupfer für Knöpfe, aktive Zustände und
+Schlüsselzahlen. Die Fotos sind die einzigen warmen Flächen der Seite.
 
-Keine externen Schriften, Skripte oder Bilder — die Seite läuft vollständig offline.
+```
+--blaupause     #0E2A47    Grundfläche
+--nachtblau     #08192B    abgesetzte Sektionen, Kopf, Fuß
+--kreide        #EDF2F7    Text
+--werkstattgrau #7C8A99    Kleingedrucktes, Marken, Platzhalter
+--kupfer        #C8763C    Akzent
+```
 
-## Herkunft der Inhalte
+Dazu drei abgeleitete Helligkeitswerte (`--kreide-leise`, `--kupfer-hell`,
+`--linie`), damit auch Fließtext zweiter Ordnung und Kupfer auf Blau die
+Kontrastwerte der WCAG-Stufe AA erreichen. Keine Verläufe, keine Schatten.
 
-- **Fließtexte** (Begrüßung, „Unsere Geschichte") wörtlich von riva-sei.de,
-  entnommen aus dem PDF-Export der Startseite.
-- **Fotos** aus demselben PDF-Export.
-- **Gästestimmen** aus öffentlichen Google-Rezensionen. Zwei Rezensionen waren
-  in der Vorlage abgeschnitten („… Mehr") und enden entsprechend am letzten
-  vollständigen Satz.
-- **Öffnungszeiten, Telefon, E-Mail, Google-Bewertung 4,4** aus Websuche
-  (Stand August 2026) — riva-sei.de war aus der Build-Umgebung nicht erreichbar.
+Zahlen laufen durchgehend in Tabellenziffern (`font-variant-numeric:
+tabular-nums`).
+
+## Schriften
+
+Die Seite nutzt den Systemschriftstapel — zwei Schnitte (400 und 600), dazu
+den Monospace-Stapel des Systems für Blattnummern, Marken und Augenbrauen. So
+wird keine einzige Schriftdatei geladen.
+
+Wenn eine Hausschrift dazukommen soll: zwei `.woff2` nach `assets/fonts/`
+legen, `@font-face` im Kopf von `style.css` ergänzen und `--satz` umstellen.
+Nicht mehr als zwei Schnitte, und selbst gehostet — kein CDN.
 
 ## Offene Punkte
 
-- **Öffnungszeiten und Kontaktdaten** gegen den aktuellen Stand des Restaurants
-  prüfen — sie stammen aus Suchergebnissen, nicht von der Website selbst.
-- **Bildergalerie**: Die Seite hat noch keinen Galerie-Abschnitt. Sobald die
-  Fotos als Dateien vorliegen, kommen sie nach `assets/galerie/`.
-- **Impressum und Datenschutz** im Fuß zeigen auf `riva-sei.de` — hier fehlen
-  die echten Ziel-URLs.
-- **Speisekarte**: Die Karte zeigt Kategorien ohne Preise und verweist auf
-  riva-sei.de/speisekarte. Für eine vollständige Karte mit Preisen wird die
-  aktuelle Speisekarte benötigt.
+- **Beide Schreibtisch-Bilder fehlen noch.** Sie gehören als
+  `assets/schreibtisch-vorher.jpg` und `assets/schreibtisch-nachher.jpg` in den
+  Ordner. Danach `python3 bilder-aufbereiten.py` laufen lassen — das erzeugt
+  die `.webp`-Fassungen, auf die die `<source>`-Zeilen zeigen, und meldet die
+  tatsächlichen Bildmaße (`width`/`height` in `index.html` danach abgleichen).
+  Fehlt die WebP-Fassung, nimmt `main.js` die `<source>`-Zeile heraus und
+  lädt das JPG nach — die Seite funktioniert also auch mit den JPGs allein,
+  nur eben mit größeren Dateien.
+- **Telefonnummer** steht als `[TELEFONNUMMER]` in der Kontaktsektion, im Fuß
+  und im Impressum.
+- **Impressum und Datenschutz** sind Gerüste mit markierten Platzhaltern.
+  Anschrift, Rechtsform und Steuerangaben fehlen, der Text ist nicht geprüft.
+- **Kontaktformular** hat keinen Server. Der Knopf packt die fünf Felder in
+  eine `mailto:`-Nachricht; darunter steht ein als solcher markierter
+  Platzhalterhinweis. Sobald ein Endpunkt existiert: `action` und `method` am
+  `<form>` setzen und `initFormular()` in `main.js` entfernen.
+- **Reste des Vorgängerprojekts** liegen noch im Ordner
+  (`build-artifact.py`, `assets/haus-riva-sei.jpg`, `assets/terrasse-rhein.jpg`)
+  und gehören gelöscht.

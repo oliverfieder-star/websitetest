@@ -1,0 +1,824 @@
+/* ==========================================================================
+   Mainfranken Digital — Blaupause
+   Farben, Abstände und Typografie laufen über Custom Properties.
+   Keine Verläufe, keine Schatten, keine externen Abhängigkeiten.
+   ========================================================================== */
+
+:root {
+  /* Palette */
+  --blaupause:     #0E2A47;
+  --nachtblau:     #08192B;
+  --kreide:        #EDF2F7;
+  --werkstattgrau: #7C8A99;
+  --kupfer:        #C8763C;
+
+  /* Abgeleitet — nur Helligkeitsvarianten für Kontrast und Linien */
+  --kreide-leise:  #A9B8C6;
+  --kupfer-hell:   #E39A63;
+  --linie:         rgba(237, 242, 247, .14);
+  --linie-stark:   rgba(237, 242, 247, .30);
+  --raster:        rgba(237, 242, 247, .038);
+  --scheibe:       rgba(8, 25, 43, .78);
+
+  /* Abstände */
+  --s1: .5rem;
+  --s2: .875rem;
+  --s3: 1.25rem;
+  --s4: 2rem;
+  --s5: 3rem;
+  --s6: 4.5rem;
+  --s7: 7rem;
+
+  /* Maße */
+  --bahn: 76rem;
+  --kopf-hoehe: 4.5rem;
+  --rasterweite: 64px;
+
+  /* Schrift — Systemstapel, damit keine Datei nachgeladen wird.
+     Genau zwei Schnitte: 400 und 600. Wer eine eigene Hausschrift will,
+     legt zwei .woff2 nach assets/fonts/ und ergänzt hier @font-face. */
+  --satz: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+  --technik: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Mono",
+             Menlo, Consolas, monospace;
+}
+
+/* ---------- Grundlagen ---------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--kopf-hoehe) + 1.5rem);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--blaupause);
+  color: var(--kreide);
+  font-family: var(--satz);
+  font-weight: 400;
+  font-size: clamp(1.0625rem, 1rem + .3vw, 1.1875rem);
+  line-height: 1.72;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Das feine Raster liegt fest hinter allem — wie das Papier unter der Zeichnung. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(to right,  var(--raster) 0 1px, transparent 1px var(--rasterweite)),
+    repeating-linear-gradient(to bottom, var(--raster) 0 1px, transparent 1px var(--rasterweite));
+}
+
+main, .kopf, .fuss { position: relative; z-index: 1; }
+
+h1, h2, h3 {
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -.012em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p { margin: 0 0 var(--s3); }
+p:last-child { margin-bottom: 0; }
+
+a { color: var(--kupfer-hell); text-decoration-thickness: 1px; text-underline-offset: .22em; }
+a:hover { color: var(--kreide); }
+
+img { display: block; max-width: 100%; height: auto; }
+
+:focus-visible {
+  outline: 2px solid var(--kupfer-hell);
+  outline-offset: 3px;
+}
+
+.zahl {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.platzhalter {
+  color: var(--werkstattgrau);
+  font-family: var(--technik);
+  font-size: .875em;
+}
+
+.sprungmarke {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--kupfer);
+  color: var(--nachtblau);
+  padding: var(--s2) var(--s3);
+  font-weight: 600;
+  text-decoration: none;
+}
+.sprungmarke:focus { left: 0; }
+
+/* ---------- Bahn / Layout ------------------------------------------------- */
+
+.bahn {
+  width: 100%;
+  max-width: var(--bahn);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+}
+
+.bereich {
+  padding-block: clamp(var(--s6), 9vw, var(--s7));
+  border-top: 1px solid var(--linie);
+}
+.bereich--dunkel { background: var(--nachtblau); }
+.bereich--hero { border-top: 0; }
+
+.bereich__kopf { margin-bottom: var(--s5); }
+/* Zeilenmaß in em: es wächst mit der Schriftgröße mit, nicht mit der des Elternteils. */
+.bereich__titel { font-size: clamp(1.75rem, 1.1rem + 2.1vw, 2.85rem); max-width: 17em; }
+.bereich__intro {
+  margin-top: var(--s3);
+  font-size: clamp(1.125rem, 1rem + .55vw, 1.375rem);
+  color: var(--kreide-leise);
+  max-width: 32em;
+}
+
+.blatt-nr {
+  font-family: var(--technik);
+  font-size: .8125rem;
+  color: var(--kupfer);
+  letter-spacing: .14em;
+  margin: 0 0 var(--s3);
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid var(--linie);
+}
+
+.augenbraue {
+  font-family: var(--technik);
+  font-size: .8125rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--kupfer);
+  margin: 0 0 var(--s3);
+  line-height: 1.6;
+}
+
+/* ---------- Kopf ---------------------------------------------------------- */
+
+.kopf {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--nachtblau);
+  border-bottom: 1px solid var(--linie);
+}
+.kopf__innen {
+  max-width: var(--bahn);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+  height: var(--kopf-hoehe);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+
+.marke {
+  display: inline-flex;
+  align-items: center;
+  gap: .7rem;
+  color: var(--kreide);
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+.marke:hover { color: var(--kreide); }
+.marke__zeichen { color: var(--kupfer); display: flex; }
+.marke__wort { font-size: 1.0625rem; }
+
+.fortschritt {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: transparent;
+}
+.fortschritt__balken {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--kupfer);
+}
+
+/* ---------- Knöpfe -------------------------------------------------------- */
+
+.knopf {
+  display: inline-block;
+  background: var(--kupfer);
+  color: var(--nachtblau);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.2;
+  letter-spacing: .01em;
+  text-decoration: none;
+  padding: .95rem 1.6rem;
+  border: 1px solid var(--kupfer);
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color .15s linear, color .15s linear;
+}
+.knopf:hover { background: var(--kupfer-hell); border-color: var(--kupfer-hell); color: var(--nachtblau); }
+
+.knopf--linie {
+  background: transparent;
+  color: var(--kreide);
+  border-color: var(--linie-stark);
+}
+.knopf--linie:hover { background: transparent; border-color: var(--kreide); color: var(--kreide); }
+
+.knopf--klein { padding: .65rem 1.1rem; font-size: .9375rem; white-space: nowrap; }
+
+/* ---------- Hero ---------------------------------------------------------- */
+
+.bereich--hero { padding-block: clamp(3rem, 6vw, 5rem) clamp(var(--s6), 9vw, var(--s7)); }
+
+.hero__zeile {
+  font-size: clamp(2.05rem, 1.1rem + 3vw, 3.6rem);
+  letter-spacing: -.022em;
+  margin-bottom: var(--s4);
+  max-width: 16em;
+}
+.hero__text {
+  font-size: clamp(1.125rem, 1rem + .65vw, 1.4375rem);
+  color: var(--kreide-leise);
+  max-width: 30em;
+  margin-bottom: var(--s5);
+}
+.hero__text .zahl { color: var(--kreide); font-weight: 600; }
+
+.hero__knoepfe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin: 0;
+}
+
+/* ---------- Szenen (Das Problem) ------------------------------------------ */
+
+.szenen {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--linie);
+  border: 1px solid var(--linie);
+}
+.szene {
+  background: var(--blaupause);
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: clamp(1.0625rem, 1rem + .45vw, 1.3125rem);
+  line-height: 1.55;
+  position: relative;
+}
+.szene::before {
+  content: "";
+  position: absolute;
+  top: clamp(1.5rem, 3vw, 2.25rem);
+  left: 0;
+  width: 3px;
+  height: 1.1em;
+  background: var(--kupfer);
+}
+.bereich--dunkel .szene { background: var(--nachtblau); }
+
+.schluss-satz {
+  margin-top: var(--s5);
+  max-width: 58ch;
+  font-size: clamp(1.125rem, 1rem + .5vw, 1.3125rem);
+  color: var(--kreide-leise);
+}
+
+/* ---------- Tafeln, Raster ------------------------------------------------ */
+
+.doppel {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s4);
+}
+.raster-drei { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s4); }
+.raster-vier { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s4); }
+
+.tafel {
+  border: 1px solid var(--linie);
+  padding: clamp(1.5rem, 2.6vw, 2.125rem);
+  position: relative;
+}
+/* Eckwinkel wie an einer Bemaßung */
+.tafel::before, .tafel::after {
+  content: "";
+  position: absolute;
+  width: 10px; height: 10px;
+  border: 1px solid var(--kupfer);
+}
+.tafel::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+.tafel::after  { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+.tafel__titel {
+  font-size: 1.1875rem;
+  margin-bottom: var(--s3);
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid var(--linie);
+}
+.tafel p { color: var(--kreide-leise); }
+
+.liste { list-style: none; margin: 0; padding: 0; }
+.liste li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: var(--s2);
+  color: var(--kreide-leise);
+}
+.liste li:last-child { margin-bottom: 0; }
+.liste li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .62em;
+  width: 6px; height: 6px;
+  background: var(--kupfer);
+}
+
+.preis-zeile {
+  margin-top: var(--s5);
+  font-size: clamp(1.125rem, 1rem + .5vw, 1.375rem);
+  color: var(--kreide-leise);
+}
+.zahl--gross { color: var(--kreide); font-weight: 600; }
+
+.zusage {
+  margin-top: var(--s4);
+  border-left: 3px solid var(--kupfer);
+  padding: var(--s2) 0 var(--s2) var(--s3);
+  font-size: clamp(1.125rem, 1rem + .5vw, 1.375rem);
+  max-width: 56ch;
+}
+
+.hinweis {
+  margin-top: var(--s5);
+  color: var(--werkstattgrau);
+  max-width: 62ch;
+  font-size: .9375rem;
+}
+
+/* ---------- Kasten mit Kupferrahmen --------------------------------------- */
+
+.kasten {
+  margin-top: var(--s5);
+  border: 1px solid var(--kupfer);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  max-width: 64ch;
+}
+.kasten p { font-size: clamp(1.0625rem, 1rem + .35vw, 1.1875rem); }
+
+/* ---------- Bildübergang -------------------------------------------------- */
+
+.wandel {
+  border-top: 1px solid var(--linie);
+  background: var(--nachtblau);
+  padding-bottom: clamp(var(--s6), 9vw, var(--s7));
+}
+
+/* Grundzustand = gestapelt. Ohne JS bleibt es dabei: lesbar vor Effekt. */
+.wandel__spur { position: relative; }
+.wandel__buehne { display: grid; gap: clamp(2rem, 5vw, 3.5rem); padding-block: clamp(var(--s5), 7vw, var(--s6)); }
+.wandel__ebene {
+  margin: 0;
+  width: 100%;
+  max-width: var(--bahn);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+}
+.wandel__flaeche { border: 1px solid var(--linie); }
+.wandel__flaeche img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+
+.wandel__schild { margin-top: var(--s3); }
+.wandel__strich { display: block; width: 44px; height: 2px; background: var(--kupfer); margin-bottom: var(--s2); }
+.wandel__zeit {
+  display: block;
+  font-size: clamp(1.125rem, 1rem + .6vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+.wandel__abschluss {
+  margin-top: clamp(var(--s5), 7vw, var(--s6));
+  font-size: clamp(1.3125rem, 1rem + 1.4vw, 2.125rem);
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -.015em;
+  max-width: 30ch;
+  text-wrap: balance;
+}
+
+/* Kino: sticky über 220vh, beide Bilder übereinander */
+.wandel[data-modus="kino"] .wandel__spur { height: 220vh; }
+.wandel[data-modus="kino"] .wandel__buehne {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: block;
+  padding: 0;
+  overflow: hidden;
+}
+.wandel[data-modus="kino"] .wandel__ebene {
+  position: absolute;
+  inset: 0;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+.wandel[data-modus="kino"] .wandel__flaeche {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  overflow: hidden;
+  will-change: opacity;
+}
+.wandel[data-modus="kino"] .wandel__flaeche img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.wandel[data-modus="kino"] .wandel__schild {
+  position: absolute;
+  top: calc(var(--kopf-hoehe) + 5vh);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  width: min(38rem, calc(100% - 3rem));
+  background: var(--scheibe);
+  border: 1px solid var(--linie-stark);
+  padding: clamp(1.1rem, 2.4vw, 1.75rem) clamp(1.25rem, 3vw, 2rem);
+  text-align: center;
+  pointer-events: none;
+  will-change: opacity;
+}
+.wandel[data-modus="kino"] .wandel__strich { margin-inline: auto; }
+.wandel[data-modus="kino"] .wandel__abschluss { margin-top: clamp(var(--s6), 10vw, var(--s7)); }
+
+/* Ruhig: nur Bild 2, beide Beschriftungen als Text darunter */
+.wandel[data-modus="ruhig"] .wandel__ebene[data-ebene="1"] .wandel__flaeche { display: none; }
+.wandel[data-modus="ruhig"] .wandel__buehne { gap: var(--s3); }
+.wandel[data-modus="ruhig"] .wandel__ebene[data-ebene="1"] { order: 2; }
+.wandel[data-modus="ruhig"] .wandel__ebene[data-ebene="2"] { order: 1; }
+.wandel[data-modus="ruhig"] .wandel__ebene[data-ebene="1"] .wandel__strich { display: none; }
+.wandel[data-modus="ruhig"] .wandel__ebene[data-ebene="1"] .wandel__zeit { font-weight: 400; color: var(--kreide-leise); font-size: 1.125rem; }
+
+/* ---------- Förderrechner ------------------------------------------------- */
+
+.rechner {
+  margin-top: var(--s6);
+  border: 1px solid var(--linie);
+  padding: clamp(1.5rem, 3.4vw, 3rem);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+.rechner__eingabe { min-width: 0; }
+.rechner__ausgabe { min-width: 0; }
+
+.rechner__label {
+  display: block;
+  font-family: var(--technik);
+  font-size: .8125rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--kupfer);
+  margin-bottom: var(--s3);
+}
+
+.regler { position: relative; height: 2.5rem; display: flex; align-items: center; }
+.regler__schiene {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--linie-stark);
+  pointer-events: none;
+}
+.regler__fuellung { display: block; height: 100%; width: 50%; background: var(--kupfer); }
+
+.regler__stift {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2.5rem;
+  cursor: pointer;
+}
+.regler__stift::-webkit-slider-runnable-track { height: 2px; background: transparent; }
+.regler__stift::-moz-range-track { height: 2px; background: transparent; }
+.regler__stift::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px; height: 22px;
+  margin-top: -10px;
+  background: var(--kupfer);
+  border: 2px solid var(--nachtblau);
+  border-radius: 50%;
+  cursor: grab;
+}
+.regler__stift::-moz-range-thumb {
+  width: 22px; height: 22px;
+  background: var(--kupfer);
+  border: 2px solid var(--nachtblau);
+  border-radius: 50%;
+  cursor: grab;
+}
+
+.regler__marken {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--technik);
+  font-size: .8125rem;
+  color: var(--werkstattgrau);
+  margin-top: -.25rem;
+}
+
+.feld-zeile { margin-top: var(--s4); }
+.feld-zeile__label,
+.formular__feld label {
+  display: block;
+  font-size: .9375rem;
+  color: var(--kreide-leise);
+  margin-bottom: var(--s1);
+}
+.feld-zeile__gruppe { display: flex; align-items: stretch; max-width: 16rem; }
+.feld-zeile__einheit {
+  display: flex;
+  align-items: center;
+  padding-inline: .875rem;
+  border: 1px solid var(--linie-stark);
+  border-left: 0;
+  color: var(--werkstattgrau);
+  font-variant-numeric: tabular-nums;
+}
+
+.feld {
+  width: 100%;
+  background: var(--blaupause);
+  color: var(--kreide);
+  border: 1px solid var(--linie-stark);
+  border-radius: 2px;
+  padding: .8rem .9rem;
+  font: inherit;
+  font-size: 1rem;
+}
+.bereich--dunkel .feld { background: var(--nachtblau); }
+.feld--zahl { font-variant-numeric: tabular-nums; border-radius: 2px 0 0 2px; }
+.feld:focus-visible { border-color: var(--kupfer); }
+
+.bilanz { margin: 0; border-top: 1px solid var(--linie); }
+.bilanz__zeile {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--linie);
+}
+.bilanz dt { color: var(--kreide-leise); }
+.bilanz dd { margin: 0; font-weight: 600; white-space: nowrap; }
+
+.bilanz__zeile--summe { border-bottom: 0; padding-top: var(--s3); align-items: baseline; }
+.bilanz__zeile--summe dt { color: var(--kreide); font-weight: 600; }
+.bilanz__zeile--summe dd {
+  color: var(--kupfer);
+  font-size: clamp(1.75rem, 1.1rem + 2.2vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -.02em;
+}
+
+.meldung {
+  margin-top: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--linie);
+  color: var(--kreide-leise);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.kleingedruckt {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: var(--s4);
+  color: var(--werkstattgrau);
+  font-size: .8125rem;
+  line-height: 1.6;
+}
+
+/* ---------- Positionstabelle ---------------------------------------------- */
+
+.positionen { border: 1px solid var(--linie); padding: clamp(1.5rem, 3vw, 2.5rem); }
+.positionen__titel {
+  font-size: 1.25rem;
+  margin-bottom: var(--s3);
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--linie-stark);
+}
+
+.tabelle { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.tabelle th, .tabelle td { text-align: left; padding: .8rem 0; vertical-align: baseline; }
+.tabelle thead th {
+  font-family: var(--technik);
+  font-size: .75rem;
+  font-weight: 400;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--werkstattgrau);
+  padding-top: 0;
+}
+.tabelle tbody td { border-top: 1px solid var(--linie); color: var(--kreide-leise); }
+.tabelle__betrag { text-align: right; white-space: nowrap; padding-left: var(--s3); }
+.tabelle tbody td.tabelle__betrag { color: var(--kreide); }
+
+.tabelle tfoot td { border-top: 1px solid var(--linie); }
+.tabelle__summe td { border-top: 1px solid var(--linie-stark); font-weight: 600; }
+.tabelle__anteil td {
+  font-weight: 600;
+  font-size: clamp(1.125rem, 1rem + .6vw, 1.375rem);
+  color: var(--kupfer);
+  border-top: 1px solid var(--kupfer);
+  padding-top: var(--s3);
+}
+
+/* ---------- Wege ---------------------------------------------------------- */
+
+.doppel--wege { gap: var(--s4); }
+.weg {
+  border: 1px solid var(--linie);
+  padding: clamp(1.75rem, 3vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+}
+.weg__marke {
+  font-family: var(--technik);
+  font-size: .8125rem;
+  letter-spacing: .14em;
+  color: var(--kupfer);
+  margin-bottom: var(--s3);
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid var(--linie);
+}
+.weg__titel { font-size: clamp(1.25rem, 1rem + .8vw, 1.625rem); margin-bottom: var(--s3); }
+.weg__text { color: var(--kreide-leise); }
+.weg__preis {
+  margin-top: auto;
+  padding-top: var(--s3);
+  margin-bottom: var(--s4);
+  font-weight: 600;
+  color: var(--kupfer);
+  font-size: 1.0625rem;
+}
+.weg p:last-child { margin-bottom: 0; }
+
+/* ---------- FAQ ----------------------------------------------------------- */
+
+.faq { border-top: 1px solid var(--linie); max-width: 52rem; }
+.frage { border-bottom: 1px solid var(--linie); }
+.frage__kopf {
+  list-style: none;
+  cursor: pointer;
+  padding: var(--s3) 2.5rem var(--s3) 0;
+  font-size: clamp(1.0625rem, 1rem + .4vw, 1.25rem);
+  font-weight: 600;
+  position: relative;
+}
+.frage__kopf::-webkit-details-marker { display: none; }
+.frage__kopf::after {
+  content: "+";
+  position: absolute;
+  right: .25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--technik);
+  font-weight: 400;
+  font-size: 1.375rem;
+  color: var(--kupfer);
+  line-height: 1;
+}
+.frage[open] .frage__kopf::after { content: "–"; }
+.frage__kopf:hover { color: var(--kupfer-hell); }
+.frage__text { padding: 0 2.5rem var(--s4) 0; color: var(--kreide-leise); max-width: 62ch; }
+
+/* ---------- Kontakt ------------------------------------------------------- */
+
+.kontakt { display: grid; grid-template-columns: 1fr 1.2fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+
+.kontakt__karte { border-left: 3px solid var(--kupfer); padding-left: var(--s3); }
+.kontakt__name { font-weight: 600; margin-bottom: var(--s2); }
+.kontakt__tel { font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem); margin-bottom: var(--s1); }
+.kontakt__mail { margin: 0; }
+
+.formular { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); }
+.formular__feld--breit, .formular__fuss { grid-column: 1 / -1; }
+.formular__fuss { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); margin-top: var(--s1); }
+.formular__fuss .kleingedruckt { padding-top: 0; flex: 1 1 16rem; }
+.formular textarea { resize: vertical; min-height: 6.5rem; }
+
+/* ---------- Fuß ----------------------------------------------------------- */
+
+.fuss {
+  border-top: 1px solid var(--linie);
+  background: var(--nachtblau);
+  padding-block: var(--s5);
+  font-size: .9375rem;
+}
+.fuss__innen { display: flex; flex-wrap: wrap; gap: var(--s3) var(--s5); justify-content: space-between; align-items: baseline; }
+.fuss p { margin: 0; }
+.fuss__marke { color: var(--kreide); }
+.fuss__kontakt { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s3); color: var(--werkstattgrau); }
+.fuss__wege { display: flex; gap: var(--s3); }
+
+/* ---------- Rechtsseiten -------------------------------------------------- */
+
+.rechtstext { max-width: 46rem; }
+.rechtstext h1 { font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem); margin-bottom: var(--s4); }
+.rechtstext h2 {
+  font-size: 1.25rem;
+  margin-top: var(--s5);
+  margin-bottom: var(--s2);
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid var(--linie);
+}
+.rechtstext p { color: var(--kreide-leise); }
+.rechtstext .platzhalter { display: inline-block; }
+
+.baustelle {
+  border: 1px solid var(--kupfer);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  margin-bottom: var(--s5);
+}
+.baustelle p { color: var(--kreide); }
+
+/* ---------- Einblenden ---------------------------------------------------- */
+
+.js [data-zeigen] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .6s ease-out, transform .6s ease-out;
+}
+.js [data-zeigen].zeigen { opacity: 1; transform: none; }
+
+/* ---------- Schmalere Fenster --------------------------------------------- */
+
+@media (max-width: 60rem) {
+  .raster-drei { grid-template-columns: 1fr; }
+  .rechner { grid-template-columns: 1fr; }
+  .kontakt { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 46rem) {
+  :root { --kopf-hoehe: 4rem; --rasterweite: 48px; }
+  .szenen { grid-template-columns: 1fr; }
+  .doppel, .raster-vier { grid-template-columns: 1fr; }
+  .formular { grid-template-columns: 1fr; }
+  .marke__wort { font-size: .9375rem; }
+  .knopf--klein { padding: .55rem .85rem; font-size: .875rem; }
+  .hero__knoepfe .knopf { width: 100%; text-align: center; }
+  .tabelle th, .tabelle td { padding: .7rem 0; }
+  .fuss__innen { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 26rem) {
+  .marke__wort { display: none; }
+}
+
+/* ---------- Weniger Bewegung ---------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js [data-zeigen] { opacity: 1; transform: none; transition: none; }
+  * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* ---------- Druck --------------------------------------------------------- */
+
+@media print {
+  body { background: #fff; color: #000; }
+  body::before, .kopf, .fortschritt { display: none; }
+  .bereich { padding-block: 1.5rem; }
+}
