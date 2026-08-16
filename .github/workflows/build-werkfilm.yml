@@ -1,0 +1,66 @@
+# Baut den Werkfilm: lädt die vier Higgsfield-Segmente, klebt sie zu einem
+# Master-Film (Tag → Nacht → Licht aus) und enkodiert scrub-tauglich
+# (dichte Keyframes) als MP4 + WebM. Die Build-Umgebung erreicht den
+# Higgsfield-CDN nicht direkt; der GitHub-Runner schon.
+name: build-werkfilm
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-werkfilm.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  montage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ffmpeg installieren
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+      - name: Segmente laden und montieren
+        run: |
+          base="https://d8j0ntlcm91z4.cloudfront.net/user_3HwhP6y3EJ5uDvH1ffTg5H1lYGM"
+          mkdir -p /tmp/seg public/media design/assets/story2
+
+          curl -fsSL -o /tmp/seg/s1.mp4 "$base/hf_20260816_115829_195f394f-0a56-4cf2-ba5d-5b954c0444fb.mp4"
+          curl -fsSL -o /tmp/seg/s2.mp4 "$base/hf_20260816_115829_8a4c1ce3-6521-4c7b-9736-aabeed2c957b.mp4"
+          curl -fsSL -o /tmp/seg/s3.mp4 "$base/hf_20260816_115829_7bef15f0-14c1-488a-8e31-3db72e757060.mp4"
+          curl -fsSL -o /tmp/seg/s4.mp4 "$base/hf_20260816_115829_9f1b540f-39af-4dd5-9a7b-609eef2ff497.mp4"
+
+          # Vereinheitlichen (Auflösung/FPS), dann verlustarm zusammenfügen
+          for n in 1 2 3 4; do
+            ffmpeg -y -i /tmp/seg/s$n.mp4 -an \
+              -vf "scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,fps=24" \
+              -c:v libx264 -crf 18 -preset fast /tmp/seg/n$n.mp4
+          done
+          printf "file '/tmp/seg/n1.mp4'\nfile '/tmp/seg/n2.mp4'\nfile '/tmp/seg/n3.mp4'\nfile '/tmp/seg/n4.mp4'\n" > /tmp/seg/liste.txt
+          ffmpeg -y -f concat -safe 0 -i /tmp/seg/liste.txt -c copy /tmp/seg/master-roh.mp4
+
+          # Scrub-Fassungen: dichte Keyframes fuer butterweiches Scrollen
+          ffmpeg -y -i /tmp/seg/master-roh.mp4 -an -g 6 -crf 27 -pix_fmt yuv420p \
+            -movflags +faststart public/media/werkfilm-master.mp4
+          ffmpeg -y -i /tmp/seg/master-roh.mp4 -an -c:v libvpx-vp9 -b:v 0 -crf 38 -g 6 -row-mt 1 \
+            public/media/werkfilm-master.webm
+
+          # Poster: erstes und letztes Bild
+          ffmpeg -y -i /tmp/seg/master-roh.mp4 -frames:v 1 -q:v 3 public/media/werkfilm-poster.jpg
+          ffmpeg -y -sseof -0.2 -i /tmp/seg/master-roh.mp4 -frames:v 1 -q:v 3 public/media/werkfilm-ende.jpg
+
+          # Keyframes als Standbild-Fallback
+          curl -fsSL -o design/assets/story2/k1-nachmittag.png "$base/hf_20260816_115412_3924555d-3714-4dbc-b0dc-fb34551a534b.png"
+          curl -fsSL -o design/assets/story2/k2-goldene-stunde.png "$base/hf_20260816_115458_6e6bd7e7-4393-4747-962f-161476dc2922.png"
+          curl -fsSL -o design/assets/story2/k3-daemmerung.png "$base/hf_20260816_115542_f0ab6d07-93f3-4e26-9f6a-47b4d57f5cdb.png"
+          curl -fsSL -o design/assets/story2/k4-buero-nacht.png "$base/hf_20260816_115626_115d8844-1254-471e-9742-7d4d1f532597.png"
+          curl -fsSL -o design/assets/story2/k5-licht-aus.png "$base/hf_20260816_115709_eb9d5c1f-8430-4a4a-b159-e44b80139bb6.png"
+
+          ls -la public/media design/assets/story2
+      - name: Committen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/media design/assets/story2
+          git commit -m "Werkfilm-Master (Tag->Nacht->Licht aus) montiert und scrub-enkodiert"
+          git push
