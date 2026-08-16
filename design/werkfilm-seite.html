@@ -238,36 +238,37 @@ input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border-radius
 .schritte p { margin-top: 0.7rem; font-size: 0.9rem; color: var(--nebel); }
 
 /* Kontakt */
-.kontakt-grid { display: grid; gap: 1.5rem; margin-top: 3rem; align-items: stretch; }
-.kontakt-karte { display: flex; flex-direction: column; }
-.calendly-box { flex: 1; margin-top: 1.4rem; min-height: 460px; border: 1px solid var(--linie); border-radius: 3px; background: var(--flaeche); display: grid; place-items: center; padding: 1.4rem; text-align: center; }
-.calendly-box iframe { width: 100%; height: 100%; min-height: 560px; border: 0; border-radius: 3px; }
-.kontakt-karte form { flex: 1; }
-@media (min-width: 900px) { .kontakt-grid { grid-template-columns: 1fr 1fr; } }
-.kontakt-karte { border: 1px solid var(--linie); border-radius: 4px; background: var(--graphit); padding: clamp(1.8rem, 3vw, 2.5rem); }
-.kontakt-karte.betont { border-color: rgba(143, 169, 189, 0.4); }
-.person { display: flex; align-items: center; gap: 1.1rem; }
-.person .foto {
-  width: 112px; height: 112px; border-radius: 50%; flex: none;
-  border: 1.5px solid var(--stahl); object-fit: cover;
-  display: grid; place-items: center;
-  background: var(--flaeche); color: var(--stahl);
-  font-weight: 700; font-size: 1.6rem; letter-spacing: 0.05em;
+.person-band {
+  margin-top: 2.6rem; display: flex; flex-wrap: wrap; align-items: center;
+  gap: 1.2rem 2rem; border: 1px solid rgba(143, 169, 189, 0.4); border-radius: 4px;
+  background: var(--graphit); padding: 1.3rem 1.6rem;
 }
-.person .name { font-weight: 700; font-size: 1.1rem; }
-.person .rolle { font-size: 0.88rem; color: var(--nebel); }
-.kontakt-karte p.text { margin-top: 1.3rem; color: var(--nebel); }
-.kontakt-karte .btn { margin-top: 1.6rem; }
-.kontakt-meta { margin-top: 1.6rem; display: grid; gap: 0.45rem; font-size: 0.92rem; color: var(--nebel); }
+.person-band .foto {
+  width: 96px; height: 96px; border-radius: 50%; flex: none;
+  border: 1.5px solid var(--stahl); object-fit: cover;
+}
+.person-band .wer { flex: 1 1 18rem; min-width: 15rem; }
+.person-band .name { font-weight: 700; font-size: 1.1rem; }
+.person-band .rolle { font-size: 0.88rem; color: var(--nebel); }
+.person-band .vita { margin-top: 0.55rem; max-width: 36rem; font-size: 0.9rem; color: var(--nebel); }
+.kontakt-grid { display: grid; gap: 1.5rem; margin-top: 1.5rem; align-items: start; }
+@media (min-width: 980px) { .kontakt-grid { grid-template-columns: 7fr 5fr; } }
+.kontakt-karte { border: 1px solid var(--linie); border-radius: 4px; background: var(--graphit); padding: clamp(1.4rem, 2.2vw, 1.8rem); }
+.kontakt-karte .karte-titel { font-weight: 700; font-size: 1.1rem; }
+.kontakt-karte p.text { margin-top: 0.6rem; font-size: 0.92rem; color: var(--nebel); }
+.calendly-box { margin-top: 1.2rem; border: 1px solid var(--linie); border-radius: 3px; background: var(--flaeche); }
+.calendly-box.wartend { display: grid; place-items: center; padding: 2.4rem 1.4rem; text-align: center; }
+.calendly-box iframe { display: block; width: 100%; height: 700px; border: 0; border-radius: 3px; }
+.kontakt-meta { display: grid; gap: 0.45rem; font-size: 0.92rem; color: var(--nebel); }
 .kontakt-meta a { color: var(--silber); text-decoration: none; font-weight: 600; }
 .kontakt-meta a:hover { color: var(--stahl); }
-form { display: grid; gap: 1.1rem; margin-top: 1.3rem; }
+form { display: grid; gap: 0.9rem; margin-top: 1.1rem; }
 form label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.35rem; }
 form label .opt { font-weight: 400; color: var(--nebel); }
 form input, form textarea {
   width: 100%; font: inherit; color: var(--silber);
   background: var(--flaeche); border: 1px solid var(--linie); border-radius: 3px;
-  padding: 0.8rem 1rem;
+  padding: 0.65rem 1rem;
 }
 #form-status { min-height: 1.5em; font-size: 0.9rem; font-weight: 600; color: var(--stahl); }
 .form-hinweis { font-size: 0.75rem; color: var(--nebel); }
@@ -293,6 +294,11 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
 .fuss .links { margin-left: auto; display: flex; gap: 2rem; }
 .fuss a, .fuss .kleinf { font-size: 0.88rem; color: var(--nebel); text-decoration: none; }
 .fuss a:hover { color: var(--stahl); }
+/* Impressum + Datenschutz: zusammengeklappt in der Fußzeile */
+.fuss-recht { max-width: 72rem; margin: 1.8rem auto 0; border-block: 0; border-top: 1px solid var(--linie); }
+.fuss-recht summary { padding: 1rem 3rem 1rem 0; font-size: 0.88rem; color: var(--nebel); }
+.fuss-recht summary:hover { color: var(--stahl); }
+.fuss-recht details div { font-size: 0.85rem; }
 
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
 .reveal.in { opacity: 1; transform: none; }
@@ -513,34 +519,36 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
     <div class="inner">
       <div class="trennmass" aria-hidden="true"><div class="l"></div><span>Kontakt</span><div class="l"></div></div>
       <h2 class="titel einzeilig reveal" id="kontakt-h">Der nächste Schritt ist ein <i>Gespräch</i>.</h2>
+      <div class="person-band reveal">
+        <img class="foto" src="{{IMG_PORTRAET}}" alt="Porträt von Oliver Fieder" width="96" height="96" />
+        <div class="wer">
+          <p class="name">Oliver Fieder</p>
+          <p class="rolle">Gründer und Berater, Mainfranken Digital</p>
+          <p class="vita">Selbstständig seit dem 15. Lebensjahr, über sechs
+          Jahre Unternehmer, seit rund drei Jahren in der Beratung, in
+          Projekten unter anderem mit Kunden wie Siemens.</p>
+        </div>
+        <div class="kontakt-meta">
+          <p>Telefon: <a href="tel:+491792137476">0179 213 74 76</a></p>
+          <p>E-Mail: <a href="mailto:oliver@mainfranken-digital.de">oliver@mainfranken-digital.de</a></p>
+          <p>Versbacher Straße 20 · 97078 Würzburg</p>
+        </div>
+      </div>
       <div class="kontakt-grid">
-        <div class="kontakt-karte betont reveal">
-          <div class="person">
-            <img class="foto" src="{{IMG_PORTRAET}}" alt="Porträt von Oliver Fieder" width="112" height="112" />
+        <div class="kontakt-karte reveal">
+          <p class="karte-titel">Termin direkt buchen</p>
+          <p class="text">Eine halbe Stunde, unverbindlich. Danach wissen
+          Sie, ob sich Digitalisierung und KI für Ihren Betrieb lohnen und
+          was der sinnvolle erste Schritt wäre.</p>
+          <div class="calendly-box wartend" id="calendly-box">
             <div>
-              <p class="name">Oliver Fieder</p>
-              <p class="rolle">Gründer und Berater, Mainfranken Digital</p>
+              <button class="btn" type="button" id="calendly-laden">Kalender anzeigen &amp; Termin buchen</button>
+              <p class="form-hinweis" style="margin-top:0.9rem;max-width:26rem;margin-inline:auto">Beim Laden des Kalenders werden Daten an Calendly (USA) übertragen. Details in der <a href="#datenschutz">Datenschutzerklärung</a>. Alternativ: <a href="https://calendly.com/oliver2004-fieder/30min" target="_blank" rel="noopener">Calendly in neuem Fenster öffnen</a>.</p>
             </div>
-          </div>
-          <p class="text blocksatz">Selbstständig seit dem 15. Lebensjahr,
-          heute über sechs Jahre Unternehmer und seit rund drei Jahren in der
-          Beratung tätig, in Projekten unter anderem mit Kunden wie Siemens.</p>
-          <p class="text blocksatz" style="margin-top:0.9rem">Eine halbe
-          Stunde, unverbindlich. Danach wissen Sie, ob sich Digitalisierung
-          und KI für Ihren Betrieb lohnen und was der sinnvolle erste Schritt
-          wäre.</p>
-          <div class="calendly-box" id="calendly-box">
-            <button class="btn" type="button" id="calendly-laden">Kalender anzeigen &amp; Termin buchen</button>
-            <p class="form-hinweis" style="margin-top:0.9rem">Beim Laden des Kalenders werden Daten an Calendly (USA) übertragen. Details in der <a href="#datenschutz">Datenschutzerklärung</a>. Alternativ: <a href="https://calendly.com/oliver2004-fieder/30min" target="_blank" rel="noopener">Calendly in neuem Fenster öffnen</a>.</p>
-          </div>
-          <div class="kontakt-meta">
-            <p>Telefon: <a href="tel:+491792137476">0179 213 74 76</a></p>
-            <p>E-Mail: <a href="mailto:oliver@mainfranken-digital.de">oliver@mainfranken-digital.de</a></p>
-            <p>Mainfranken Digital · Versbacher Straße 20 · 97078 Würzburg</p>
           </div>
         </div>
         <div class="kontakt-karte reveal">
-          <p class="name">Oder schreiben Sie kurz</p>
+          <p class="karte-titel">Oder schreiben Sie kurz</p>
           <form id="kontakt-formular" novalidate>
             <div>
               <label for="f-name">Ihr Name</label>
@@ -619,75 +627,6 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
     </div>
   </section>
 
-  <!-- ═══ Rechtliches ═══ -->
-  <section class="inhalt abgesetzt" id="rechtliches" aria-label="Rechtliches">
-    <div class="inner">
-      <div class="trennmass" aria-hidden="true"><div class="l"></div><span>Rechtliches</span><div class="l"></div></div>
-      <div class="faq-liste">
-        <details id="impressum">
-          <summary>Impressum</summary>
-          <div style="padding-bottom:1.5rem;color:var(--nebel);max-width:44rem">
-            <p><strong style="color:var(--silber)">Angaben gemäß § 5 DDG</strong></p>
-            <p style="margin-top:0.8rem">Fieder Handels GmbH<br />Versbacher Straße 20<br />97078 Würzburg</p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Vertreten durch:</strong><br />Geschäftsführer Oliver Fieder</p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Kontakt:</strong><br />Telefon: <a href="tel:+491792137476">0179 213 74 76</a><br />E-Mail: <a href="mailto:oliver@mainfranken-digital.de">oliver@mainfranken-digital.de</a></p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Registereintrag:</strong><br />Eintragung im Handelsregister.<br />Registergericht: Amtsgericht Würzburg<br />Registernummer: HRB 17397</p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Umsatzsteuer-ID:</strong><br />Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: DE3370133371</p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong><br />Oliver Fieder, Versbacher Straße 20, 97078 Würzburg</p>
-            <p style="margin-top:0.8rem">„Mainfranken Digital“ ist ein Angebot der Fieder Handels GmbH.</p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Verbraucherstreitbeilegung:</strong><br />Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
-          </div>
-        </details>
-        <details id="datenschutz">
-          <summary>Datenschutzerklärung</summary>
-          <div style="padding-bottom:1.5rem;color:var(--nebel);max-width:44rem" class="blocksatz">
-            <p><strong style="color:var(--silber)">1. Verantwortlicher</strong><br />
-            Fieder Handels GmbH, Versbacher Straße 20, 97078 Würzburg,
-            Telefon: 0179 213 74 76, E-Mail: oliver@mainfranken-digital.de.</p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">2. Hosting und Server-Logdateien</strong><br />
-            Beim Aufruf dieser Website verarbeitet der Hosting-Anbieter automatisch
-            technisch notwendige Daten (z.&nbsp;B. IP-Adresse, Datum und Uhrzeit des
-            Abrufs, aufgerufene Seite, Browsertyp), um die Website auszuliefern und
-            ihre Stabilität und Sicherheit zu gewährleisten (Art.&nbsp;6 Abs.&nbsp;1
-            lit.&nbsp;f DSGVO). Die Logdaten werden nach spätestens sieben Tagen
-            gelöscht, soweit keine sicherheitsrelevante Aufbewahrung erforderlich ist.
-            Diese Website setzt keine Cookies zu Analyse- oder Werbezwecken ein und
-            verwendet kein Tracking.</p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">3. Kontaktaufnahme</strong><br />
-            Wenn Sie uns per Formular, E-Mail oder Telefon kontaktieren, verarbeiten
-            wir die von Ihnen mitgeteilten Daten (Name, Betrieb, Kontaktdaten, Inhalt
-            der Anfrage) ausschließlich zur Bearbeitung Ihrer Anfrage und für
-            Anschlussfragen (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO, bei
-            allgemeinen Anfragen Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Die
-            Daten werden gelöscht, sobald sie für die Bearbeitung nicht mehr
-            erforderlich sind und keine gesetzlichen Aufbewahrungspflichten
-            entgegenstehen.</p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">4. Terminbuchung über Calendly</strong><br />
-            Für die Online-Terminbuchung nutzen wir den Dienst Calendly der Calendly
-            LLC, 1315 Peachtree St NE, Atlanta, GA 30309, USA. Der Kalender wird erst
-            geladen, wenn Sie ihn aktiv anklicken; erst dann werden Daten (u.&nbsp;a.
-            IP-Adresse sowie die von Ihnen eingegebenen Termindaten) an Calendly
-            übertragen, ggf. auch in die USA. Rechtsgrundlage ist Ihre Einwilligung
-            durch das aktive Laden (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO) sowie
-            die Durchführung vorvertraglicher Maßnahmen (Art.&nbsp;6 Abs.&nbsp;1
-            lit.&nbsp;b DSGVO). Calendly ist nach dem EU-U.S. Data Privacy Framework
-            zertifiziert. Details: <a href="https://calendly.com/privacy" target="_blank" rel="noopener">calendly.com/privacy</a>.</p>
-            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">5. Ihre Rechte</strong><br />
-            Sie haben das Recht auf Auskunft (Art.&nbsp;15 DSGVO), Berichtigung
-            (Art.&nbsp;16), Löschung (Art.&nbsp;17), Einschränkung der Verarbeitung
-            (Art.&nbsp;18), Datenübertragbarkeit (Art.&nbsp;20) sowie Widerspruch
-            gegen Verarbeitungen auf Grundlage von Art.&nbsp;6 Abs.&nbsp;1
-            lit.&nbsp;f DSGVO (Art.&nbsp;21). Eine erteilte Einwilligung können Sie
-            jederzeit mit Wirkung für die Zukunft widerrufen. Außerdem haben Sie das
-            Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren,
-            z.&nbsp;B. beim Bayerischen Landesamt für Datenschutzaufsicht (BayLDA),
-            Promenade 18, 91522 Ansbach.</p>
-            <p style="margin-top:0.8rem">Stand: August 2026</p>
-          </div>
-        </details>
-      </div>
-    </div>
-  </section>
 </main>
 
 <footer>
@@ -699,6 +638,69 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
       <a href="#datenschutz">Datenschutz</a>
     </div>
   </div>
+        <div class="faq-liste fuss-recht">
+          <details id="impressum">
+            <summary>Impressum</summary>
+            <div style="padding-bottom:1.5rem;color:var(--nebel);max-width:44rem">
+              <p><strong style="color:var(--silber)">Angaben gemäß § 5 DDG</strong></p>
+              <p style="margin-top:0.8rem">Fieder Handels GmbH<br />Versbacher Straße 20<br />97078 Würzburg</p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Vertreten durch:</strong><br />Geschäftsführer Oliver Fieder</p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Kontakt:</strong><br />Telefon: <a href="tel:+491792137476">0179 213 74 76</a><br />E-Mail: <a href="mailto:oliver@mainfranken-digital.de">oliver@mainfranken-digital.de</a></p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Registereintrag:</strong><br />Eintragung im Handelsregister.<br />Registergericht: Amtsgericht Würzburg<br />Registernummer: HRB 17397</p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Umsatzsteuer-ID:</strong><br />Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: DE3370133371</p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong><br />Oliver Fieder, Versbacher Straße 20, 97078 Würzburg</p>
+              <p style="margin-top:0.8rem">„Mainfranken Digital“ ist ein Angebot der Fieder Handels GmbH.</p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Verbraucherstreitbeilegung:</strong><br />Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+            </div>
+          </details>
+          <details id="datenschutz">
+            <summary>Datenschutzerklärung</summary>
+            <div style="padding-bottom:1.5rem;color:var(--nebel);max-width:44rem" class="blocksatz">
+              <p><strong style="color:var(--silber)">1. Verantwortlicher</strong><br />
+              Fieder Handels GmbH, Versbacher Straße 20, 97078 Würzburg,
+              Telefon: 0179 213 74 76, E-Mail: oliver@mainfranken-digital.de.</p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">2. Hosting und Server-Logdateien</strong><br />
+              Beim Aufruf dieser Website verarbeitet der Hosting-Anbieter automatisch
+              technisch notwendige Daten (z.&nbsp;B. IP-Adresse, Datum und Uhrzeit des
+              Abrufs, aufgerufene Seite, Browsertyp), um die Website auszuliefern und
+              ihre Stabilität und Sicherheit zu gewährleisten (Art.&nbsp;6 Abs.&nbsp;1
+              lit.&nbsp;f DSGVO). Die Logdaten werden nach spätestens sieben Tagen
+              gelöscht, soweit keine sicherheitsrelevante Aufbewahrung erforderlich ist.
+              Diese Website setzt keine Cookies zu Analyse- oder Werbezwecken ein und
+              verwendet kein Tracking.</p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">3. Kontaktaufnahme</strong><br />
+              Wenn Sie uns per Formular, E-Mail oder Telefon kontaktieren, verarbeiten
+              wir die von Ihnen mitgeteilten Daten (Name, Betrieb, Kontaktdaten, Inhalt
+              der Anfrage) ausschließlich zur Bearbeitung Ihrer Anfrage und für
+              Anschlussfragen (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO, bei
+              allgemeinen Anfragen Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Die
+              Daten werden gelöscht, sobald sie für die Bearbeitung nicht mehr
+              erforderlich sind und keine gesetzlichen Aufbewahrungspflichten
+              entgegenstehen.</p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">4. Terminbuchung über Calendly</strong><br />
+              Für die Online-Terminbuchung nutzen wir den Dienst Calendly der Calendly
+              LLC, 1315 Peachtree St NE, Atlanta, GA 30309, USA. Der Kalender wird erst
+              geladen, wenn Sie ihn aktiv anklicken; erst dann werden Daten (u.&nbsp;a.
+              IP-Adresse sowie die von Ihnen eingegebenen Termindaten) an Calendly
+              übertragen, ggf. auch in die USA. Rechtsgrundlage ist Ihre Einwilligung
+              durch das aktive Laden (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO) sowie
+              die Durchführung vorvertraglicher Maßnahmen (Art.&nbsp;6 Abs.&nbsp;1
+              lit.&nbsp;b DSGVO). Calendly ist nach dem EU-U.S. Data Privacy Framework
+              zertifiziert. Details: <a href="https://calendly.com/privacy" target="_blank" rel="noopener">calendly.com/privacy</a>.</p>
+              <p style="margin-top:0.8rem"><strong style="color:var(--silber)">5. Ihre Rechte</strong><br />
+              Sie haben das Recht auf Auskunft (Art.&nbsp;15 DSGVO), Berichtigung
+              (Art.&nbsp;16), Löschung (Art.&nbsp;17), Einschränkung der Verarbeitung
+              (Art.&nbsp;18), Datenübertragbarkeit (Art.&nbsp;20) sowie Widerspruch
+              gegen Verarbeitungen auf Grundlage von Art.&nbsp;6 Abs.&nbsp;1
+              lit.&nbsp;f DSGVO (Art.&nbsp;21). Eine erteilte Einwilligung können Sie
+              jederzeit mit Wirkung für die Zukunft widerrufen. Außerdem haben Sie das
+              Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren,
+              z.&nbsp;B. beim Bayerischen Landesamt für Datenschutzaufsicht (BayLDA),
+              Promenade 18, 91522 Ansbach.</p>
+              <p style="margin-top:0.8rem">Stand: August 2026</p>
+            </div>
+          </details>
+        </div>
 </footer>
 
 <script>
@@ -771,16 +773,26 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
   if (calendlyKnopf) {
     calendlyKnopf.addEventListener("click", function () {
       var box = document.getElementById("calendly-box");
+      box.classList.remove("wartend");
       box.innerHTML = "";
       var frame = document.createElement("iframe");
       frame.src = "https://calendly.com/oliver2004-fieder/30min?embed_type=Inline&hide_landing_page_details=1&hide_gdpr_banner=1&background_color=14171c&text_color=e9e7e2&primary_color=8fa9bd";
       frame.title = "Termin buchen (Calendly)";
       frame.loading = "lazy";
-      box.style.display = "block";
-      box.style.padding = "0";
       box.appendChild(frame);
     });
   }
+
+  /* Rechtstexte: Fußzeilen-Link klappt den jeweiligen Text auf */
+  function rechtstextOeffnen() {
+    var id = location.hash.slice(1);
+    if (id === "impressum" || id === "datenschutz") {
+      var el = document.getElementById(id);
+      if (el) el.open = true;
+    }
+  }
+  rechtstextOeffnen();
+  window.addEventListener("hashchange", rechtstextOeffnen);
 
   /* Kontaktformular */
   var EMAIL = "oliver@mainfranken-digital.de";

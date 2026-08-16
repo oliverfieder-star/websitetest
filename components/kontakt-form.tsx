@@ -6,7 +6,7 @@ import { useState } from "react";
 const EMAIL = "oliver@mainfranken-digital.de";
 
 const feld =
-  "w-full rounded-lg border border-linie bg-nacht px-4 py-3 text-schrift placeholder:text-gedimmt/60 focus:outline-3 focus:outline-stahl";
+  "w-full rounded-lg border border-linie bg-nacht px-4 py-2.5 text-schrift placeholder:text-gedimmt/60 focus:outline-3 focus:outline-stahl";
 
 export function KontaktForm() {
   const [status, setStatus] = useState("");
@@ -32,7 +32,7 @@ export function KontaktForm() {
   }
 
   return (
-    <form onSubmit={absenden} noValidate className="grid gap-5">
+    <form onSubmit={absenden} noValidate className="grid gap-4">
       <div>
         <label htmlFor="f-name" className="mb-1.5 block text-sm font-semibold">
           Ihr Name
@@ -56,17 +56,17 @@ export function KontaktForm() {
           Worum geht es?{" "}
           <span className="font-normal text-gedimmt">(zwei Sätze genügen)</span>
         </label>
-        <textarea id="f-nachricht" name="nachricht" rows={4} className={feld} />
+        <textarea id="f-nachricht" name="nachricht" rows={3} className={feld} />
       </div>
       <div>
         <button
           type="submit"
-          className="cursor-pointer rounded-full bg-stahl px-8 py-4 text-base font-semibold text-tinte transition-transform hover:-translate-y-0.5 hover:bg-stahl-hell"
+          className="cursor-pointer rounded-full bg-stahl px-7 py-3 text-sm font-semibold text-tinte transition-transform hover:-translate-y-0.5 hover:bg-stahl-hell"
         >
           Nachricht senden
         </button>
       </div>
-      <p role="status" className="min-h-6 text-sm font-semibold text-stahl">
+      <p role="status" className="min-h-5 text-sm font-semibold text-stahl">
         {status}
       </p>
       <p className="text-xs leading-relaxed text-gedimmt">

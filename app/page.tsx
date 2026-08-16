@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Reveal } from "@/components/reveal";
 import { Phone } from "lucide-react";
 import { CalendlyBox } from "@/components/calendly-box";
+import { Rechtstexte } from "@/components/rechtstexte";
 
 /** Maßketten-Trenner (Zeichensprache) */
 function Trenner({ children }: { children: React.ReactNode }) {
@@ -263,56 +264,58 @@ export default function Home() {
               Der nächste Schritt ist ein <span className="text-stahl">Gespräch</span>.
             </H2>
           </Reveal>
-          <div className="mt-12 grid gap-6 md:grid-cols-2">
-            <Reveal className="flex h-full flex-col rounded-md border border-stahl/40 bg-nacht p-8 md:p-10">
-              <div className="flex items-center gap-4">
-                <img
-                  src="/media/oliver-portraet.jpg"
-                  alt="Porträt von Oliver Fieder"
-                  width={112}
-                  height={112}
-                  className="h-28 w-28 flex-none rounded-full border-[1.5px] border-stahl object-cover"
-                />
-                <div>
-                  <p className="text-lg font-bold">Oliver Fieder</p>
-                  <p className="text-sm text-gedimmt">
-                    Gründer und Berater, Mainfranken Digital
-                  </p>
-                </div>
-              </div>
-              <p className="mt-6 text-justify leading-relaxed text-gedimmt [hyphens:auto]">
-                Selbstständig seit dem 15. Lebensjahr, heute über sechs Jahre
-                Unternehmer und seit rund drei Jahren in der Beratung tätig, in
+          {/* Personen-Band: Porträt, Erfahrung, Erreichbarkeit */}
+          <Reveal className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5 rounded-md border border-stahl/40 bg-nacht px-6 py-5 md:px-8">
+            <img
+              src="/media/oliver-portraet.jpg"
+              alt="Porträt von Oliver Fieder"
+              width={96}
+              height={96}
+              className="h-24 w-24 flex-none rounded-full border-[1.5px] border-stahl object-cover"
+            />
+            <div className="min-w-60 flex-1 basis-72">
+              <p className="text-lg font-bold">Oliver Fieder</p>
+              <p className="text-sm text-gedimmt">
+                Gründer und Berater, Mainfranken Digital
+              </p>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-gedimmt">
+                Selbstständig seit dem 15. Lebensjahr, über sechs Jahre
+                Unternehmer, seit rund drei Jahren in der Beratung, in
                 Projekten unter anderem mit Kunden wie Siemens.
               </p>
-              <p className="mt-4 text-justify leading-relaxed text-gedimmt [hyphens:auto]">
+            </div>
+            <div className="space-y-1.5 text-sm text-gedimmt">
+              <p className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-stahl" aria-hidden="true" />
+                <a
+                  href="tel:+491792137476"
+                  className="font-semibold text-schrift hover:text-stahl"
+                >
+                  0179 213 74 76
+                </a>
+              </p>
+              <p>
+                <a href="mailto:oliver@mainfranken-digital.de" className="text-schrift hover:text-stahl">
+                  oliver@mainfranken-digital.de
+                </a>
+              </p>
+              <p>Versbacher Straße 20 · 97078 Würzburg</p>
+            </div>
+          </Reveal>
+
+          <div className="mt-6 grid items-start gap-6 lg:grid-cols-[7fr_5fr]">
+            <Reveal className="rounded-md border border-linie bg-nacht p-6 md:p-7">
+              <p className="text-lg font-bold">Termin direkt buchen</p>
+              <p className="mt-2 text-sm leading-relaxed text-gedimmt">
                 Eine halbe Stunde, unverbindlich. Danach wissen Sie, ob sich
                 Digitalisierung und KI für Ihren Betrieb lohnen und was der
                 sinnvolle erste Schritt wäre.
               </p>
               <CalendlyBox />
-              <div className="mt-7 space-y-1.5 text-sm text-gedimmt">
-                <p className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-stahl" aria-hidden="true" />
-                  <a
-                    href="tel:+491792137476"
-                    className="font-semibold text-schrift hover:text-stahl"
-                  >
-                    0179 213 74 76
-                  </a>
-                </p>
-                <p>
-                  E-Mail:{" "}
-                  <a href="mailto:oliver@mainfranken-digital.de" className="text-schrift hover:text-stahl">
-                    oliver@mainfranken-digital.de
-                  </a>
-                </p>
-                <p>Mainfranken Digital · Versbacher Straße 20 · 97078 Würzburg</p>
-              </div>
             </Reveal>
-            <Reveal delay={120} className="flex h-full flex-col rounded-md border border-linie bg-nacht p-8 md:p-10">
+            <Reveal delay={120} className="rounded-md border border-linie bg-nacht p-6 md:p-7">
               <p className="text-lg font-bold">Oder schreiben Sie kurz</p>
-              <div className="mt-5">
+              <div className="mt-4">
                 <KontaktForm />
               </div>
             </Reveal>
@@ -372,154 +375,6 @@ export default function Home() {
             </Reveal>
           </div>
         </section>
-        {/* ── Rechtliches ───────────────────────────────────────── */}
-        <section aria-label="Rechtliches" className="mx-auto max-w-4xl px-5 py-20">
-          <Trenner>Rechtliches</Trenner>
-          <div className="divide-y divide-linie border-y border-linie text-sm leading-relaxed text-gedimmt">
-            <details id="impressum" className="group">
-              <summary className="cursor-pointer list-none py-5 text-base font-semibold text-schrift hover:text-stahl">
-                Impressum
-              </summary>
-              <div className="max-w-2xl space-y-3 pb-6">
-                <p className="font-semibold text-schrift">Angaben gemäß § 5 DDG</p>
-                <p>
-                  Fieder Handels GmbH
-                  <br />
-                  Versbacher Straße 20
-                  <br />
-                  97078 Würzburg
-                </p>
-                <p>
-                  <span className="font-semibold text-schrift">Vertreten durch:</span>
-                  <br />
-                  Geschäftsführer Oliver Fieder
-                </p>
-                <p>
-                  <span className="font-semibold text-schrift">Kontakt:</span>
-                  <br />
-                  Telefon: <a href="tel:+491792137476">0179 213 74 76</a>
-                  <br />
-                  E-Mail:{" "}
-                  <a href="mailto:oliver@mainfranken-digital.de">
-                    oliver@mainfranken-digital.de
-                  </a>
-                </p>
-                <p>
-                  <span className="font-semibold text-schrift">Registereintrag:</span>
-                  <br />
-                  Eintragung im Handelsregister.
-                  <br />
-                  Registergericht: Amtsgericht Würzburg
-                  <br />
-                  Registernummer: HRB 17397
-                </p>
-                <p>
-                  <span className="font-semibold text-schrift">Umsatzsteuer-ID:</span>
-                  <br />
-                  Umsatzsteuer-Identifikationsnummer gemäß § 27a
-                  Umsatzsteuergesetz: DE3370133371
-                </p>
-                <p>
-                  <span className="font-semibold text-schrift">
-                    Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:
-                  </span>
-                  <br />
-                  Oliver Fieder, Versbacher Straße 20, 97078 Würzburg
-                </p>
-                <p>„Mainfranken Digital“ ist ein Angebot der Fieder Handels GmbH.</p>
-                <p>
-                  <span className="font-semibold text-schrift">
-                    Verbraucherstreitbeilegung:
-                  </span>
-                  <br />
-                  Wir sind nicht bereit oder verpflichtet, an
-                  Streitbeilegungsverfahren vor einer
-                  Verbraucherschlichtungsstelle teilzunehmen.
-                </p>
-              </div>
-            </details>
-            <details id="datenschutz" className="group">
-              <summary className="cursor-pointer list-none py-5 text-base font-semibold text-schrift hover:text-stahl">
-                Datenschutzerklärung
-              </summary>
-              <div className="max-w-2xl space-y-3 pb-6 text-justify [hyphens:auto]">
-                <p>
-                  <span className="font-semibold text-schrift">1. Verantwortlicher</span>
-                  <br />
-                  Fieder Handels GmbH, Versbacher Straße 20, 97078 Würzburg,
-                  Telefon: 0179 213 74 76, E-Mail: oliver@mainfranken-digital.de.
-                </p>
-                <p>
-                  <span className="font-semibold text-schrift">
-                    2. Hosting und Server-Logdateien
-                  </span>
-                  <br />
-                  Beim Aufruf dieser Website verarbeitet der Hosting-Anbieter
-                  automatisch technisch notwendige Daten (z. B. IP-Adresse, Datum
-                  und Uhrzeit des Abrufs, aufgerufene Seite, Browsertyp), um die
-                  Website auszuliefern und ihre Stabilität und Sicherheit zu
-                  gewährleisten (Art. 6 Abs. 1 lit. f DSGVO). Die Logdaten werden
-                  nach spätestens sieben Tagen gelöscht, soweit keine
-                  sicherheitsrelevante Aufbewahrung erforderlich ist. Diese
-                  Website setzt keine Cookies zu Analyse- oder Werbezwecken ein
-                  und verwendet kein Tracking.
-                </p>
-                <p>
-                  <span className="font-semibold text-schrift">3. Kontaktaufnahme</span>
-                  <br />
-                  Wenn Sie uns per Formular, E-Mail oder Telefon kontaktieren,
-                  verarbeiten wir die von Ihnen mitgeteilten Daten (Name,
-                  Betrieb, Kontaktdaten, Inhalt der Anfrage) ausschließlich zur
-                  Bearbeitung Ihrer Anfrage und für Anschlussfragen (Art. 6
-                  Abs. 1 lit. b DSGVO, bei allgemeinen Anfragen Art. 6 Abs. 1
-                  lit. f DSGVO). Die Daten werden gelöscht, sobald sie für die
-                  Bearbeitung nicht mehr erforderlich sind und keine
-                  gesetzlichen Aufbewahrungspflichten entgegenstehen.
-                </p>
-                <p>
-                  <span className="font-semibold text-schrift">
-                    4. Terminbuchung über Calendly
-                  </span>
-                  <br />
-                  Für die Online-Terminbuchung nutzen wir den Dienst Calendly
-                  der Calendly LLC, 1315 Peachtree St NE, Atlanta, GA 30309,
-                  USA. Der Kalender wird erst geladen, wenn Sie ihn aktiv
-                  anklicken; erst dann werden Daten (u. a. IP-Adresse sowie die
-                  von Ihnen eingegebenen Termindaten) an Calendly übertragen,
-                  ggf. auch in die USA. Rechtsgrundlage ist Ihre Einwilligung
-                  durch das aktive Laden (Art. 6 Abs. 1 lit. a DSGVO) sowie die
-                  Durchführung vorvertraglicher Maßnahmen (Art. 6 Abs. 1 lit. b
-                  DSGVO). Calendly ist nach dem EU-U.S. Data Privacy Framework
-                  zertifiziert. Details:{" "}
-                  <a
-                    href="https://calendly.com/privacy"
-                    target="_blank"
-                    rel="noopener"
-                    className="text-stahl underline underline-offset-2"
-                  >
-                    calendly.com/privacy
-                  </a>
-                  .
-                </p>
-                <p>
-                  <span className="font-semibold text-schrift">5. Ihre Rechte</span>
-                  <br />
-                  Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung
-                  (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung
-                  (Art. 18), Datenübertragbarkeit (Art. 20) sowie Widerspruch
-                  gegen Verarbeitungen auf Grundlage von Art. 6 Abs. 1 lit. f
-                  DSGVO (Art. 21). Eine erteilte Einwilligung können Sie
-                  jederzeit mit Wirkung für die Zukunft widerrufen. Außerdem
-                  haben Sie das Recht, sich bei einer
-                  Datenschutz-Aufsichtsbehörde zu beschweren, z. B. beim
-                  Bayerischen Landesamt für Datenschutzaufsicht (BayLDA),
-                  Promenade 18, 91522 Ansbach.
-                </p>
-                <p>Stand: August 2026</p>
-              </div>
-            </details>
-          </div>
-        </section>
       </main>
 
       <footer className="border-t border-linie">
@@ -546,6 +401,7 @@ export default function Home() {
             </a>
           </div>
         </div>
+        <Rechtstexte />
       </footer>
     </>
   );
