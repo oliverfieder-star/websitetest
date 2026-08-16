@@ -1,7 +1,6 @@
 # Holt die von Higgsfield generierten Medien in das Repo.
 # Die Build-Umgebung erreicht den Higgsfield-CDN nicht direkt; der
-# GitHub-Runner schon. Videos werden zusätzlich keyframe-dicht
-# re-enkodiert (-g 6), damit Scroll-Scrubbing butterweich läuft.
+# GitHub-Runner schon.
 name: fetch-assets
 
 on:
@@ -18,42 +17,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: ffmpeg installieren
-        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
       - name: Medien laden
         run: |
           base="https://d8j0ntlcm91z4.cloudfront.net/user_3HwhP6y3EJ5uDvH1ffTg5H1lYGM"
-          mkdir -p public/media design/assets
+          mkdir -p design/assets
 
-          # Richtung B — Werkfilm (Videos)
-          curl -fsSL -o /tmp/hobel.mp4   "$base/hf_20260815_154830_b90e45ac-9d05-48f0-9864-56e05090d333.mp4"
-          curl -fsSL -o /tmp/fenster.mp4 "$base/hf_20260815_154846_4f3a49fe-17f8-4b31-9817-12b33416bb67.mp4"
+          # Porträt Oliver Fieder (nano_banana, zwei Varianten)
+          curl -fsSL -o design/assets/portraet-v1.png "$base/hf_20260816_144453_7d2dffb9-2333-484a-a996-43d2f6e0ad2c.png"
+          curl -fsSL -o design/assets/portraet-v2.png "$base/hf_20260816_144453_feb4d932-bce5-49ac-ab74-505b861d11a8.png"
 
-          # Scrub-Fassungen: dichte Keyframes, stumm, 1280 breit
-          ffmpeg -y -i /tmp/hobel.mp4   -an -vf scale=1280:-2 -g 6 -crf 27 -pix_fmt yuv420p -movflags +faststart public/media/hobel-scrub.mp4
-          ffmpeg -y -i /tmp/fenster.mp4 -an -vf scale=1280:-2 -g 6 -crf 27 -pix_fmt yuv420p -movflags +faststart public/media/fenster-scrub.mp4
-          # Abspiel-Fassungen (Vorspann), etwas kleiner
-          ffmpeg -y -i /tmp/hobel.mp4   -an -vf scale=1280:-2 -crf 26 -pix_fmt yuv420p -movflags +faststart public/media/hobel.mp4
-          ffmpeg -y -i /tmp/fenster.mp4 -an -vf scale=1280:-2 -crf 26 -pix_fmt yuv420p -movflags +faststart public/media/fenster.mp4
-          # Poster
-          ffmpeg -y -i /tmp/hobel.mp4 -frames:v 1 -q:v 3 public/media/hobel-poster.jpg
-
-          # Richtung A — helle Werkstatt / Richtung C — Material-Makros
-          curl -fsSL -o design/assets/werkstatt-hell.png "$base/hf_20260815_160524_79362229-31a1-4f19-84f7-93bb67dd3441.png"
-          curl -fsSL -o design/assets/kalkputz.png       "$base/hf_20260815_154834_8e40d282-3f44-4f74-9320-565587c8a175.png"
-          curl -fsSL -o design/assets/eiche-makro.png    "$base/hf_20260815_154834_2be93d3b-7542-46b9-89a8-f4363b68ef86.png"
-
-          # Story-Keyframes: dieselbe Halle zu drei Tageszeiten (Konsistenztest)
-          mkdir -p design/assets/story
-          curl -fsSL -o design/assets/story/halle-nachmittag.png "$base/hf_20260816_094124_36a10718-50c0-4bc9-af6d-5d935dc67d7b.png"
-          curl -fsSL -o design/assets/story/halle-daemmerung.png "$base/hf_20260816_094158_7905a8bc-3a59-4223-abea-2336669c56fa.png"
-          curl -fsSL -o design/assets/story/halle-licht-aus.png  "$base/hf_20260816_094259_1203f9a8-7ff4-4e74-ac2b-5ae406145189.png"
-
-          ls -la public/media design/assets
+          ls -la design/assets
       - name: Committen
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/media design/assets design/assets/story
-          git commit -m "Higgsfield-Medien: Werkfilm-Clips (Scrub-Fassung), helle Werkstatt, Material-Makros"
+          git add design/assets
+          git commit -m "Higgsfield-Porträt Oliver Fieder (zwei Varianten)"
           git push
