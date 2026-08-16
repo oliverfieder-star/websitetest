@@ -16,6 +16,7 @@ type Tafel = {
   von: number;
   bis: number;
   pos: string;
+  posGross?: boolean;
   titel: React.ReactNode;
   sub?: string;
   cta?: boolean;
@@ -26,39 +27,40 @@ const TAFELN: Tafel[] = [
     von: 0,
     bis: 0.13,
     pos: "Mainfranken Digital",
+    posGross: true,
     titel: (
       <>
         KI und Digitalisierung für Ihren <i className="not-italic text-stahl">Handwerksbetrieb</i>.
       </>
     ),
-    sub: "Scrollen Sie durch einen Arbeitstag — bis zum Feierabend.",
+    sub: "Wir digitalisieren Büro und Verwaltung in Handwerksbetrieben. Von der ersten Analyse bis zur fertigen Umsetzung.",
   },
   {
     von: 0.2,
     bis: 0.36,
-    pos: "These 01",
+    pos: "Digitalisierung & KI",
     titel: (
       <>
-        Weniger Zeit im <i className="not-italic text-stahl">Büro</i>.
+        Weniger Zeit für <i className="not-italic text-stahl">Büro und Verwaltung</i>.
       </>
     ),
-    sub: "Angebote, Rechnungen und Stundenzettel laufen tagsüber automatisiert mit — während Ihr Betrieb arbeitet.",
+    sub: "Durch Digitalisierung und den Einsatz künstlicher Intelligenz gestalten wir Ihre Abläufe effizienter. Beratung und Umsetzung aus einer Hand.",
   },
   {
     von: 0.42,
     bis: 0.58,
-    pos: "These 02 — Förderung",
+    pos: "Förderung",
     titel: (
       <>
-        Digitalbonus Bayern: bis zu <i className="not-italic text-stahl">50 %</i> erstattet.
+        Bis zu <i className="not-italic text-stahl">50 %</i> der Kosten erstattet bekommen.
       </>
     ),
-    sub: "Bis zu 7.500 € Zuschuss für Ihr Digitalisierungsprojekt — den Antrag klären wir gemeinsam.",
+    sub: "Bis zu 7.500 € Zuschuss über den Digitalbonus Bayern für unser gemeinsames Projekt.",
   },
   {
     von: 0.66,
     bis: 0.8,
-    pos: "21:15 Uhr — nur das Büro leuchtet noch",
+    pos: "Nur das Büro leuchtet noch",
     titel: (
       <>
         Damit auch das Büro endlich <i className="not-italic text-stahl">Feierabend</i> hat.
@@ -78,14 +80,6 @@ const TAFELN: Tafel[] = [
     cta: true,
   },
 ];
-
-function uhrzeit(p: number) {
-  if (p >= 0.9) return "18:02"; // die Pointe: Feierabend zur Feierabendzeit
-  const start = 15.5 * 60;
-  const ende = 21.75 * 60;
-  const min = Math.round(start + (ende - start) * (p / 0.9));
-  return `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
-}
 
 export function Werkfilm() {
   const filmRef = useRef<HTMLElement>(null);
@@ -146,16 +140,6 @@ export function Werkfilm() {
         </video>
         <div className="absolute inset-0 bg-gradient-to-b from-nacht/20 to-nacht/30" />
 
-        {/* Uhrzeit-Stempel (Zeichensprache) */}
-        <p
-          aria-hidden="true"
-          className={`absolute right-5 top-[5.2rem] z-10 rounded-sm border px-3.5 py-1.5 font-mono text-[13px] tracking-[0.18em] tabular-nums backdrop-blur-sm transition-colors md:right-12 ${
-            p >= 0.9 ? "border-stahl text-stahl" : "border-linie text-schrift"
-          } bg-nacht/55`}
-        >
-          {uhrzeit(p)}
-        </p>
-
         {/* Tageslinie */}
         <div
           aria-hidden="true"
@@ -172,34 +156,39 @@ export function Werkfilm() {
                 an ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
               }`}
             >
-              <div>
-                <p className="font-mono text-[11.5px] font-medium uppercase tracking-[0.3em] text-stahl">
-                  <span className="opacity-45">—— </span>
-                  {t.pos}
-                  <span className="opacity-45"> ——</span>
-                </p>
-                <h2 className="font-display mx-auto mt-4 max-w-[22ch] text-balance text-[clamp(1.9rem,5.2vw,4.2rem)] font-bold uppercase leading-[1.04] [text-shadow:0_2px_44px_rgba(0,0,0,0.75)]">
+              {/* Scrim: hält die Tafel auch über hellen Bildstellen lesbar */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-[radial-gradient(ellipse_62%_52%_at_50%_50%,rgba(9,11,14,0.78),rgba(9,11,14,0.42)_55%,transparent_78%)]"
+              />
+              <div className="relative">
+                {t.posGross ? (
+                  <p className="font-mono text-[clamp(0.95rem,1.6vw,1.25rem)] font-medium uppercase tracking-[0.3em] text-schrift">
+                    Mainfranken<span className="text-stahl"> Digital</span>
+                  </p>
+                ) : (
+                  <p className="font-mono text-xs font-medium uppercase tracking-[0.28em] text-stahl">
+                    {t.pos}
+                  </p>
+                )}
+                <h2 className="font-display mx-auto mt-4 max-w-[20ch] text-balance text-[clamp(1.9rem,5.2vw,4.2rem)] font-bold uppercase leading-[1.05] [text-shadow:0_2px_22px_rgba(0,0,0,0.95),0_2px_60px_rgba(0,0,0,0.85)]">
                   {t.titel}
                 </h2>
                 {t.sub && (
-                  <p className="mx-auto mt-5 max-w-lg text-schrift/90 [text-shadow:0_1px_20px_rgba(0,0,0,0.8)]">
+                  <p className="mx-auto mt-5 max-w-xl text-[1.08rem] text-[#f4f2ee] [text-shadow:0_1px_14px_rgba(0,0,0,0.95),0_1px_40px_rgba(0,0,0,0.9)]">
                     {t.sub}
                   </p>
                 )}
                 {t.cta && (
-                  <div className="pointer-events-auto mt-9 flex flex-wrap items-center justify-center gap-5">
+                  <div className="pointer-events-auto mt-9">
                     <a
-                      href="#angebot"
-                      className="rounded-sm bg-stahl px-8 py-4 text-sm font-bold uppercase tracking-wider text-tinte transition hover:-translate-y-0.5 hover:bg-stahl-hell"
+                      href="https://calendly.com/oliver2004-fieder/30min"
+                      target="_blank"
+                      rel="noopener"
+                      className="inline-block rounded-sm bg-stahl px-9 py-4 text-sm font-bold uppercase tracking-wider text-tinte shadow-[0_14px_44px_-14px_rgba(143,169,189,0.55)] transition hover:-translate-y-0.5 hover:bg-stahl-hell"
                     >
-                      Erstgespräch vereinbaren
+                      Gespräch vereinbaren
                     </a>
-                    <p className="text-sm text-gedimmt">
-                      oder direkt anrufen:{" "}
-                      <strong className="whitespace-nowrap text-schrift">
-                        [PLATZHALTER Telefon]
-                      </strong>
-                    </p>
                   </div>
                 )}
               </div>
@@ -207,13 +196,19 @@ export function Werkfilm() {
           );
         })}
 
-        <p
-          className={`absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-[11px] font-semibold uppercase tracking-[0.28em] text-gedimmt transition-opacity ${
-            p > 0.04 ? "opacity-0" : "opacity-100"
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 transition-opacity ${
+            p > 0.03 ? "opacity-0" : "opacity-100"
           }`}
         >
-          Scrollen
-        </p>
+          <span className="relative h-[42px] w-[26px] rounded-[14px] border-2 border-schrift/95">
+            <span className="scrollrad absolute left-1/2 top-[7px] h-[9px] w-[4px] -translate-x-1/2 rounded-sm bg-stahl" />
+          </span>
+          <span className="text-xs font-bold uppercase tracking-[0.24em] text-schrift [text-shadow:0_1px_10px_rgba(0,0,0,0.9)]">
+            Scrollen, um zu starten
+          </span>
+        </div>
       </div>
     </section>
   );

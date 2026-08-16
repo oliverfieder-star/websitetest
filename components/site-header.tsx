@@ -4,8 +4,8 @@ const NAV = [
   ["Angebot", "#angebot"],
   ["Förderung", "#foerderung"],
   ["Ablauf", "#ablauf"],
-  ["Fragen", "#fragen"],
   ["Kontakt", "#kontakt"],
+  ["Fragen", "#fragen"],
 ] as const;
 
 export function SiteHeader() {
@@ -33,12 +33,11 @@ export function SiteHeader() {
           </ul>
         </nav>
         <a
-          href="#kontakt"
-          title="Telefonnummer folgt — zur Kontaktsektion"
+          href="tel:+491792137476"
           className="ml-auto flex items-center gap-2 text-sm font-semibold text-schrift transition-colors hover:text-stahl md:ml-0"
         >
           <Phone className="h-4 w-4 text-stahl" aria-hidden="true" />
-          <span className="hidden sm:inline">[PLATZHALTER Telefon]</span>
+          <span className="hidden sm:inline">0179 213 74 76</span>
         </a>
       </div>
     </header>

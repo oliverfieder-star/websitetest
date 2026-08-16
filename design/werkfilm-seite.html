@@ -4,20 +4,16 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mainfranken Digital — KI und Digitalisierung fürs Handwerk</title>
-<meta name="description" content="KI und Digitalisierung für Ihren Handwerksbetrieb: weniger Zeit im Büro, gefördert über den Digitalbonus Bayern. Digital-Check 1.900 € netto, Umsetzungsprojekte ab 15.000 €, effektiv ab 7.500 €." />
+<meta name="description" content="KI und Digitalisierung für Ihren Handwerksbetrieb: weniger Zeit für Büro und Verwaltung, gefördert über den Digitalbonus Bayern. Digital-Check 1.900 € netto, Umsetzungsprojekte ab 10.000 €." />
 <meta name="theme-color" content="#0D0F12" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230D0F12'/%3E%3Crect x='10' y='7' width='12' height='18' rx='1.5' fill='%238FA9BD'/%3E%3Cpath d='M16 7v18M10 15.5h12' stroke='%230D0F12' stroke-width='1.7'/%3E%3C/svg%3E" />
 <style>
 /* ═══ Mainfranken Digital — „Werkfilm" ══════════════════════════
-   Die Seite ist ein durchgescrollter Arbeitstag: eine Kamerafahrt
-   durch eine moderne Handwerkshalle (Transporter, Hochregal,
-   Glasbüro), Higgsfield-generiert als ein Master-Film. Scrollen =
-   Zeit: Nachmittag → goldene Stunde → Dämmerung → Nacht. Die
-   Value Proposition erscheint als Tafeln im Film; am Ende geht im
-   Büro das Licht aus — dann kommt die Einladung zum Gespräch und
-   direkt darauf die beiden Angebote. Zeichensprache aus Studie A:
-   Uhrzeit-Stempel, Maßketten, Positionsnummern.
-   Palette: Graphit / Silber / Stahlblau. Filmkorn obendrauf.
+   Die Seite ist ein durchgescrollter Arbeitstag: eine Higgsfield-
+   Kamerafahrt durch eine moderne Handwerkshalle. Scrollen = Zeit:
+   Nachmittag → Dämmerung → Nacht; am Ende geht im Glasbüro das
+   Licht aus, dann kommt die Einladung zum Gespräch (Calendly) und
+   direkt darauf die Leistungen. Palette Graphit/Silber/Stahlblau.
    ═══════════════════════════════════════════════════════════════ */
 @font-face {
   font-family: "Space Grotesk";
@@ -28,7 +24,7 @@
   --graphit: #0d0f12;
   --flaeche: #14171c;
   --silber: #e9e7e2;
-  --nebel: #9aa0a8;
+  --nebel: #a8aeb6;
   --stahl: #8fa9bd;
   --linie: rgba(233, 231, 226, 0.12);
   --grotesk: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
@@ -44,6 +40,7 @@ body {
 ::selection { background: var(--stahl); color: var(--graphit); }
 :focus-visible { outline: 3px solid var(--stahl); outline-offset: 3px; }
 a { color: inherit; }
+.blocksatz { text-align: justify; hyphens: auto; }
 
 /* Filmkorn */
 .korn {
@@ -64,16 +61,15 @@ header {
   position: fixed; inset-inline: 0; top: 0; z-index: 60;
   display: flex; align-items: center; gap: 2rem;
   padding: 1.1rem clamp(1.2rem, 4vw, 3rem);
-  background: linear-gradient(rgba(13, 15, 18, 0.9), rgba(13, 15, 18, 0));
+  background: linear-gradient(rgba(13, 15, 18, 0.92), rgba(13, 15, 18, 0));
 }
-.marke { font-weight: 700; font-size: 1rem; text-decoration: none; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+.marke { font-weight: 700; font-size: 1.15rem; text-decoration: none; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
 .marke i { font-style: normal; color: var(--stahl); }
 header nav { margin-left: auto; }
 header nav ul { display: flex; gap: 1.6rem; list-style: none; }
 header nav a { font-size: 0.88rem; color: var(--nebel); text-decoration: none; padding: 0.5rem 0; }
 header nav a:hover { color: var(--stahl); }
-.tel { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
-header nav ~ .tel { margin-left: 0; }
+.tel { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .tel:hover { color: var(--stahl); }
 @media (max-width: 960px) { header nav { display: none; } header .tel { margin-left: auto; } }
 @media (max-width: 520px) { .tel span { display: none; } }
@@ -81,24 +77,11 @@ header nav ~ .tel { margin-left: 0; }
 /* ── Der Werkfilm ── */
 #film { position: relative; height: 680vh; }
 #film .buehne { position: sticky; top: 0; height: 100svh; overflow: hidden; background: #000; }
-#film video, #film .standbild {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-}
+#film video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 #film .buehne::after {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(rgba(13,15,18,0.18), rgba(13,15,18,0.28));
+  background: linear-gradient(rgba(13,15,18,0.16), rgba(13,15,18,0.26));
 }
-
-/* Uhrzeit-Stempel (Zeichensprache) */
-.uhr {
-  position: absolute; top: 5.2rem; right: clamp(1.2rem, 4vw, 3rem); z-index: 3;
-  font-family: var(--mono); font-size: 13px; letter-spacing: 0.18em;
-  color: var(--silber); font-variant-numeric: tabular-nums;
-  padding: 0.45rem 0.9rem; border: 1px solid var(--linie); border-radius: 2px;
-  background: rgba(13, 15, 18, 0.55); backdrop-filter: blur(6px);
-  transition: color 0.4s ease, border-color 0.4s ease;
-}
-.uhr.final { color: var(--stahl); border-color: var(--stahl); }
 
 /* Tageslinie: Fortschritt als Lichtverlauf */
 .tageslinie {
@@ -106,7 +89,7 @@ header nav ~ .tel { margin-left: 0; }
   background: linear-gradient(to right, #e8c37a, #c98a5a 45%, #4a5a74 75%, #22303f);
 }
 
-/* Tafeln im Film */
+/* Tafeln im Film — mit kräftigem Scrim für Lesbarkeit */
 .tafel {
   position: absolute; inset: 0; z-index: 2;
   display: grid; place-items: center; text-align: center; padding: 0 1.5rem;
@@ -114,36 +97,64 @@ header nav ~ .tel { margin-left: 0; }
   transition: opacity 0.55s ease, transform 0.55s ease;
   pointer-events: none;
 }
-.tafel.an { opacity: 1; transform: none; }
-.tafel .pos {
-  font-family: var(--mono); font-size: 11.5px; font-weight: 500;
-  letter-spacing: 0.3em; text-transform: uppercase; color: var(--stahl);
+.tafel::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 62% 52% at 50% 50%,
+    rgba(9, 11, 14, 0.78), rgba(9, 11, 14, 0.42) 55%, transparent 78%);
 }
-.tafel .pos::before, .tafel .pos::after { content: "——"; opacity: 0.45; margin: 0 0.8em; letter-spacing: 0; }
+.tafel.an { opacity: 1; transform: none; }
+.tafel > div { position: relative; }
+.tafel .label {
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--stahl);
+}
+.tafel .label.gross { font-size: clamp(0.95rem, 1.6vw, 1.25rem); letter-spacing: 0.3em; color: var(--silber); }
+.tafel .label.gross i { font-style: normal; color: var(--stahl); }
 .tafel h2 {
   margin-top: 1.1rem; font-weight: 700; text-transform: uppercase;
-  font-size: clamp(1.9rem, 5.2vw, 4.2rem); line-height: 1.04; letter-spacing: 0.01em;
-  text-shadow: 0 2px 44px rgba(0, 0, 0, 0.75);
-  max-width: 22ch;
+  font-size: clamp(1.9rem, 5.2vw, 4.2rem); line-height: 1.05; letter-spacing: 0.01em;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.95), 0 2px 60px rgba(0, 0, 0, 0.85);
+  max-width: 20ch; margin-inline: auto;
 }
 .tafel h2 i { font-style: normal; color: var(--stahl); }
-.tafel p.sub { margin: 1.3rem auto 0; max-width: 32rem; color: var(--silber); opacity: 0.88; text-shadow: 0 1px 20px rgba(0,0,0,0.8); }
-.tafel .cta { pointer-events: auto; margin-top: 2.2rem; display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center; justify-content: center; }
-.btn {
-  display: inline-block; background: var(--silber); color: var(--graphit);
-  font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.9rem;
-  padding: 1rem 2.1rem; border-radius: 2px; text-decoration: none; border: 0; cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
+.tafel p.sub {
+  margin: 1.4rem auto 0; max-width: 34rem; font-size: 1.08rem; color: #f4f2ee;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.95), 0 1px 40px rgba(0, 0, 0, 0.9);
 }
-.btn:hover { background: #fff; transform: translateY(-2px); }
-.btn.stahl { background: var(--stahl); color: var(--graphit); }
-.btn.stahl:hover { background: #a7c0d2; }
-.tafel .cta p { font-size: 0.9rem; color: var(--nebel); }
-.tafel .cta strong { color: var(--silber); white-space: nowrap; }
+.tafel .cta { pointer-events: auto; margin-top: 2.4rem; }
+.btn {
+  display: inline-block; background: var(--stahl); color: var(--graphit);
+  font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.92rem;
+  padding: 1.05rem 2.4rem; border-radius: 2px; text-decoration: none; border: 0; cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 14px 44px -14px rgba(143, 169, 189, 0.55);
+}
+.btn:hover { background: #a7c0d2; transform: translateY(-2px); }
+.btn.hell { background: var(--silber); }
+.btn.hell:hover { background: #fff; }
+
+/* Deutliches Scroll-Signal */
 .scrollcue {
-  position: absolute; bottom: 1.6rem; left: 50%; transform: translateX(-50%); z-index: 3;
-  font-size: 11px; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase;
-  color: var(--nebel); transition: opacity 0.4s ease;
+  position: absolute; bottom: 1.6rem; left: 50%; transform: translateX(-50%); z-index: 5;
+  display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--silber); text-shadow: 0 1px 10px rgba(0,0,0,0.9);
+  transition: opacity 0.4s ease; pointer-events: none;
+}
+.scrollcue .maus {
+  width: 26px; height: 42px; border: 2px solid var(--silber); border-radius: 14px;
+  position: relative; opacity: 0.95;
+}
+.scrollcue .maus::before {
+  content: ""; position: absolute; left: 50%; top: 7px; transform: translateX(-50%);
+  width: 4px; height: 9px; border-radius: 2px; background: var(--stahl);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .scrollcue .maus::before { animation: radeln 1.6s ease-in-out infinite; }
+  @keyframes radeln {
+    0%, 100% { transform: translate(-50%, 0); opacity: 1; }
+    60% { transform: translate(-50%, 14px); opacity: 0.2; }
+  }
 }
 .scrollcue.weg { opacity: 0; }
 
@@ -161,18 +172,18 @@ section.inhalt { padding: clamp(4.5rem, 10vh, 8rem) clamp(1.2rem, 4vw, 3rem); sc
 .inner { max-width: 72rem; margin: 0 auto; }
 .abgesetzt { background: var(--flaeche); border-block: 1px solid var(--linie); }
 
-/* Maßketten-Trenner (Zeichensprache) */
 .trennmass { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 3rem; }
 .trennmass .l { flex: 1; height: 1px; background: var(--linie); position: relative; }
 .trennmass .l::before, .trennmass .l::after { content: ""; position: absolute; top: -4px; width: 1px; height: 9px; background: var(--linie); }
 .trennmass .l::before { left: 0; } .trennmass .l::after { right: 0; }
 .trennmass span { font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; color: var(--stahl); text-transform: uppercase; }
 
-h2.titel { font-weight: 700; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.06; max-width: 46rem; }
+h2.titel { font-weight: 700; text-transform: uppercase; font-size: clamp(1.7rem, 3.6vw, 2.6rem); line-height: 1.1; max-width: 56rem; }
 h2.titel i { font-style: normal; color: var(--stahl); }
-p.intro { margin-top: 1.3rem; max-width: 42rem; color: var(--nebel); font-size: 1.03rem; }
+@media (min-width: 1100px) { h2.titel.einzeilig { white-space: nowrap; } }
+p.intro { margin-top: 1.3rem; max-width: 44rem; color: var(--nebel); font-size: 1.03rem; }
 
-/* Angebote als Stückliste */
+/* Angebote */
 .karten { display: grid; gap: 1.5rem; margin-top: 3rem; }
 @media (min-width: 900px) { .karten { grid-template-columns: 1fr 1fr; } }
 .karte { position: relative; overflow: hidden; border: 1px solid var(--linie); border-radius: 4px; background: var(--graphit); padding: clamp(1.8rem, 3vw, 2.6rem); }
@@ -187,7 +198,7 @@ p.intro { margin-top: 1.3rem; max-width: 42rem; color: var(--nebel); font-size: 
   font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em;
   transform: rotate(-1.2deg);
 }
-.karte p.text { margin-top: 1.2rem; color: var(--nebel); }
+.karte p.text { margin-top: 1.2rem; color: var(--nebel); text-align: justify; hyphens: auto; }
 .karte ul { list-style: none; margin-top: 1.5rem; display: grid; gap: 0.8rem; font-size: 0.92rem; color: var(--nebel); }
 .karte ul li { display: flex; gap: 0.8rem; }
 .karte ul li::before { content: ""; margin-top: 0.68em; width: 1rem; height: 1px; background: var(--stahl); flex: none; }
@@ -196,6 +207,7 @@ p.intro { margin-top: 1.3rem; max-width: 42rem; color: var(--nebel); font-size: 
 .foerder-grid { display: grid; gap: 3rem; align-items: start; }
 @media (min-width: 900px) { .foerder-grid { grid-template-columns: 1fr 1.1fr; } }
 .klein { margin-top: 1.4rem; font-size: 0.85rem; color: var(--nebel); max-width: 36rem; }
+.klein a, p.intro a { color: var(--stahl); }
 .rechner { border: 1px solid var(--linie); border-radius: 4px; background: var(--flaeche); padding: clamp(1.8rem, 3vw, 2.5rem); }
 .rechner label { font-family: var(--mono); font-size: 11.5px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--nebel); }
 #volumen-anzeige { font-size: clamp(2.2rem, 5vw, 3.1rem); font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 0.4rem; }
@@ -225,6 +237,37 @@ input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border-radius
 .schritte h3 { margin-top: 0.9rem; font-size: 1rem; font-weight: 700; text-transform: uppercase; }
 .schritte p { margin-top: 0.7rem; font-size: 0.9rem; color: var(--nebel); }
 
+/* Kontakt */
+.kontakt-grid { display: grid; gap: 1.5rem; margin-top: 3rem; }
+@media (min-width: 900px) { .kontakt-grid { grid-template-columns: 1fr 1fr; } }
+.kontakt-karte { border: 1px solid var(--linie); border-radius: 4px; background: var(--graphit); padding: clamp(1.8rem, 3vw, 2.5rem); }
+.kontakt-karte.betont { border-color: rgba(143, 169, 189, 0.4); }
+.person { display: flex; align-items: center; gap: 1.1rem; }
+.person .foto {
+  width: 84px; height: 84px; border-radius: 50%; flex: none;
+  border: 1.5px solid var(--stahl); object-fit: cover;
+  display: grid; place-items: center;
+  background: var(--flaeche); color: var(--stahl);
+  font-weight: 700; font-size: 1.6rem; letter-spacing: 0.05em;
+}
+.person .name { font-weight: 700; font-size: 1.1rem; }
+.person .rolle { font-size: 0.88rem; color: var(--nebel); }
+.kontakt-karte p.text { margin-top: 1.3rem; color: var(--nebel); }
+.kontakt-karte .btn { margin-top: 1.6rem; }
+.kontakt-meta { margin-top: 1.6rem; display: grid; gap: 0.45rem; font-size: 0.92rem; color: var(--nebel); }
+.kontakt-meta a { color: var(--silber); text-decoration: none; font-weight: 600; }
+.kontakt-meta a:hover { color: var(--stahl); }
+form { display: grid; gap: 1.1rem; margin-top: 1.3rem; }
+form label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.35rem; }
+form label .opt { font-weight: 400; color: var(--nebel); }
+form input, form textarea {
+  width: 100%; font: inherit; color: var(--silber);
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: 3px;
+  padding: 0.8rem 1rem;
+}
+#form-status { min-height: 1.5em; font-size: 0.9rem; font-weight: 600; color: var(--stahl); }
+.form-hinweis { font-size: 0.75rem; color: var(--nebel); }
+
 /* FAQ */
 .faq-liste { margin-top: 2.6rem; border-block: 1px solid var(--linie); max-width: 56rem; }
 .faq-liste details + details { border-top: 1px solid var(--linie); }
@@ -239,23 +282,7 @@ input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border-radius
   transition: transform 0.25s ease;
 }
 .faq-liste details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
-.faq-liste details p { padding-bottom: 1.5rem; max-width: 44rem; color: var(--nebel); }
-
-/* Kontakt */
-.kontakt-grid { display: grid; gap: 3.5rem; margin-top: 2.6rem; }
-@media (min-width: 900px) { .kontakt-grid { grid-template-columns: 1fr 1fr; } }
-.tel-gross { display: flex; align-items: center; gap: 0.8rem; margin-top: 1.8rem; font-size: clamp(1.5rem, 3.2vw, 2.2rem); font-weight: 700; color: var(--stahl); }
-.kontakt-meta { margin-top: 1.4rem; display: grid; gap: 0.4rem; font-size: 0.9rem; color: var(--nebel); }
-form { display: grid; gap: 1.1rem; }
-form label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.35rem; }
-form label .opt { font-weight: 400; color: var(--nebel); }
-form input, form textarea {
-  width: 100%; font: inherit; color: var(--silber);
-  background: var(--graphit); border: 1px solid var(--linie); border-radius: 3px;
-  padding: 0.8rem 1rem;
-}
-#form-status { min-height: 1.5em; font-size: 0.9rem; font-weight: 600; color: var(--stahl); }
-.form-hinweis { font-size: 0.75rem; color: var(--nebel); }
+.faq-liste details p { padding-bottom: 1.5rem; max-width: 44rem; color: var(--nebel); text-align: justify; hyphens: auto; }
 
 footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 3rem); }
 .fuss { max-width: 72rem; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 0.8rem 2.5rem; align-items: baseline; }
@@ -285,13 +312,13 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
       <li><a href="#angebot">Angebot</a></li>
       <li><a href="#foerderung">Förderung</a></li>
       <li><a href="#ablauf">Ablauf</a></li>
-      <li><a href="#fragen">Fragen</a></li>
       <li><a href="#kontakt">Kontakt</a></li>
+      <li><a href="#fragen">Fragen</a></li>
     </ul>
   </nav>
-  <a class="tel" href="#kontakt" title="Telefonnummer folgt — zur Kontaktsektion">
+  <a class="tel" href="tel:+491792137476">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-    <span>[PLATZHALTER Telefon]</span>
+    <span>0179 213 74 76</span>
   </a>
 </header>
 
@@ -304,71 +331,78 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
         <source src="{{VID_MASTER_MP4}}" type="video/mp4" />
       </video>
 
-      <p class="uhr" id="uhr" aria-hidden="true">15:30</p>
       <div class="tageslinie" id="tageslinie" aria-hidden="true"></div>
 
       <div class="tafel" data-von="0" data-bis="0.13">
         <div>
-          <p class="pos">Mainfranken Digital</p>
+          <p class="label gross">Mainfranken<i> Digital</i></p>
           <h2>KI und Digitalisierung für Ihren <i>Handwerksbetrieb</i>.</h2>
-          <p class="sub">Scrollen Sie durch einen Arbeitstag — bis zum Feierabend.</p>
+          <p class="sub">Wir digitalisieren Büro und Verwaltung in
+          Handwerksbetrieben. Von der ersten Analyse bis zur fertigen
+          Umsetzung.</p>
         </div>
       </div>
 
       <div class="tafel" data-von="0.2" data-bis="0.36">
         <div>
-          <p class="pos">These 01</p>
-          <h2>Weniger Zeit im <i>Büro</i>.</h2>
-          <p class="sub">Angebote, Rechnungen und Stundenzettel laufen tagsüber
-          automatisiert mit — während Ihr Betrieb arbeitet.</p>
+          <p class="label">Digitalisierung &amp; KI</p>
+          <h2>Weniger Zeit für <i>Büro und Verwaltung</i>.</h2>
+          <p class="sub">Durch Digitalisierung und den Einsatz künstlicher
+          Intelligenz gestalten wir Ihre Abläufe effizienter. Beratung und
+          Umsetzung aus einer Hand.</p>
         </div>
       </div>
 
       <div class="tafel" data-von="0.42" data-bis="0.58">
         <div>
-          <p class="pos">These 02 — Förderung</p>
-          <h2>Digitalbonus Bayern: bis zu <i>50&nbsp;%</i> erstattet.</h2>
-          <p class="sub">Bis zu 7.500&nbsp;€ Zuschuss für Ihr Digitalisierungsprojekt —
-          den Antrag klären wir gemeinsam.</p>
+          <p class="label">Förderung</p>
+          <h2>Bis zu <i>50&nbsp;%</i> der Kosten erstattet bekommen.</h2>
+          <p class="sub">Bis zu 7.500&nbsp;€ Zuschuss über den Digitalbonus
+          Bayern für unser gemeinsames Projekt.</p>
         </div>
       </div>
 
       <div class="tafel" data-von="0.66" data-bis="0.8">
         <div>
-          <p class="pos">21:15 Uhr — nur das Büro leuchtet noch</p>
+          <p class="label">Nur das Büro leuchtet noch</p>
           <h2>Damit auch das Büro endlich <i>Feierabend</i> hat.</h2>
         </div>
       </div>
 
       <div class="tafel" data-von="0.9" data-bis="1">
         <div>
-          <p class="pos">Feierabend</p>
+          <p class="label">Feierabend</p>
           <h2>Jetzt ins <i>Gespräch</i> kommen.</h2>
           <p class="sub">Gemeinsam machen wir Ihre Prozesse effizienter.</p>
           <div class="cta">
-            <a class="btn stahl" href="#angebot">Erstgespräch vereinbaren</a>
-            <p>oder direkt anrufen: <strong>[PLATZHALTER Telefon]</strong></p>
+            <a class="btn" href="https://calendly.com/oliver2004-fieder/30min" target="_blank" rel="noopener">Gespräch vereinbaren</a>
           </div>
         </div>
       </div>
 
-      <p class="scrollcue" id="scrollcue">Scrollen</p>
+      <div class="scrollcue" id="scrollcue" aria-hidden="true">
+        <div class="maus"></div>
+        <span>Scrollen, um zu starten</span>
+      </div>
     </div>
   </section>
 
   <!-- Standbild-Fassung: reduzierte Bewegung / kein Video -->
   <div id="film-statisch" aria-label="Ein Arbeitstag in Ihrem Betrieb">
     <div class="text">
-      <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:0.3em;text-transform:uppercase;color:var(--stahl)">Mainfranken Digital</p>
+      <p style="font-family:var(--mono);font-size:12px;letter-spacing:0.3em;text-transform:uppercase;color:var(--stahl)">Mainfranken Digital</p>
       <h2 style="margin-top:1rem">KI und Digitalisierung für Ihren <i>Handwerksbetrieb</i>.</h2>
+      <p>Wir digitalisieren Büro und Verwaltung in Handwerksbetrieben. Von der
+      ersten Analyse bis zur fertigen Umsetzung.</p>
     </div>
     <figure><img src="{{IMG_K1}}" alt="Moderne Handwerkshalle am Nachmittag: Transporter, Hochregal, hinten ein verglastes Büro." /></figure>
     <div class="text">
-      <h2>Weniger Zeit im <i>Büro</i>.</h2>
-      <p>Angebote, Rechnungen und Stundenzettel laufen tagsüber automatisiert mit.
-      Digitalbonus Bayern: bis zu 50&nbsp;% der Kosten erstattet, höchstens 7.500&nbsp;€.</p>
+      <h2>Weniger Zeit für <i>Büro und Verwaltung</i>.</h2>
+      <p>Durch Digitalisierung und den Einsatz künstlicher Intelligenz gestalten
+      wir Ihre Abläufe effizienter. Digitalbonus Bayern: bis zu 50&nbsp;% der
+      Kosten erstattet, höchstens 7.500&nbsp;€.</p>
     </div>
-    <figure><img src="{{IMG_K4}}" alt="Nachts: Die Halle ist dunkel, nur im verglasten Büro brennt noch Licht — zwei Menschen arbeiten." /></figure>
+    <figure><img src="{{IMG_K4}}" alt="Nachts: Die Halle ist dunkel, nur im verglasten Büro brennt noch Licht." /></figure>
     <div class="text">
       <h2>Damit auch das Büro endlich <i>Feierabend</i> hat.</h2>
     </div>
@@ -376,40 +410,44 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
     <div class="text">
       <h2>Jetzt ins <i>Gespräch</i> kommen.</h2>
       <p>Gemeinsam machen wir Ihre Prozesse effizienter.</p>
-      <p style="margin-top:1.6rem"><a class="btn stahl" href="#angebot">Erstgespräch vereinbaren</a></p>
+      <p style="margin-top:1.6rem"><a class="btn" href="https://calendly.com/oliver2004-fieder/30min" target="_blank" rel="noopener">Gespräch vereinbaren</a></p>
     </div>
   </div>
 
-  <!-- ═══ Angebote ═══ -->
+  <!-- ═══ Angebot ═══ -->
   <section class="inhalt abgesetzt" id="angebot" aria-labelledby="angebot-h">
     <div class="inner">
-      <div class="trennmass" aria-hidden="true"><div class="l"></div><span>Stückliste</span><div class="l"></div></div>
-      <h2 class="titel reveal" id="angebot-h">Zwei Wege, ein Ziel: <i>ein ruhigeres Büro</i>.</h2>
-      <p class="intro reveal">Erst die gemeinsame Analyse, dann das geförderte Projekt —
-      umgesetzt wird nur, was in Ihrem Alltag Zeit spart.</p>
+      <div class="trennmass" aria-hidden="true"><div class="l"></div><span>Leistungen</span><div class="l"></div></div>
+      <h2 class="titel reveal" id="angebot-h">Unsere Dienstleistungen: <i>Künstliche Intelligenz und Digitalisierung</i>.</h2>
+      <p class="intro reveal blocksatz">Typischerweise starten wir mit dem
+      Digital-Check: der gemeinsamen Analyse Ihrer Abläufe. Danach folgt das
+      Umsetzungsprojekt. Wir beraten nicht nur, wir setzen auch um und bleiben,
+      bis alles im Alltag läuft.</p>
       <div class="karten">
         <article class="karte reveal">
-          <p class="posnr">POS. 01 — DER START</p>
+          <p class="posnr">SCHRITT 1 · DER EINSTIEG</p>
           <h3>Digital-Check</h3>
           <p class="preis">1.900&nbsp;€ <small>netto</small></p>
           <p class="text">Die gemeinsame Analyse: ein Tag in Ihrem Betrieb. Wir
-          gehen die Büroarbeit zusammen durch — wo geht Zeit verloren, was lässt
-          sich automatisieren, was bleibt besser, wie es ist.</p>
+          gehen die Büro- und Verwaltungsarbeit zusammen durch: Wo geht Zeit
+          verloren, was lässt sich automatisieren, was bleibt besser, wie es
+          ist.</p>
           <ul>
             <li>Vor Ort, an Ihren echten Abläufen</li>
             <li>Schriftlicher Maßnahmenplan mit Prioritäten</li>
-            <li>Ehrliche Empfehlung — auch wenn sie „nichts ändern“ heißt</li>
+            <li>Ehrliche Empfehlung, auch wenn sie „nichts ändern“ heißt</li>
           </ul>
         </article>
         <article class="karte betont reveal">
-          <p class="posnr">POS. 02 — DAS PROJEKT</p>
+          <p class="posnr">SCHRITT 2 · DAS PROJEKT</p>
           <h3>Umsetzungsprojekt</h3>
-          <p class="preis">ab 15.000&nbsp;€</p>
-          <p class="stempel">DIGITALBONUS BAYERN: effektiv ab 7.500 €</p>
-          <p class="text">Das größere Beratungs- und Umsetzungsprojekt: Die
-          wichtigsten Punkte aus dem Digital-Check werden eingerichtet — Angebote
-          schneller schreiben, Belege automatisch erfassen, Abläufe automatisieren.
-          Schritt für Schritt, während Ihr Betrieb normal weiterläuft.</p>
+          <p class="preis">ab 10.000&nbsp;€</p>
+          <p class="stempel">DIGITALBONUS BAYERN: bis zu 50 % gefördert</p>
+          <p class="text">Beratung und Umsetzung aus einer Hand: Die wichtigsten
+          Punkte aus dem Digital-Check werden eingerichtet, von der schnelleren
+          Angebotserstellung bis zur automatischen Belegerfassung. Ein typisches
+          Projekt liegt bei 15.000&nbsp;€, effektiv 7.500&nbsp;€ nach
+          Förderung.</p>
           <ul>
             <li>Einrichtung und Anpassung an Ihre Arbeitsweise</li>
             <li>Einweisung für Sie und Ihr Büro</li>
@@ -426,20 +464,22 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
       <div class="reveal">
         <div class="trennmass" aria-hidden="true"><div class="l"></div><span>Förderung</span><div class="l"></div></div>
         <h2 class="titel" id="foerderung-h">Der Digitalbonus Bayern übernimmt bis zu <i>50&nbsp;%</i>.</h2>
-        <p class="intro">Für Digitalisierungsprojekte wie dieses gibt es den
-        Digitalbonus Bayern: bezuschusst werden 50&nbsp;Prozent des
-        Projektvolumens, höchstens 7.500&nbsp;€. Voraussetzung ist ein
-        Projektvolumen von mindestens 4.000&nbsp;€. Rechnen Sie selbst.</p>
-        <p class="klein">Angaben ohne Gewähr; maßgeblich sind die aktuellen
-        Bedingungen des Programms ([PLATZHALTER: Link zum Digitalbonus Bayern]).
+        <p class="intro blocksatz">Für Digitalisierungsprojekte wie dieses gibt
+        es den <a href="https://www.digitalbonus.bayern.de/" target="_blank" rel="noopener">Digitalbonus Bayern</a>:
+        bezuschusst werden 50&nbsp;Prozent des Projektvolumens, höchstens
+        7.500&nbsp;€. Voraussetzung ist ein Projektvolumen von mindestens
+        4.000&nbsp;€. Rechnen Sie selbst.</p>
+        <p class="klein blocksatz">Angaben ohne Gewähr; maßgeblich sind die
+        aktuellen Bedingungen unter
+        <a href="https://www.digitalbonus.bayern.de/" target="_blank" rel="noopener">digitalbonus.bayern.de</a>.
         Ob Ihr Betrieb die Voraussetzungen erfüllt und wie der Antrag läuft,
         klären wir im Erstgespräch.</p>
       </div>
       <div class="rechner reveal">
         <label for="volumen">Ihr Projektvolumen</label>
         <p id="volumen-anzeige">15.000&nbsp;€</p>
-        <input type="range" id="volumen" min="4000" max="60000" step="500" value="15000" aria-describedby="calc-hinweis" />
-        <div class="skala" aria-hidden="true"><span>4.000&nbsp;€</span><span>60.000&nbsp;€</span></div>
+        <input type="range" id="volumen" min="4000" max="30000" step="500" value="15000" aria-describedby="calc-hinweis" />
+        <div class="skala" aria-hidden="true"><span>4.000&nbsp;€</span><span>30.000&nbsp;€</span></div>
         <dl class="ergebnisse">
           <div class="zuschuss"><dt>Zuschuss</dt><dd id="zuschuss">7.500&nbsp;€</dd></div>
           <div><dt>Ihr Anteil</dt><dd id="eigenanteil">7.500&nbsp;€</dd></div>
@@ -454,9 +494,9 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
   <section class="inhalt abgesetzt" id="ablauf" aria-labelledby="ablauf-h">
     <div class="inner">
       <div class="trennmass" aria-hidden="true"><div class="l"></div><span>So läuft es ab</span><div class="l"></div></div>
-      <h2 class="titel reveal" id="ablauf-h">Vier Schritte zu <i>ruhigeren Abenden</i>.</h2>
+      <h2 class="titel einzeilig reveal" id="ablauf-h">Vier Schritte zu <i>ruhigeren Abenden</i>.</h2>
       <ol class="schritte">
-        <li class="reveal"><span class="nr" aria-hidden="true">01</span><h3>Erstgespräch</h3><p>Eine halbe Stunde am Telefon. Sie erzählen, wo es klemmt — ich sage Ihnen offen, ob und wie ich helfen kann. Kostet nichts und verpflichtet zu nichts.</p></li>
+        <li class="reveal"><span class="nr" aria-hidden="true">01</span><h3>Erstgespräch</h3><p>Eine halbe Stunde, wie es Ihnen passt. Sie erzählen, wo es klemmt. Ich sage Ihnen offen, ob und wie ich helfen kann. Kostet nichts und verpflichtet zu nichts.</p></li>
         <li class="reveal"><span class="nr" aria-hidden="true">02</span><h3>Digital-Check</h3><p>Ein Tag vor Ort in Ihrem Betrieb. Danach haben Sie schwarz auf weiß, was sich bei Ihnen lohnt, was es kostet und was es bringt.</p></li>
         <li class="reveal"><span class="nr" aria-hidden="true">03</span><h3>Umsetzung</h3><p>Die Abläufe werden eingerichtet und so lange angepasst, bis sie in Ihren Alltag passen. Digitalbonus und Antrag klären wir vorher gemeinsam.</p></li>
         <li class="reveal"><span class="nr" aria-hidden="true">04</span><h3>Alltag</h3><p>Ihr Büro erledigt tagsüber, was bisher am Abend hängen blieb. Ich bleibe erreichbar, wenn etwas hakt.</p></li>
@@ -464,80 +504,106 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
     </div>
   </section>
 
-  <!-- ═══ FAQ ═══ -->
-  <section class="inhalt" id="fragen" aria-labelledby="fragen-h">
-    <div class="inner">
-      <div class="trennmass" aria-hidden="true"><div class="l"></div><span>Häufige Fragen</span><div class="l"></div></div>
-      <h2 class="titel reveal" id="fragen-h">Klare Antworten, <i>bevor Sie anrufen</i>.</h2>
-      <div class="faq-liste reveal">
-        <details>
-          <summary>Muss ich mich mit KI auskennen?</summary>
-          <p>Nein. Sie müssen Ihren Betrieb kennen — den Rest übernehme ich. Alles wird so eingerichtet, dass Sie und Ihr Büro es ohne Vorkenntnisse bedienen können, und so lange erklärt, bis es sitzt.</p>
-        </details>
-        <details>
-          <summary>Wir haben schon Software, die keiner benutzt. Warum sollte das diesmal anders sein?</summary>
-          <p>Weil zuerst der Ablauf kommt und dann das Werkzeug. Im Digital-Check schaue ich mir an, wie bei Ihnen tatsächlich gearbeitet wird — geändert wird nur, was spürbar Zeit spart. Was nicht zu Ihrem Betrieb passt, wird auch nicht angeschafft.</p>
-        </details>
-        <details>
-          <summary>Wie funktioniert der Digitalbonus Bayern?</summary>
-          <p>Der Freistaat bezuschusst Digitalisierungsprojekte von Handwerks- und Gewerbebetrieben mit 50&nbsp;Prozent des Projektvolumens, höchstens 7.500&nbsp;€; das Projekt muss mindestens 4.000&nbsp;€ umfassen. Antrag und Voraussetzungen klären wir gemeinsam im Erstgespräch — ohne Gewähr, maßgeblich sind die aktuellen Programmbedingungen.</p>
-        </details>
-        <details>
-          <summary>Was passiert mit unseren Daten?</summary>
-          <p>Ihre Daten bleiben Ihre Daten. Welche Werkzeuge welche Daten verarbeiten, legen wir vorab gemeinsam fest und halten es schriftlich fest. Details: [PLATZHALTER: Datenschutzhinweise].</p>
-        </details>
-        <details>
-          <summary>Wie viel Zeit kostet mich das neben dem Tagesgeschäft?</summary>
-          <p>Der Digital-Check ist ein Tag. In der Umsetzung brauche ich Sie punktuell — für Entscheidungen und die Einweisung. Geplant wird um Ihren Betriebsalltag herum, nicht umgekehrt.</p>
-        </details>
-        <details>
-          <summary>Was kostet es am Ende wirklich?</summary>
-          <p>Der Digital-Check kostet 1.900&nbsp;€ netto. Ein Umsetzungsprojekt beginnt bei 15.000&nbsp;€; mit Digitalbonus liegt Ihr Anteil bei ab 7.500&nbsp;€. Alle Kosten stehen im Angebot, bevor Sie sich entscheiden — Überraschungen gibt es keine.</p>
-        </details>
-      </div>
-    </div>
-  </section>
-
   <!-- ═══ Kontakt ═══ -->
-  <section class="inhalt abgesetzt" id="kontakt" aria-labelledby="kontakt-h">
+  <section class="inhalt" id="kontakt" aria-labelledby="kontakt-h">
     <div class="inner">
       <div class="trennmass" aria-hidden="true"><div class="l"></div><span>Kontakt</span><div class="l"></div></div>
-      <h2 class="titel reveal" id="kontakt-h">Der nächste Schritt ist ein <i>Anruf</i>.</h2>
+      <h2 class="titel einzeilig reveal" id="kontakt-h">Der nächste Schritt ist ein <i>Gespräch</i>.</h2>
       <div class="kontakt-grid">
-        <div class="reveal">
-          <p class="intro">Eine halbe Stunde, unverbindlich. Danach wissen Sie,
-          ob sich das für Ihren Betrieb lohnt.</p>
-          <p class="tel-gross">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            [PLATZHALTER Telefon]
-          </p>
+        <div class="kontakt-karte betont reveal">
+          <div class="person">
+            <span class="foto" role="img" aria-label="Porträt folgt">OF</span>
+            <div>
+              <p class="name">Oliver Fieder</p>
+              <p class="rolle">Mainfranken Digital</p>
+            </div>
+          </div>
+          <p class="text blocksatz">Eine halbe Stunde, unverbindlich. Danach
+          wissen Sie, ob sich Digitalisierung und KI für Ihren Betrieb lohnen
+          und was der sinnvolle erste Schritt wäre.</p>
+          <a class="btn" href="https://calendly.com/oliver2004-fieder/30min" target="_blank" rel="noopener">Termin direkt buchen</a>
           <div class="kontakt-meta">
-            <p>Erreichbar: [PLATZHALTER: Zeiten]</p>
+            <p>Telefon: <a href="tel:+491792137476">0179 213 74 76</a></p>
             <p>E-Mail: [PLATZHALTER: E-Mail-Adresse]</p>
             <p>Mainfranken Digital, [PLATZHALTER: Ort]</p>
           </div>
         </div>
-        <form id="kontakt-formular" class="reveal" novalidate>
-          <div>
-            <label for="f-name">Ihr Name</label>
-            <input id="f-name" name="name" type="text" autocomplete="name" required />
-          </div>
-          <div>
-            <label for="f-betrieb">Betrieb <span class="opt">(optional)</span></label>
-            <input id="f-betrieb" name="betrieb" type="text" autocomplete="organization" />
-          </div>
-          <div>
-            <label for="f-rueckruf">Telefon oder E-Mail für den Rückruf</label>
-            <input id="f-rueckruf" name="rueckruf" type="text" autocomplete="tel" required />
-          </div>
-          <div>
-            <label for="f-nachricht">Worum geht es? <span class="opt">(zwei Sätze genügen)</span></label>
-            <textarea id="f-nachricht" name="nachricht" rows="4"></textarea>
-          </div>
-          <div><button class="btn stahl" type="submit">Nachricht senden</button></div>
-          <p id="form-status" role="status"></p>
-          <p class="form-hinweis">Ihre Angaben werden nur zur Beantwortung Ihrer Anfrage verwendet. [PLATZHALTER: Datenschutzhinweis]</p>
-        </form>
+        <div class="kontakt-karte reveal">
+          <p class="name">Oder schreiben Sie kurz</p>
+          <form id="kontakt-formular" novalidate>
+            <div>
+              <label for="f-name">Ihr Name</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required />
+            </div>
+            <div>
+              <label for="f-betrieb">Betrieb <span class="opt">(optional)</span></label>
+              <input id="f-betrieb" name="betrieb" type="text" autocomplete="organization" />
+            </div>
+            <div>
+              <label for="f-rueckruf">Telefon oder E-Mail für den Rückruf</label>
+              <input id="f-rueckruf" name="rueckruf" type="text" autocomplete="tel" required />
+            </div>
+            <div>
+              <label for="f-nachricht">Worum geht es? <span class="opt">(zwei Sätze genügen)</span></label>
+              <textarea id="f-nachricht" name="nachricht" rows="3"></textarea>
+            </div>
+            <div><button class="btn hell" type="submit">Nachricht senden</button></div>
+            <p id="form-status" role="status"></p>
+            <p class="form-hinweis">Ihre Angaben werden nur zur Beantwortung Ihrer Anfrage verwendet. [PLATZHALTER: Datenschutzhinweis]</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FAQ ═══ -->
+  <section class="inhalt abgesetzt" id="fragen" aria-labelledby="fragen-h">
+    <div class="inner">
+      <div class="trennmass" aria-hidden="true"><div class="l"></div><span>Häufige Fragen</span><div class="l"></div></div>
+      <h2 class="titel einzeilig reveal" id="fragen-h">Klare Antworten, <i>bevor Sie anrufen</i>.</h2>
+      <div class="faq-liste reveal">
+        <details>
+          <summary>Muss ich mich mit KI auskennen?</summary>
+          <p>Nein. Sie müssen Ihren Betrieb kennen, den Rest übernehme ich.
+          Alles wird so eingerichtet, dass Sie und Ihr Büro es ohne
+          Vorkenntnisse bedienen können, und so lange erklärt, bis es sitzt.</p>
+        </details>
+        <details>
+          <summary>Wir haben schon Software, die keiner benutzt. Warum sollte das diesmal anders sein?</summary>
+          <p>Weil zuerst der Ablauf kommt und dann das Werkzeug. Im
+          Digital-Check schaue ich mir an, wie bei Ihnen tatsächlich gearbeitet
+          wird. Geändert wird nur, was spürbar Zeit spart. Was nicht zu Ihrem
+          Betrieb passt, wird auch nicht angeschafft.</p>
+        </details>
+        <details>
+          <summary>Wie funktioniert der Digitalbonus Bayern?</summary>
+          <p>Der Freistaat bezuschusst Digitalisierungsprojekte von Handwerks-
+          und Gewerbebetrieben mit 50&nbsp;Prozent des Projektvolumens,
+          höchstens 7.500&nbsp;€; das Projekt muss mindestens 4.000&nbsp;€
+          umfassen. Antrag und Voraussetzungen klären wir gemeinsam im
+          Erstgespräch. Ohne Gewähr; maßgeblich sind die aktuellen Bedingungen
+          unter digitalbonus.bayern.de.</p>
+        </details>
+        <details>
+          <summary>Was passiert mit unseren Daten?</summary>
+          <p>Ihre Daten bleiben Ihre Daten. Welche Werkzeuge welche Daten
+          verarbeiten, legen wir vorab gemeinsam fest und halten es schriftlich
+          fest. Details: [PLATZHALTER: Datenschutzhinweise].</p>
+        </details>
+        <details>
+          <summary>Wie viel Zeit kostet mich das neben dem Tagesgeschäft?</summary>
+          <p>Der Digital-Check ist ein Tag. In der Umsetzung brauche ich Sie
+          punktuell, für Entscheidungen und die Einweisung. Geplant wird um
+          Ihren Betriebsalltag herum, nicht umgekehrt.</p>
+        </details>
+        <details>
+          <summary>Was kostet es am Ende wirklich?</summary>
+          <p>Der Digital-Check kostet 1.900&nbsp;€ netto. Ein Umsetzungsprojekt
+          beginnt bei 10.000&nbsp;€; ein typisches Projekt liegt bei
+          15.000&nbsp;€, mit Digitalbonus effektiv 7.500&nbsp;€. Alle Kosten
+          stehen im Angebot, bevor Sie sich entscheiden. Überraschungen gibt es
+          keine.</p>
+        </details>
       </div>
     </div>
   </section>
@@ -546,7 +612,7 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
 <footer>
   <div class="fuss">
     <a class="marke" href="#film">Mainfranken<i> Digital</i></a>
-    <p class="kleinf">Telefon: [PLATZHALTER Telefon] · [PLATZHALTER: E-Mail]</p>
+    <p class="kleinf">Oliver Fieder · Telefon: <a href="tel:+491792137476">0179 213 74 76</a> · [PLATZHALTER: E-Mail]</p>
     <div class="links">
       <a href="#kontakt">Impressum [PLATZHALTER]</a>
       <a href="#kontakt">Datenschutz [PLATZHALTER]</a>
@@ -558,13 +624,9 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
 (function () {
   var reduziert = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ═══ Werkfilm: Scrollen = Zeit ═══
-     Der Master-Film (Nachmittag → Nacht → Licht aus) hängt am
-     Scrollrad; die Uhrzeit läuft von 15:30 bis 22:00 mit — und
-     springt im Finale auf 18:02: mit uns geht das Licht früher aus. */
+  /* ═══ Werkfilm: Scrollen = Zeit ═══ */
   var film = document.getElementById("film");
   var video = document.getElementById("werkfilm");
-  var uhr = document.getElementById("uhr");
   var tageslinie = document.getElementById("tageslinie");
   var scrollcue = document.getElementById("scrollcue");
   var tafeln = Array.prototype.slice.call(document.querySelectorAll(".tafel"));
@@ -575,14 +637,6 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
     return Math.max(0, Math.min(1, -r.top / (r.height - innerHeight)));
   }
 
-  function uhrzeit(p) {
-    if (p >= 0.9) return "18:02"; // die Pointe: Feierabend zur Feierabendzeit
-    var start = 15.5 * 60, ende = 21.75 * 60;
-    var min = Math.round(start + (ende - start) * (p / 0.9));
-    var h = Math.floor(min / 60), m = min % 60;
-    return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
-  }
-
   if (!reduziert) {
     addEventListener("scroll", function () { ziel = fortschritt(); }, { passive: true });
     (function los() {
@@ -590,10 +644,8 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
         var t = ziel * video.duration;
         video.currentTime += (t - video.currentTime) * 0.22;
       }
-      uhr.textContent = uhrzeit(ziel);
-      uhr.classList.toggle("final", ziel >= 0.9);
       tageslinie.style.width = (ziel * 100).toFixed(2) + "%";
-      scrollcue.classList.toggle("weg", ziel > 0.04);
+      scrollcue.classList.toggle("weg", ziel > 0.03);
       tafeln.forEach(function (tafel) {
         var von = Number(tafel.dataset.von), bis = Number(tafel.dataset.bis);
         tafel.classList.toggle("an", ziel >= von && ziel <= bis);
@@ -614,7 +666,7 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
     document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
   }
 
-  /* Förderrechner: zuschuss = min(volumen × 0,5, 7500) — Deckelung ist Pflicht */
+  /* Förderrechner: zuschuss = min(volumen × 0,5, 7500), Deckelung ist Pflicht */
   var slider = document.getElementById("volumen");
   var fmt = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
   function rechne() {
@@ -628,12 +680,12 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
     document.getElementById("calc-hinweis").textContent =
       volumen >= 15000 ? "Der Höchstbetrag von 7.500 € ist erreicht." : "Das sind 50 % Ihres Projektvolumens.";
     slider.setAttribute("aria-valuetext", fmt.format(volumen) + " Projektvolumen, " + fmt.format(zuschuss) + " Zuschuss");
-    slider.style.setProperty("--fill", (((volumen - 4000) / 56000) * 100).toFixed(1) + "%");
+    slider.style.setProperty("--fill", (((volumen - 4000) / 26000) * 100).toFixed(1) + "%");
   }
   slider.addEventListener("input", rechne);
   rechne();
 
-  /* Kontaktformular: EMAIL ersetzen; bis dahin ehrlicher Verweis aufs Telefon */
+  /* Kontaktformular: EMAIL ersetzen; bis dahin ehrlicher Verweis auf Telefon/Calendly */
   var EMAIL = "[PLATZHALTER]";
   var form = document.getElementById("kontakt-formular");
   var status = document.getElementById("form-status");
@@ -643,7 +695,7 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
     var rueckruf = document.getElementById("f-rueckruf").value.trim();
     if (!name || !rueckruf) { status.textContent = "Bitte Namen und eine Rückrufmöglichkeit angeben."; return; }
     if (EMAIL.indexOf("PLATZHALTER") !== -1) {
-      status.textContent = "Das Formular ist noch nicht angeschlossen — bitte rufen Sie an: [PLATZHALTER Telefon].";
+      status.textContent = "Das Formular ist noch nicht angeschlossen. Rufen Sie an (0179 213 74 76) oder buchen Sie direkt einen Termin.";
       return;
     }
     var body = "Name: " + name + "\nBetrieb: " + document.getElementById("f-betrieb").value.trim() +

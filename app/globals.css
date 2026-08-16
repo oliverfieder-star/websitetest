@@ -89,6 +89,15 @@ body {
   50%      { top: 102%; }
 }
 
+/* Scrollrad-Animation im Scroll-Hinweis */
+@media (prefers-reduced-motion: no-preference) {
+  .scrollrad { animation: radeln 1.6s ease-in-out infinite; }
+  @keyframes radeln {
+    0%, 100% { transform: translate(-50%, 0); opacity: 1; }
+    60% { transform: translate(-50%, 14px); opacity: 0.2; }
+  }
+}
+
 /* Sanftes Aufdecken beim Scrollen */
 .reveal {
   opacity: 0;

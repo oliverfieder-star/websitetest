@@ -11,7 +11,7 @@ import { useState } from "react";
  */
 
 const MIN = 4000;
-const MAX = 60000;
+const MAX = 30000;
 const STEP = 500;
 const DECKEL = 7500;
 
