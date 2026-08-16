@@ -36,6 +36,7 @@ const teaser = {
     "{{IMG_K1}}": () => uri("design/assets/story2/k1-nachmittag.jpg", "image/jpeg"),
     "{{IMG_K4}}": () => uri("design/assets/story2/k4-buero-nacht.jpg", "image/jpeg"),
     "{{IMG_K5}}": () => uri("design/assets/story2/k5-licht-aus.jpg", "image/jpeg"),
+    "{{IMG_PORTRAET}}": () => uri("public/media/oliver-portraet.jpg", "image/jpeg"),
   },
 };
 

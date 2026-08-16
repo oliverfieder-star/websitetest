@@ -266,20 +266,26 @@ export default function Home() {
           <div className="mt-12 grid gap-6 md:grid-cols-2">
             <Reveal className="flex h-full flex-col rounded-md border border-stahl/40 bg-nacht p-8 md:p-10">
               <div className="flex items-center gap-4">
-                {/* Porträt-Slot: wird durch das Higgsfield-Porträt ersetzt */}
-                <span
-                  role="img"
-                  aria-label="Porträt folgt"
-                  className="grid h-20 w-20 flex-none place-items-center rounded-full border-[1.5px] border-stahl bg-flaeche text-2xl font-bold tracking-wider text-stahl"
-                >
-                  OF
-                </span>
+                <img
+                  src="/media/oliver-portraet.jpg"
+                  alt="Porträt von Oliver Fieder"
+                  width={80}
+                  height={80}
+                  className="h-20 w-20 flex-none rounded-full border-[1.5px] border-stahl object-cover"
+                />
                 <div>
                   <p className="text-lg font-bold">Oliver Fieder</p>
-                  <p className="text-sm text-gedimmt">Mainfranken Digital</p>
+                  <p className="text-sm text-gedimmt">
+                    Gründer und Berater, Mainfranken Digital
+                  </p>
                 </div>
               </div>
               <p className="mt-6 text-justify leading-relaxed text-gedimmt [hyphens:auto]">
+                Selbstständig seit dem 15. Lebensjahr, heute über sechs Jahre
+                Unternehmer und seit rund drei Jahren in der Beratung tätig, in
+                Projekten unter anderem mit Kunden wie Siemens.
+              </p>
+              <p className="mt-4 text-justify leading-relaxed text-gedimmt [hyphens:auto]">
                 Eine halbe Stunde, unverbindlich. Danach wissen Sie, ob sich
                 Digitalisierung und KI für Ihren Betrieb lohnen und was der
                 sinnvolle erste Schritt wäre.
