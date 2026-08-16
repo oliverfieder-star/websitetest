@@ -269,9 +269,9 @@ export default function Home() {
                 <img
                   src="/media/oliver-portraet.jpg"
                   alt="Porträt von Oliver Fieder"
-                  width={80}
-                  height={80}
-                  className="h-20 w-20 flex-none rounded-full border-[1.5px] border-stahl object-cover"
+                  width={112}
+                  height={112}
+                  className="h-28 w-28 flex-none rounded-full border-[1.5px] border-stahl object-cover"
                 />
                 <div>
                   <p className="text-lg font-bold">Oliver Fieder</p>
@@ -405,6 +405,15 @@ export default function Home() {
                   </a>
                 </p>
                 <p>
+                  <span className="font-semibold text-schrift">Registereintrag:</span>
+                  <br />
+                  Eintragung im Handelsregister.
+                  <br />
+                  Registergericht: Amtsgericht Würzburg
+                  <br />
+                  Registernummer: HRB 17397
+                </p>
+                <p>
                   <span className="font-semibold text-schrift">Umsatzsteuer-ID:</span>
                   <br />
                   Umsatzsteuer-Identifikationsnummer gemäß § 27a
@@ -418,6 +427,15 @@ export default function Home() {
                   Oliver Fieder, Versbacher Straße 20, 97078 Würzburg
                 </p>
                 <p>„Mainfranken Digital“ ist ein Angebot der Fieder Handels GmbH.</p>
+                <p>
+                  <span className="font-semibold text-schrift">
+                    Verbraucherstreitbeilegung:
+                  </span>
+                  <br />
+                  Wir sind nicht bereit oder verpflichtet, an
+                  Streitbeilegungsverfahren vor einer
+                  Verbraucherschlichtungsstelle teilzunehmen.
+                </p>
               </div>
             </details>
             <details id="datenschutz" className="group">
