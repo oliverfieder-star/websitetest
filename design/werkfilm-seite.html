@@ -238,7 +238,11 @@ input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border-radius
 .schritte p { margin-top: 0.7rem; font-size: 0.9rem; color: var(--nebel); }
 
 /* Kontakt */
-.kontakt-grid { display: grid; gap: 1.5rem; margin-top: 3rem; }
+.kontakt-grid { display: grid; gap: 1.5rem; margin-top: 3rem; align-items: stretch; }
+.kontakt-karte { display: flex; flex-direction: column; }
+.calendly-box { flex: 1; margin-top: 1.4rem; min-height: 460px; border: 1px solid var(--linie); border-radius: 3px; background: var(--flaeche); display: grid; place-items: center; padding: 1.4rem; text-align: center; }
+.calendly-box iframe { width: 100%; height: 100%; min-height: 560px; border: 0; border-radius: 3px; }
+.kontakt-karte form { flex: 1; }
 @media (min-width: 900px) { .kontakt-grid { grid-template-columns: 1fr 1fr; } }
 .kontakt-karte { border: 1px solid var(--linie); border-radius: 4px; background: var(--graphit); padding: clamp(1.8rem, 3vw, 2.5rem); }
 .kontakt-karte.betont { border-color: rgba(143, 169, 189, 0.4); }
@@ -521,11 +525,14 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
           <p class="text blocksatz">Eine halbe Stunde, unverbindlich. Danach
           wissen Sie, ob sich Digitalisierung und KI für Ihren Betrieb lohnen
           und was der sinnvolle erste Schritt wäre.</p>
-          <a class="btn" href="https://calendly.com/oliver2004-fieder/30min" target="_blank" rel="noopener">Termin direkt buchen</a>
+          <div class="calendly-box" id="calendly-box">
+            <button class="btn" type="button" id="calendly-laden">Kalender anzeigen &amp; Termin buchen</button>
+            <p class="form-hinweis" style="margin-top:0.9rem">Beim Laden des Kalenders werden Daten an Calendly (USA) übertragen. Details in der <a href="#datenschutz">Datenschutzerklärung</a>. Alternativ: <a href="https://calendly.com/oliver2004-fieder/30min" target="_blank" rel="noopener">Calendly in neuem Fenster öffnen</a>.</p>
+          </div>
           <div class="kontakt-meta">
             <p>Telefon: <a href="tel:+491792137476">0179 213 74 76</a></p>
-            <p>E-Mail: [PLATZHALTER: E-Mail-Adresse]</p>
-            <p>Mainfranken Digital, [PLATZHALTER: Ort]</p>
+            <p>E-Mail: <a href="mailto:oliver@mainfranken-digital.de">oliver@mainfranken-digital.de</a></p>
+            <p>Mainfranken Digital · Versbacher Straße 20 · 97078 Würzburg</p>
           </div>
         </div>
         <div class="kontakt-karte reveal">
@@ -549,7 +556,7 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
             </div>
             <div><button class="btn hell" type="submit">Nachricht senden</button></div>
             <p id="form-status" role="status"></p>
-            <p class="form-hinweis">Ihre Angaben werden nur zur Beantwortung Ihrer Anfrage verwendet. [PLATZHALTER: Datenschutzhinweis]</p>
+            <p class="form-hinweis">Ihre Angaben werden nur zur Beantwortung Ihrer Anfrage verwendet. Details in der <a href="#datenschutz">Datenschutzerklärung</a>.</p>
           </form>
         </div>
       </div>
@@ -588,7 +595,7 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
           <summary>Was passiert mit unseren Daten?</summary>
           <p>Ihre Daten bleiben Ihre Daten. Welche Werkzeuge welche Daten
           verarbeiten, legen wir vorab gemeinsam fest und halten es schriftlich
-          fest. Details: [PLATZHALTER: Datenschutzhinweise].</p>
+          fest. Details stehen in der Datenschutzerklärung auf dieser Seite.</p>
         </details>
         <details>
           <summary>Wie viel Zeit kostet mich das neben dem Tagesgeschäft?</summary>
@@ -607,15 +614,83 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
       </div>
     </div>
   </section>
+
+  <!-- ═══ Rechtliches ═══ -->
+  <section class="inhalt abgesetzt" id="rechtliches" aria-label="Rechtliches">
+    <div class="inner">
+      <div class="trennmass" aria-hidden="true"><div class="l"></div><span>Rechtliches</span><div class="l"></div></div>
+      <div class="faq-liste">
+        <details id="impressum">
+          <summary>Impressum</summary>
+          <div style="padding-bottom:1.5rem;color:var(--nebel);max-width:44rem">
+            <p><strong style="color:var(--silber)">Angaben gemäß § 5 DDG</strong></p>
+            <p style="margin-top:0.8rem">Fieder Handels GmbH<br />Versbacher Straße 20<br />97078 Würzburg</p>
+            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Vertreten durch:</strong><br />Geschäftsführer Oliver Fieder</p>
+            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Kontakt:</strong><br />Telefon: <a href="tel:+491792137476">0179 213 74 76</a><br />E-Mail: <a href="mailto:oliver@mainfranken-digital.de">oliver@mainfranken-digital.de</a></p>
+            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Umsatzsteuer-ID:</strong><br />Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: DE3370133371</p>
+            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong><br />Oliver Fieder, Versbacher Straße 20, 97078 Würzburg</p>
+            <p style="margin-top:0.8rem">„Mainfranken Digital“ ist ein Angebot der Fieder Handels GmbH.</p>
+          </div>
+        </details>
+        <details id="datenschutz">
+          <summary>Datenschutzerklärung</summary>
+          <div style="padding-bottom:1.5rem;color:var(--nebel);max-width:44rem" class="blocksatz">
+            <p><strong style="color:var(--silber)">1. Verantwortlicher</strong><br />
+            Fieder Handels GmbH, Versbacher Straße 20, 97078 Würzburg,
+            Telefon: 0179 213 74 76, E-Mail: oliver@mainfranken-digital.de.</p>
+            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">2. Hosting und Server-Logdateien</strong><br />
+            Beim Aufruf dieser Website verarbeitet der Hosting-Anbieter automatisch
+            technisch notwendige Daten (z.&nbsp;B. IP-Adresse, Datum und Uhrzeit des
+            Abrufs, aufgerufene Seite, Browsertyp), um die Website auszuliefern und
+            ihre Stabilität und Sicherheit zu gewährleisten (Art.&nbsp;6 Abs.&nbsp;1
+            lit.&nbsp;f DSGVO). Die Logdaten werden nach spätestens sieben Tagen
+            gelöscht, soweit keine sicherheitsrelevante Aufbewahrung erforderlich ist.
+            Diese Website setzt keine Cookies zu Analyse- oder Werbezwecken ein und
+            verwendet kein Tracking.</p>
+            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">3. Kontaktaufnahme</strong><br />
+            Wenn Sie uns per Formular, E-Mail oder Telefon kontaktieren, verarbeiten
+            wir die von Ihnen mitgeteilten Daten (Name, Betrieb, Kontaktdaten, Inhalt
+            der Anfrage) ausschließlich zur Bearbeitung Ihrer Anfrage und für
+            Anschlussfragen (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO, bei
+            allgemeinen Anfragen Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Die
+            Daten werden gelöscht, sobald sie für die Bearbeitung nicht mehr
+            erforderlich sind und keine gesetzlichen Aufbewahrungspflichten
+            entgegenstehen.</p>
+            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">4. Terminbuchung über Calendly</strong><br />
+            Für die Online-Terminbuchung nutzen wir den Dienst Calendly der Calendly
+            LLC, 1315 Peachtree St NE, Atlanta, GA 30309, USA. Der Kalender wird erst
+            geladen, wenn Sie ihn aktiv anklicken; erst dann werden Daten (u.&nbsp;a.
+            IP-Adresse sowie die von Ihnen eingegebenen Termindaten) an Calendly
+            übertragen, ggf. auch in die USA. Rechtsgrundlage ist Ihre Einwilligung
+            durch das aktive Laden (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO) sowie
+            die Durchführung vorvertraglicher Maßnahmen (Art.&nbsp;6 Abs.&nbsp;1
+            lit.&nbsp;b DSGVO). Calendly ist nach dem EU-U.S. Data Privacy Framework
+            zertifiziert. Details: <a href="https://calendly.com/privacy" target="_blank" rel="noopener">calendly.com/privacy</a>.</p>
+            <p style="margin-top:0.8rem"><strong style="color:var(--silber)">5. Ihre Rechte</strong><br />
+            Sie haben das Recht auf Auskunft (Art.&nbsp;15 DSGVO), Berichtigung
+            (Art.&nbsp;16), Löschung (Art.&nbsp;17), Einschränkung der Verarbeitung
+            (Art.&nbsp;18), Datenübertragbarkeit (Art.&nbsp;20) sowie Widerspruch
+            gegen Verarbeitungen auf Grundlage von Art.&nbsp;6 Abs.&nbsp;1
+            lit.&nbsp;f DSGVO (Art.&nbsp;21). Eine erteilte Einwilligung können Sie
+            jederzeit mit Wirkung für die Zukunft widerrufen. Außerdem haben Sie das
+            Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren,
+            z.&nbsp;B. beim Bayerischen Landesamt für Datenschutzaufsicht (BayLDA),
+            Promenade 18, 91522 Ansbach.</p>
+            <p style="margin-top:0.8rem">Stand: August 2026</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
   <div class="fuss">
     <a class="marke" href="#film">Mainfranken<i> Digital</i></a>
-    <p class="kleinf">Oliver Fieder · Telefon: <a href="tel:+491792137476">0179 213 74 76</a> · [PLATZHALTER: E-Mail]</p>
+    <p class="kleinf">Oliver Fieder · Telefon: <a href="tel:+491792137476">0179 213 74 76</a> · <a href="mailto:oliver@mainfranken-digital.de">oliver@mainfranken-digital.de</a></p>
     <div class="links">
-      <a href="#kontakt">Impressum [PLATZHALTER]</a>
-      <a href="#kontakt">Datenschutz [PLATZHALTER]</a>
+      <a href="#impressum">Impressum</a>
+      <a href="#datenschutz">Datenschutz</a>
     </div>
   </div>
 </footer>
@@ -685,8 +760,24 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
   slider.addEventListener("input", rechne);
   rechne();
 
-  /* Kontaktformular: EMAIL ersetzen; bis dahin ehrlicher Verweis auf Telefon/Calendly */
-  var EMAIL = "[PLATZHALTER]";
+  /* Calendly: Kalender erst nach aktivem Klick laden (Datenschutz) */
+  var calendlyKnopf = document.getElementById("calendly-laden");
+  if (calendlyKnopf) {
+    calendlyKnopf.addEventListener("click", function () {
+      var box = document.getElementById("calendly-box");
+      box.innerHTML = "";
+      var frame = document.createElement("iframe");
+      frame.src = "https://calendly.com/oliver2004-fieder/30min?embed_type=Inline&hide_landing_page_details=1&hide_gdpr_banner=1&background_color=14171c&text_color=e9e7e2&primary_color=8fa9bd";
+      frame.title = "Termin buchen (Calendly)";
+      frame.loading = "lazy";
+      box.style.display = "block";
+      box.style.padding = "0";
+      box.appendChild(frame);
+    });
+  }
+
+  /* Kontaktformular */
+  var EMAIL = "oliver@mainfranken-digital.de";
   var form = document.getElementById("kontakt-formular");
   var status = document.getElementById("form-status");
   form.addEventListener("submit", function (e) {
@@ -694,10 +785,6 @@ footer { border-top: 1px solid var(--linie); padding: 2.4rem clamp(1.2rem, 4vw, 
     var name = document.getElementById("f-name").value.trim();
     var rueckruf = document.getElementById("f-rueckruf").value.trim();
     if (!name || !rueckruf) { status.textContent = "Bitte Namen und eine Rückrufmöglichkeit angeben."; return; }
-    if (EMAIL.indexOf("PLATZHALTER") !== -1) {
-      status.textContent = "Das Formular ist noch nicht angeschlossen. Rufen Sie an (0179 213 74 76) oder buchen Sie direkt einen Termin.";
-      return;
-    }
     var body = "Name: " + name + "\nBetrieb: " + document.getElementById("f-betrieb").value.trim() +
       "\nRückruf: " + rueckruf + "\n\n" + document.getElementById("f-nachricht").value.trim();
     location.href = "mailto:" + EMAIL + "?subject=" + encodeURIComponent("Anfrage über mainfranken-digital") + "&body=" + encodeURIComponent(body);

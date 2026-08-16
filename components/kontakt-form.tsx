@@ -2,11 +2,8 @@
 
 import { useState } from "react";
 
-/**
- * EMAIL durch die echte Adresse ersetzen; solange der Platzhalter
- * drinsteht, verweist das Formular ehrlich auf das Telefon.
- */
-const EMAIL = "[PLATZHALTER]";
+/** Baut aus den Formularfeldern eine mailto-Nachricht. */
+const EMAIL = "oliver@mainfranken-digital.de";
 
 const feld =
   "w-full rounded-lg border border-linie bg-nacht px-4 py-3 text-schrift placeholder:text-gedimmt/60 focus:outline-3 focus:outline-stahl";
@@ -23,12 +20,6 @@ export function KontaktForm() {
 
     if (!name || !rueckruf) {
       setStatus("Bitte Namen und eine Rückrufmöglichkeit angeben.");
-      return;
-    }
-    if (EMAIL.includes("PLATZHALTER")) {
-      setStatus(
-        "Das Formular ist noch nicht angeschlossen — bitte rufen Sie an: [PLATZHALTER Telefon]."
-      );
       return;
     }
     const betrieb = String(daten.get("betrieb") ?? "").trim();
@@ -80,7 +71,11 @@ export function KontaktForm() {
       </p>
       <p className="text-xs leading-relaxed text-gedimmt">
         Ihre Angaben werden nur zur Beantwortung Ihrer Anfrage verwendet.
-        [PLATZHALTER: Datenschutzhinweis]
+        Details in der{" "}
+        <a href="#datenschutz" className="underline underline-offset-2">
+          Datenschutzerklärung
+        </a>
+        .
       </p>
     </form>
   );
