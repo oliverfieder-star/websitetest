@@ -1,5 +1,4 @@
-import { HeroFuturistic } from "@/components/ui/hero-futuristic";
-import { Marquee } from "@/components/ui/marquee";
+import { Werkfilm } from "@/components/ui/werkfilm";
 import { Accordion } from "@/components/ui/accordion";
 import { Foerderrechner } from "@/components/foerderrechner";
 import { KontaktForm } from "@/components/kontakt-form";
@@ -7,20 +6,9 @@ import { SiteHeader } from "@/components/site-header";
 import { Reveal } from "@/components/reveal";
 import { Phone } from "lucide-react";
 
-const AUFGABEN = [
-  "Angebote",
-  "Rechnungen",
-  "Aufmaße",
-  "Stundenzettel",
-  "Materiallisten",
-  "E-Mail-Anfragen",
-  "Terminplanung",
-  "Lieferscheine",
-];
-
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber">
+    <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-stahl">
       {children}
     </p>
   );
@@ -39,77 +27,21 @@ export default function Home() {
     <>
       <SiteHeader />
       <main id="top">
-        <HeroFuturistic />
-
-        {/* ── Laufband der Büroaufgaben ─────────────────────────── */}
-        <div id="aufgaben">
-          <Marquee items={AUFGABEN} />
-        </div>
-
-        {/* ── Problem ───────────────────────────────────────────── */}
-        <section
-          id="problem"
-          aria-labelledby="problem-h"
-          className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-24 md:grid-cols-2 md:py-36"
-        >
-          <Reveal>
-            <Eyebrow>Kommt Ihnen bekannt vor?</Eyebrow>
-            <h2
-              id="problem-h"
-              className="font-display text-balance text-3xl font-bold uppercase leading-[1.06] tracking-tight md:text-5xl"
-            >
-              Der Betrieb läuft. Das Büro frisst den{" "}
-              <span className="text-amber">Feierabend</span>.
-            </h2>
-            <ul className="mt-10 space-y-6 text-base leading-relaxed text-gedimmt md:text-lg">
-              <li className="border-l-2 border-amber pl-5">
-                Angebote entstehen nachts am Küchentisch, weil tagsüber niemand
-                dazu kommt.
-              </li>
-              <li className="border-l-2 border-amber pl-5">
-                Aufmaße, Fotos und Lieferscheine liegen verstreut — im Auto, im
-                Postfach, auf Zetteln neben der Kaffeemaschine.
-              </li>
-              <li className="border-l-2 border-amber pl-5">
-                Software wurde schon angeschafft und wird nicht benutzt, weil
-                sie am Alltag auf der Baustelle vorbeigeplant war.
-              </li>
-            </ul>
-            <p className="mt-10 max-w-xl text-lg font-medium text-schrift md:text-xl">
-              Das lässt sich abstellen — nicht mit noch einem Programm, sondern
-              mit Abläufen, die zu Ihrem Betrieb passen.
-            </p>
-          </Reveal>
-          <Reveal delay={120} className="relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/werkstatt.jpg"
-              alt="Werkstatt in der Abenddämmerung: In einem Bürofenster brennt noch Licht."
-              width={1920}
-              height={1072}
-              loading="lazy"
-              className="rounded-2xl border border-linie object-cover shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]"
-            />
-            <p className="mt-3 text-xs text-gedimmt">
-              Abends um acht: Im Büro brennt noch Licht — hier setzen wir an.
-            </p>
-          </Reveal>
-        </section>
+        <Werkfilm />
 
         {/* ── Leistungen ────────────────────────────────────────── */}
         <section
-          id="leistungen"
-          aria-labelledby="leistungen-h"
+          id="angebot"
+          aria-labelledby="angebot-h"
           className="border-t border-linie bg-flaeche"
         >
           <div className="mx-auto max-w-6xl px-5 py-24 md:py-36">
             <Reveal>
               <Eyebrow>Das Angebot</Eyebrow>
-              <H2>Erst schauen, dann machen.</H2>
+              <H2>Zwei Wege, ein Ziel: ein ruhigeres Büro.</H2>
               <p className="mt-5 max-w-2xl text-gedimmt md:text-lg">
-                Kein Paket von der Stange: Zuerst wird geprüft, was sich in
-                Ihrem Betrieb überhaupt lohnt — umgesetzt wird nur, was im
-                Alltag Zeit spart.
+                Erst die gemeinsame Analyse, dann das geförderte Projekt —
+                umgesetzt wird nur, was in Ihrem Alltag Zeit spart.
               </p>
             </Reveal>
             <div className="mt-14 grid gap-6 md:grid-cols-2">
@@ -124,28 +56,28 @@ export default function Home() {
                   </span>
                 </p>
                 <p className="mt-5 leading-relaxed text-gedimmt">
-                  Ein Tag in Ihrem Betrieb. Wir gehen die Büroarbeit gemeinsam
-                  durch: Wo geht Zeit verloren, was lässt sich automatisieren —
-                  und was bleibt besser, wie es ist.
+                  Die gemeinsame Analyse: ein Tag in Ihrem Betrieb. Wir gehen die
+                  Büroarbeit zusammen durch — wo geht Zeit verloren, was lässt
+                  sich automatisieren, was bleibt besser, wie es ist.
                 </p>
                 <ul className="mt-6 space-y-3 text-sm text-gedimmt">
                   <li className="flex gap-3">
-                    <span className="mt-2.5 h-px w-4 flex-none bg-amber" />
+                    <span className="mt-2.5 h-px w-4 flex-none bg-stahl" />
                     Vor Ort, an Ihren echten Abläufen
                   </li>
                   <li className="flex gap-3">
-                    <span className="mt-2.5 h-px w-4 flex-none bg-amber" />
+                    <span className="mt-2.5 h-px w-4 flex-none bg-stahl" />
                     Schriftlicher Maßnahmenplan mit Prioritäten
                   </li>
                   <li className="flex gap-3">
-                    <span className="mt-2.5 h-px w-4 flex-none bg-amber" />
+                    <span className="mt-2.5 h-px w-4 flex-none bg-stahl" />
                     Ehrliche Empfehlung — auch wenn sie „nichts ändern“ heißt
                   </li>
                 </ul>
               </Reveal>
               <Reveal
                 delay={120}
-                className="group relative overflow-hidden rounded-2xl border border-amber/35 bg-nacht p-8 md:p-10"
+                className="group relative overflow-hidden rounded-2xl border border-stahl/35 bg-nacht p-8 md:p-10"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -162,26 +94,27 @@ export default function Home() {
                   <p className="font-display mt-4 text-4xl font-bold md:text-5xl">
                     ab 15.000&nbsp;€
                   </p>
-                  <p className="mt-3 inline-block rounded-full border border-amber px-4 py-1.5 text-sm font-semibold text-amber">
-                    effektiv ab 7.500&nbsp;€ nach Förderung
+                  <p className="mt-3 inline-block rounded-full border border-stahl px-4 py-1.5 text-sm font-semibold text-stahl">
+                    Digitalbonus Bayern: effektiv ab 7.500&nbsp;€
                   </p>
                   <p className="mt-5 leading-relaxed text-gedimmt">
-                    Die wichtigsten Punkte aus dem Digital-Check werden
-                    eingerichtet: Angebote schneller schreiben, Belege
-                    automatisch erfassen, Abläufe automatisieren — Schritt für
-                    Schritt, während Ihr Betrieb normal weiterläuft.
+                    Das größere Beratungs- und Umsetzungsprojekt: Die wichtigsten
+                    Punkte aus dem Digital-Check werden eingerichtet — Angebote
+                    schneller schreiben, Belege automatisch erfassen, Abläufe
+                    automatisieren. Schritt für Schritt, während Ihr Betrieb
+                    normal weiterläuft.
                   </p>
                   <ul className="mt-6 space-y-3 text-sm text-gedimmt">
                     <li className="flex gap-3">
-                      <span className="mt-2.5 h-px w-4 flex-none bg-amber" />
+                      <span className="mt-2.5 h-px w-4 flex-none bg-stahl" />
                       Einrichtung und Anpassung an Ihre Arbeitsweise
                     </li>
                     <li className="flex gap-3">
-                      <span className="mt-2.5 h-px w-4 flex-none bg-amber" />
+                      <span className="mt-2.5 h-px w-4 flex-none bg-stahl" />
                       Einweisung für Sie und Ihr Büro
                     </li>
                     <li className="flex gap-3">
-                      <span className="mt-2.5 h-px w-4 flex-none bg-amber" />
+                      <span className="mt-2.5 h-px w-4 flex-none bg-stahl" />
                       Begleitung, bis es im Alltag läuft
                     </li>
                   </ul>
@@ -205,7 +138,7 @@ export default function Home() {
                 className="font-display text-balance text-3xl font-bold uppercase leading-[1.06] tracking-tight md:text-5xl"
               >
                 Der Staat übernimmt die Hälfte — bis{" "}
-                <span className="text-amber">7.500&nbsp;€</span>.
+                <span className="text-stahl">7.500&nbsp;€</span>.
               </h2>
               <p className="mt-6 leading-relaxed text-gedimmt md:text-lg">
                 Für Digitalisierungsprojekte wie dieses gibt es ein
@@ -261,7 +194,7 @@ export default function Home() {
                   <li className="h-full rounded-2xl border border-linie bg-nacht p-7">
                     <span
                       aria-hidden="true"
-                      className="font-display text-5xl font-bold text-amber/90"
+                      className="font-display text-5xl font-bold text-stahl/90"
                     >
                       {String(i + 1).padStart(2, "0")}
                     </span>
@@ -313,9 +246,9 @@ export default function Home() {
                     "Der Digital-Check ist ein Tag. In der Umsetzung brauche ich Sie punktuell — für Entscheidungen und die Einweisung. Geplant wird um Ihren Betriebsalltag herum, nicht umgekehrt.",
                 },
                 {
-                  frage: "Für welche Betriebe ist das gedacht?",
+                  frage: "Wie funktioniert der Digitalbonus Bayern?",
                   antwort:
-                    "Für Handwerksbetriebe in Bayern. Ob es für Ihren Betrieb passt, klären wir im Erstgespräch — offen und ohne Verkaufsdruck.",
+                    "Der Freistaat bezuschusst Digitalisierungsprojekte von Handwerks- und Gewerbebetrieben mit 50 Prozent des Projektvolumens, höchstens 7.500 €; das Projekt muss mindestens 4.000 € umfassen. Antrag und Voraussetzungen klären wir gemeinsam im Erstgespräch — ohne Gewähr, maßgeblich sind die aktuellen Programmbedingungen.",
                 },
                 {
                   frage: "Was kostet es am Ende wirklich?",
@@ -340,13 +273,13 @@ export default function Home() {
                 id="kontakt-h"
                 className="font-display text-balance text-3xl font-bold uppercase leading-[1.06] tracking-tight md:text-5xl"
               >
-                Der nächste Schritt ist ein <span className="text-amber">Anruf</span>.
+                Der nächste Schritt ist ein <span className="text-stahl">Anruf</span>.
               </h2>
               <p className="mt-6 max-w-md leading-relaxed text-gedimmt md:text-lg">
                 Eine halbe Stunde, unverbindlich. Danach wissen Sie, ob sich das
                 für Ihren Betrieb lohnt.
               </p>
-              <p className="font-display mt-8 flex items-center gap-3 text-2xl font-bold text-amber md:text-4xl">
+              <p className="font-display mt-8 flex items-center gap-3 text-2xl font-bold text-stahl md:text-4xl">
                 <Phone className="h-7 w-7" aria-hidden="true" />
                 [PLATZHALTER Telefon]
               </p>
@@ -366,16 +299,16 @@ export default function Home() {
       <footer className="border-t border-linie">
         <div className="mx-auto flex max-w-6xl flex-wrap items-baseline gap-x-10 gap-y-3 px-5 py-10">
           <p className="font-display font-bold">
-            Mainfranken<span className="text-amber"> Digital</span>
+            Mainfranken<span className="text-stahl"> Digital</span>
           </p>
           <p className="text-sm text-gedimmt">
             Telefon: [PLATZHALTER Telefon] · [PLATZHALTER: E-Mail]
           </p>
           <div className="ml-auto flex gap-8 text-sm">
-            <a href="#kontakt" className="text-gedimmt hover:text-amber">
+            <a href="#kontakt" className="text-gedimmt hover:text-stahl">
               Impressum [PLATZHALTER]
             </a>
-            <a href="#kontakt" className="text-gedimmt hover:text-amber">
+            <a href="#kontakt" className="text-gedimmt hover:text-stahl">
               Datenschutz [PLATZHALTER]
             </a>
           </div>

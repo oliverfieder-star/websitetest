@@ -10,15 +10,15 @@
    ═══════════════════════════════════════════════════════════════ */
 
 @theme {
-  --color-nacht: #0a0e14;
-  --color-flaeche: #10151e;
-  --color-flaeche-2: #161d29;
-  --color-amber: #e8a34d;
-  --color-amber-hell: #ffc97a;
-  --color-schrift: #f5f2ea;
-  --color-gedimmt: #a7aebb;
-  --color-linie: rgba(245, 242, 234, 0.1);
-  --color-tinte: #171310;
+  --color-nacht: #0d0f12;
+  --color-flaeche: #14171c;
+  --color-flaeche-2: #1a1f27;
+  --color-stahl: #8fa9bd;
+  --color-stahl-hell: #a7c0d2;
+  --color-schrift: #e9e7e2;
+  --color-gedimmt: #9aa0a8;
+  --color-linie: rgba(233, 231, 226, 0.12);
+  --color-tinte: #0d0f12;
 
   --font-display: var(--font-space-grotesk);
   --font-body: var(--font-inter);
@@ -46,12 +46,12 @@ body {
 }
 
 ::selection {
-  background: var(--color-amber);
+  background: var(--color-stahl);
   color: var(--color-tinte);
 }
 
 :focus-visible {
-  outline: 3px solid var(--color-amber);
+  outline: 3px solid var(--color-stahl);
   outline-offset: 3px;
   border-radius: 2px;
 }

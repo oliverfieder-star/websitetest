@@ -9,7 +9,7 @@ import { useState } from "react";
 const EMAIL = "[PLATZHALTER]";
 
 const feld =
-  "w-full rounded-lg border border-linie bg-nacht px-4 py-3 text-schrift placeholder:text-gedimmt/60 focus:outline-3 focus:outline-amber";
+  "w-full rounded-lg border border-linie bg-nacht px-4 py-3 text-schrift placeholder:text-gedimmt/60 focus:outline-3 focus:outline-stahl";
 
 export function KontaktForm() {
   const [status, setStatus] = useState("");
@@ -70,12 +70,12 @@ export function KontaktForm() {
       <div>
         <button
           type="submit"
-          className="cursor-pointer rounded-full bg-amber px-8 py-4 text-base font-semibold text-tinte transition-transform hover:-translate-y-0.5 hover:bg-amber-hell"
+          className="cursor-pointer rounded-full bg-stahl px-8 py-4 text-base font-semibold text-tinte transition-transform hover:-translate-y-0.5 hover:bg-stahl-hell"
         >
           Nachricht senden
         </button>
       </div>
-      <p role="status" className="min-h-6 text-sm font-semibold text-amber">
+      <p role="status" className="min-h-6 text-sm font-semibold text-stahl">
         {status}
       </p>
       <p className="text-xs leading-relaxed text-gedimmt">

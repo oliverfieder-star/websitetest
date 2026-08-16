@@ -90,13 +90,13 @@ const PostProcessing = ({
     const uvY = uv().y;
     const scanWidth = float(0.05);
     const scanLine = smoothstep(0, scanWidth, abs(uvY.sub(uScanProgress)));
-    const amberOverlay = vec3(1.0, 0.62, 0.25)
+    const stahlOverlay = vec3(1.0, 0.62, 0.25)
       .mul(oneMinus(scanLine))
       .mul(float(0.35).mul(uBoost));
 
     const withScanEffect = mix(
       scenePassColor,
-      add(scenePassColor, amberOverlay),
+      add(scenePassColor, stahlOverlay),
       smoothstep(0.9, 1.0, oneMinus(scanLine))
     );
 
@@ -226,7 +226,7 @@ function HeroCopy() {
     return () => clearTimeout(t);
   }, [visibleWords, all.length]);
 
-  const renderLine = (words: string[], offset: number, amber: boolean) => (
+  const renderLine = (words: string[], offset: number, stahl: boolean) => (
     <div className="flex justify-center gap-[0.35em] overflow-hidden">
       {words.map((word, i) => {
         const idx = offset + i;
@@ -234,7 +234,7 @@ function HeroCopy() {
           <span
             key={idx}
             className={`${idx < visibleWords ? "fade-in" : ""} ${
-              amber ? "text-amber" : "text-schrift"
+              stahl ? "text-stahl" : "text-schrift"
             }`}
             style={{
               animationDelay: `${idx * 0.14}s`,
@@ -251,7 +251,7 @@ function HeroCopy() {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6">
       <p
-        className={`mb-6 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber md:text-xs ${
+        className={`mb-6 text-[11px] font-semibold uppercase tracking-[0.3em] text-stahl md:text-xs ${
           visibleWords > 0 ? "fade-in" : "opacity-0"
         }`}
       >
@@ -280,7 +280,7 @@ function HeroCopy() {
       >
         <a
           href="#kontakt"
-          className="rounded-full bg-amber px-8 py-4 text-base font-semibold text-tinte shadow-[0_12px_40px_-12px_rgba(232,163,77,0.6)] transition-transform hover:-translate-y-0.5 hover:bg-amber-hell"
+          className="rounded-full bg-stahl px-8 py-4 text-base font-semibold text-tinte shadow-[0_12px_40px_-12px_rgba(232,163,77,0.6)] transition-transform hover:-translate-y-0.5 hover:bg-stahl-hell"
         >
           Erstgespräch vereinbaren
         </a>
@@ -345,7 +345,7 @@ export function HeroFuturistic() {
 
       <a
         href="#aufgaben"
-        className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 text-[11px] font-semibold uppercase tracking-[0.25em] text-gedimmt transition-colors hover:text-amber"
+        className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 text-[11px] font-semibold uppercase tracking-[0.25em] text-gedimmt transition-colors hover:text-stahl"
       >
         Entdecken ↓
       </a>

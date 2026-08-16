@@ -33,13 +33,13 @@ export function Accordion({
                 aria-controls={`${baseId}-panel-${i}`}
                 id={`${baseId}-button-${i}`}
                 onClick={() => setOpen(isOpen ? null : i)}
-                className="flex w-full cursor-pointer items-center justify-between gap-6 py-6 text-left text-base font-semibold text-schrift transition-colors hover:text-amber md:text-lg"
+                className="flex w-full cursor-pointer items-center justify-between gap-6 py-6 text-left text-base font-semibold text-schrift transition-colors hover:text-stahl md:text-lg"
               >
                 {item.frage}
                 <Plus
                   aria-hidden="true"
                   className={cn(
-                    "h-5 w-5 flex-none text-amber transition-transform duration-300",
+                    "h-5 w-5 flex-none text-stahl transition-transform duration-300",
                     isOpen && "rotate-45"
                   )}
                 />

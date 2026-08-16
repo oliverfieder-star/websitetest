@@ -32,7 +32,7 @@ export function Marquee({
             className="flex items-center gap-10 font-display text-sm font-medium uppercase tracking-[0.2em] text-gedimmt"
           >
             {item}
-            <span className="h-1.5 w-1.5 rounded-full bg-amber" aria-hidden="true" />
+            <span className="h-1.5 w-1.5 rounded-full bg-stahl" aria-hidden="true" />
           </span>
         ))}
       </div>

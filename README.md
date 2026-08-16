@@ -15,7 +15,21 @@ npm run dev        # http://localhost:3000
 npm run build      # statischer Export nach out/
 ```
 
-## Design: „Werklicht"
+## Design: „Werkfilm"
+
+Das Herzstück ist der **Werkfilm** (`components/ui/werkfilm.tsx`): ein
+durchgescrollter Arbeitstag in einer modernen Handwerkshalle (Higgsfield-
+generiert als Keyframe-Kette + Videosegmente mit Start-/Endbild, vom
+GitHub-Runner zu einem keyframe-dicht enkodierten Master-Film montiert —
+`.github/workflows/build-werkfilm.yml`). Scrollen = Zeit: Nachmittag →
+Dämmerung → Nacht; am Ende geht im Glasbüro das Licht aus, die Uhr springt
+auf 18:02, dann kommt der CTA. Value-Proposition-Tafeln liegen im Film;
+reduzierte Bewegung erhält eine Standbild-Sequenz.
+
+Einzeldatei-Fassung der Seite: `node design/build-teaser.mjs` →
+`design/dist/werkfilm-seite.html`.
+
+## Früherer Stand: „Werklicht"
 
 Cinematisches Dunkel (Graphit mit Blauanteil), ein warmes Amber als einzige
 laute Farbe, große kompakte Display-Typografie (Space Grotesk) mit ruhiger

@@ -52,15 +52,15 @@ export function Foerderrechner() {
         aria-valuetext={`${euro.format(volumen)} Projektvolumen, ${euro.format(zuschuss)} Zuschuss`}
         aria-describedby="calc-hinweis"
         className="mt-6 h-11 w-full cursor-pointer appearance-none bg-transparent
-          [&::-moz-range-progress]:h-1.5 [&::-moz-range-progress]:rounded-full [&::-moz-range-progress]:bg-amber
-          [&::-moz-range-thumb]:h-7 [&::-moz-range-thumb]:w-7 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-nacht [&::-moz-range-thumb]:bg-amber
+          [&::-moz-range-progress]:h-1.5 [&::-moz-range-progress]:rounded-full [&::-moz-range-progress]:bg-stahl
+          [&::-moz-range-thumb]:h-7 [&::-moz-range-thumb]:w-7 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-nacht [&::-moz-range-thumb]:bg-stahl
           [&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-flaeche-2
           [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full
-          [&::-webkit-slider-thumb]:-mt-3 [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-nacht [&::-webkit-slider-thumb]:bg-amber [&::-webkit-slider-thumb]:shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
+          [&::-webkit-slider-thumb]:-mt-3 [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-nacht [&::-webkit-slider-thumb]:bg-stahl [&::-webkit-slider-thumb]:shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
         style={{
           // Verlaufsfüllung für die WebKit-Spur
           ["--fill" as string]: `${fill}%`,
-          background: `linear-gradient(to right, var(--color-amber) 0 ${fill}%, var(--color-flaeche-2) ${fill}% 100%)`,
+          background: `linear-gradient(to right, var(--color-stahl) 0 ${fill}%, var(--color-flaeche-2) ${fill}% 100%)`,
           borderRadius: "999px",
           height: "6px",
           marginTop: "2rem",
@@ -76,8 +76,8 @@ export function Foerderrechner() {
       </div>
 
       <dl className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <div className="rounded-xl border border-amber/40 bg-nacht p-5">
-          <dt className="text-sm font-semibold text-amber">Zuschuss</dt>
+        <div className="rounded-xl border border-stahl/40 bg-nacht p-5">
+          <dt className="text-sm font-semibold text-stahl">Zuschuss</dt>
           <dd className="font-display mt-1 text-3xl font-bold tabular-nums text-schrift md:text-4xl">
             {euro.format(zuschuss)}
           </dd>
@@ -95,7 +95,7 @@ export function Foerderrechner() {
         aria-hidden="true"
       >
         <div
-          className="bg-amber transition-[width] duration-200"
+          className="bg-stahl transition-[width] duration-200"
           style={{ width: `${anteil.toFixed(1)}%` }}
         />
       </div>

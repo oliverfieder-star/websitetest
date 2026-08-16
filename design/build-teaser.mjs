@@ -29,6 +29,14 @@ const teaser = {
     "{{IMG_EICHE}}": () => uri("design/assets/eiche-makro.jpg", "image/jpeg"),
     "{{IMG_KALK}}": () => uri("design/assets/kalkputz.jpg", "image/jpeg"),
   },
+  "werkfilm-seite.html": {
+    "{{VID_MASTER_WEBM}}": () => uri("public/media/werkfilm-master.webm", "video/webm"),
+    "{{VID_MASTER_MP4}}": () => uri("public/media/werkfilm-master.mp4", "video/mp4"),
+    "{{IMG_POSTER}}": () => uri("public/media/werkfilm-poster.jpg", "image/jpeg"),
+    "{{IMG_K1}}": () => uri("design/assets/story2/k1-nachmittag.jpg", "image/jpeg"),
+    "{{IMG_K4}}": () => uri("design/assets/story2/k4-buero-nacht.jpg", "image/jpeg"),
+    "{{IMG_K5}}": () => uri("design/assets/story2/k5-licht-aus.jpg", "image/jpeg"),
+  },
 };
 
 mkdirSync(join(root, "design/dist"), { recursive: true });
