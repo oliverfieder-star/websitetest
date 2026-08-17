@@ -18,9 +18,25 @@ präzise. Kein Schmuck ohne Funktion.
 | Stahl hell | `#A7C0D2` | Hover/Steigerung (Web) |
 | Linie | `#2B2F36` | feine Rahmen und Trennlinien (Ersatz für 12 % Weiß) |
 
+Heller Beratungs-Modus (Tageslicht-Fassung derselben Welt):
+
+| Token | Hex | Verwendung |
+|---|---|---|
+| Papier | `#F4F3F0` | Seitengrund hell |
+| Karte hell | `#FCFBF9` | Karten hell |
+| Graphit | `#14171C` | Primärtext hell |
+| Schiefer | `#4A5058` | Fließtext hell |
+| Grau hell | `#7A8088` | Nebentext hell |
+| Stahl tief | `#4F6E88` | Akzent-Text/CTA auf hellem Grund |
+| Linie hell | `#D9D7D2` | feine Linien hell |
+
+Deck-Rhythmus: dunkles Cover → helle Inhaltsfolien → dunkle Zitat-
+und Kontaktfolien. Dokumente (Word/PDF) laufen komplett hell.
+
 Regeln: Stahl ist Würze, nicht Grundfarbe. Nie mehr als ein Akzentwort
 pro Headline. Keine Verläufe außer Bild-Abdunkelung. Kein reines
-Schwarz, kein reines Weiß.
+Schwarz, kein reines Weiß. Auf hellem Grund nie das helle `#8FA9BD`
+als Textfarbe (zu wenig Kontrast), sondern `#4F6E88`.
 
 ## Typografie
 
