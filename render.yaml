@@ -14,8 +14,16 @@ services:
   - type: web
     name: jcnd-board
     runtime: static
-    staticPublishPath: ./jcnetwork-days
-    buildCommand: ""
+    rootDir: jcnetwork-days
+    staticPublishPath: .
+    # Schreibt config.js aus den Umgebungsvariablen. Das Repository ist
+    # öffentlich — der Supabase-Key darf deshalb nicht eingecheckt werden.
+    buildCommand: ./build.sh
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
     headers:
       - path: /*
         name: X-Frame-Options
