@@ -1,0 +1,46 @@
+# Render-Blueprint für das Planungsboard der JCNetwork Days 2026.
+#
+# Einrichten: auf render.com „New → Blueprint", dieses Repository wählen.
+# Render legt beide Dienste an und fragt die Werte ab, die hier als
+# sync:false stehen.
+#
+# ACHTUNG: Eine Render-Static-Site ist öffentlich erreichbar. Im Board stehen
+# Telefonnummern von Helfenden. Entweder in den Einstellungen der Site einen
+# Passwortschutz einschalten, oder die Seite hinter Cloudflare Access hängen.
+# Siehe jcnetwork-days/README.md, Abschnitt „Selbst hosten".
+
+services:
+  # Das Board selbst — reine Dateien, kein Build.
+  - type: web
+    name: jcnd-board
+    runtime: static
+    staticPublishPath: ./jcnetwork-days
+    buildCommand: ""
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+
+  # Der MCP-Server — liest denselben Stand und wird in der Claude-App
+  # jeder Person als Connector eingehängt.
+  - type: web
+    name: jcnd-mcp
+    runtime: node
+    plan: free
+    rootDir: jcnetwork-days/mcp
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /gesund
+    envVars:
+      # Render würfelt den Token beim ersten Deploy aus; danach im
+      # Dashboard nachlesen und in die Connector-URL einsetzen.
+      - key: MCP_TOKEN
+        generateValue: true
+      # Dieselben Werte wie in jcnetwork-days/config.js.
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false

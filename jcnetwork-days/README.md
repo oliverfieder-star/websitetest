@@ -229,9 +229,20 @@ Planung, kein gemeinsames Werkzeug.
 
 ### Was ohne Claude-Konto fehlt
 
-Nichts an der Planung. Nur die beiden Exporte unter „Team" nutzen die
-`downloads`-Capability des Artifacts; selbst gehostet fehlen sie. Wer sie
-braucht, öffnet die Artifact-Fassung.
+Nichts. Die Exporte laufen selbst gehostet über einen normalen Browser-Download;
+im Artifact über dessen `downloads`-Capability, weil dort ein gewöhnlicher
+Download-Link gesperrt ist. Die Funktion `download()` in `app.js` probiert beide
+Wege in dieser Reihenfolge.
+
+### Render
+
+Für Render liegt ein Blueprint im Wurzelverzeichnis (`render.yaml`): auf
+render.com „New → Blueprint", dieses Repository wählen. Render legt beides an —
+die Static Site mit dem Board und den MCP-Server als Web Service — und fragt
+`SUPABASE_URL` und `SUPABASE_KEY` ab. Den `MCP_TOKEN` würfelt Render selbst aus.
+
+Render-Static-Sites sind öffentlich. Der Passwortschutz steht in den
+Einstellungen der Site; sonst gilt der Abschnitt „Zugriff beschränken" oben.
 
 ## Startseite und Rollen
 
@@ -267,3 +278,57 @@ lassen sich löschen.
 Kategoriefarben und Bereichsfarben kommen aus derselben geprüften Reihe
 (sieben Slots). Zwölf Bereiche auf sieben Farben heißt Wiederholung — deshalb
 steht der Name immer daneben und die Farbe trägt nie allein die Bedeutung.
+
+## MCP-Server: Claude in der eigenen App
+
+`mcp/` enthält einen MCP-Server, der denselben Planstand liest wie das Board.
+Jede Person hängt ihn in **ihrer eigenen** Claude-App als Connector ein — die
+Nutzung geht damit über das jeweils eigene Abo, und das Board selbst ruft
+weiterhin nichts auf.
+
+Er ist **nur lesend**. Geändert wird im Board.
+
+### Werkzeuge
+
+| Werkzeug | Beantwortet |
+|---|---|
+| `projekt_ueberblick` | Countdown, offene und überfällige Aufgaben je Bereich, Personallücken, Logistik |
+| `aufgaben_offen` | offene RACI-Aufgaben, nach Bereich, Person oder Dringlichkeit |
+| `bereich_status` | Soll gegen Ist je Einsatzbereich und Tag |
+| `luecken_finden` | unterbesetzte Zeitfenster, zusammenhängend gefasst |
+| `helfer_schichten` | alle Schichten einer Person |
+| `helfende_suchen` | nach Führerschein, Erste Hilfe, Sprinter, ohne Schicht |
+| `material_status` | Logistikposten je Station, mit Herkunft und Packstatus |
+| `raum_status` | Räume, Ausstattung, Workshops und was fehlt |
+
+Die Namen folgen bewusst dem Vokabular, das der bestehende Server
+`Planungstool_Personal` benutzt.
+
+### Einhängen
+
+Nach dem Deploy steht in Render unter *Environment* der erzeugte `MCP_TOKEN`.
+Die Connector-URL ist dann:
+
+    https://<dienstname>.onrender.com/mcp/<token>
+
+In der Claude-App unter *Einstellungen → Connectors → Connector hinzufügen*
+diese URL eintragen. Ohne oder mit falschem Token antwortet der Endpunkt mit
+404 — der Token ist der ganze Zugangsschutz, also behandelt ihn wie ein
+Passwort und teilt ihn nur im Team.
+
+### Lokal ausprobieren
+
+    cd jcnetwork-days/mcp
+    npm install
+    MCP_TOKEN=test SUPABASE_URL=... SUPABASE_KEY=... npm start
+
+Ohne Supabase-Werte startet er trotzdem und liefert die RACI aus `data.js` —
+nur eben ohne Status, Schichten und Material.
+
+### Grenzen
+
+- Der Render-Free-Plan schläft nach Leerlauf ein; der erste Aufruf danach
+  braucht eine halbe Minute.
+- Der Server hält keine Sitzung (staatenlos), damit mehrere Personen
+  gleichzeitig fragen können, ohne dass Render klebrige Sitzungen braucht.
+- Supabase-Antworten werden fünf Sekunden zwischengespeichert.

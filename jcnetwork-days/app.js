@@ -1362,12 +1362,25 @@ function planBriefing() {
   }
   return l.join("\n");
 }
+/** Herunterladen auf zwei Wegen: im Artifact über die downloads-Capability
+ *  (dort ist ein normaler Link gesperrt), selbst gehostet über einen Blob. */
 async function download(filename, text, was) {
   let dl = null;
   try { dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null; } catch { dl = null; }
-  if (!dl) { toast("Herunterladen geht nur in der veröffentlichten Fassung."); return; }
-  try { await dl.save({ filename, data:text }); toast(was + " heruntergeladen"); }
-  catch { toast("Der Download wurde abgebrochen."); }
+  if (dl) {
+    try { await dl.save({ filename, data:text }); toast(was + " heruntergeladen"); }
+    catch { toast("Der Download wurde abgebrochen."); }
+    return;
+  }
+  try {
+    const typ = filename.endsWith(".csv") ? "text/csv" : "text/markdown";
+    const url = URL.createObjectURL(new Blob([text], { type: typ + ";charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; a.style.display = "none";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    toast(was + " heruntergeladen");
+  } catch { toast("Dieser Browser erlaubt den Download nicht."); }
 }
 
 /* ======================================================================
