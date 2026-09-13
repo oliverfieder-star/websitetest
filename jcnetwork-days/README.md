@@ -174,3 +174,61 @@ und Kontrast). Sie sind bewusst getrennt von der Akzentfarbe (C&C-Blau, nur
 Bedienelemente) und den Statusfarben (überfällig, bald, erledigt). Dieselbe
 Kategorie hat überall dieselbe Farbe — im Balken, an der Posten-Kante, im
 Eingabedialog.
+
+## Selbst hosten
+
+Die App ist statisches HTML mit ein paar JavaScript-Dateien — kein Build, kein
+Server. Sie läuft auf jedem Webspace, der Dateien ausliefert. Der einzige
+Unterschied zwischen den Betriebsarten ist, **wo der geteilte Stand liegt**;
+`store.js` entscheidet das beim Start:
+
+| Betriebsart | Geteilter Stand | Wer kommt rein |
+|---|---|---|
+| Claude-Artifact | `db`-Capability, nichts einzurichten | nur angemeldete Mitglieder der Organisation |
+| Selbst gehostet + Supabase | Supabase, Abgleich alle 8 Sekunden | jede Person mit dem Link |
+| Selbst gehostet ohne Supabase | nur der eigene Browser | jede Person mit dem Link, aber ohne gemeinsamen Stand |
+
+Die Fußzeile links unten sagt immer, welcher Fall gerade gilt.
+
+### Schritt 1 — Dateien ausliefern
+
+Alles unter `jcnetwork-days/` hochladen: `index.html`, `app.js`, `store.js`,
+`config.js`, `data.js`, `ops.js`. Fertig.
+
+Für GitHub Pages liegt ein Workflow bereit (`.github/workflows/pages.yml`):
+unter *Settings → Pages → Source: GitHub Actions* einschalten, dann
+veröffentlicht jeder Push die aktuelle Fassung.
+
+### Schritt 2 — Gemeinsamen Stand einrichten
+
+Ohne diesen Schritt sieht jede Person nur ihre eigenen Eingaben.
+
+1. Kostenloses Projekt auf supabase.com anlegen.
+2. Im SQL Editor `supabase-schema.sql` ausführen.
+3. Aus *Project Settings → API* die Projekt-URL und den `anon`-Key in
+   `config.js` eintragen.
+
+### Schritt 3 — Zugriff beschränken
+
+**Das ist keine Kür.** Im Board stehen Telefonnummern von Helfenden. Der
+anon-Key steht im ausgelieferten JavaScript und ist für jede Person lesbar,
+die die Seite öffnet — wer den Link hat, kann also alles lesen und ändern.
+Eine öffentlich erreichbare Seite wäre damit eine Datenpanne.
+
+Zwei praktikable Wege:
+
+- **Cloudflare Pages + Cloudflare Access** — kostenlos bis 50 Personen,
+  Anmeldung per E-Mail-Code. Für ein Projektteam plus Helfende der passende
+  Zuschnitt und der Weg, den wir empfehlen.
+- **Privates Repository + GitHub Pages** — Pages ist für private
+  Repositories Teil der kostenpflichtigen Pläne.
+
+Wer keinen Zugriffsschutz einrichten kann: die Seite ohne Supabase betreiben
+und die Telefonnummern leer lassen. Dann ist sie ein Nachschlagewerk für die
+Planung, kein gemeinsames Werkzeug.
+
+### Was ohne Claude-Konto fehlt
+
+Nichts an der Planung. Nur die beiden Exporte unter „Team" nutzen die
+`downloads`-Capability des Artifacts; selbst gehostet fehlen sie. Wer sie
+braucht, öffnet die Artifact-Fassung.

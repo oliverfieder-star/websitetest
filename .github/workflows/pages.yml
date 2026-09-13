@@ -1,0 +1,42 @@
+# Veröffentlicht das Planungsboard als statische Seite auf GitHub Pages.
+#
+# Einmal einschalten: Repository -> Settings -> Pages -> Source: GitHub Actions.
+# Danach erscheint bei jedem Push auf den Branch die aktuelle Fassung unter
+# https://<konto>.github.io/<repo>/
+#
+# ACHTUNG: GitHub Pages ist bei öffentlichen Repositories für jede Person im
+# Netz erreichbar. Im Board stehen Telefonnummern von Helfenden. Entweder das
+# Repository privat halten (Pages ist dann Teil der kostenpflichtigen Pläne)
+# oder einen Anbieter mit Zugriffsschutz nehmen -- siehe README.
+name: Planungsboard veröffentlichen
+
+on:
+  push:
+    branches: ["claude/zen-faraday-13q37w", "main"]
+    paths: ["jcnetwork-days/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Nur das Board hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: jcnetwork-days
+      - id: deployment
+        uses: actions/deploy-pages@v4

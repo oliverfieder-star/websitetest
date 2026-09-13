@@ -199,7 +199,7 @@ let db = null;
 const LS = { state:"jcnd.state.v1", custom:"jcnd.custom.v1", team:"jcnd.team.v2", me:"jcnd.me.v1" };
 const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
-let syncState = ["", "verbinde …"];
+let syncState = ["", "verbinde …"], speicherModus = "lokal";
 function applyTeamDoc(doc) {
   if (doc && Array.isArray(doc.people) && doc.people.length)
     team = doc.people.map(p => ({ ...p, areas: p.areas === ALL ? ALL : [...(p.areas || [])] }));
@@ -213,9 +213,10 @@ async function initStore() {
   logi = lsGet("jcnd.logi", []); raeume = lsGet("jcnd.raum", []); workshops = lsGet("jcnd.ws", []);
   abwesend = lsGet("jcnd.abw", []);
   opsDoc.bedarf = lsGet("jcnd.ops.bedarf", null); opsDoc.bereiche = lsGet("jcnd.ops.bereiche", null);
-  try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch { db = null; }
-  if (!db) { syncState = ["off", "nur auf diesem Gerät"]; return; }
-  syncState = ["on", "geteilt mit dem Team"];
+  const st = await window.JCNDStore.open();
+  db = st.db; speicherModus = st.modus;
+  if (!db) { syncState = ["off", st.text]; return; }
+  syncState = ["on", st.text];
   const fail = e => { syncState = ["off", "Verbindung unterbrochen"]; console.warn(e); render(); };
   db.collection("state").onSnapshot(s => {
     overlay = new Map(s.docs.map(d => [d.id, d.data()]));
@@ -414,6 +415,7 @@ function renderBoard() {
 
     <div class="foot">
       <button class="lnk" data-go="mine" type="button">Alle ${work.length} Aufgaben von dir</button>
+      <button class="lnk" data-go="offen" type="button">Alle offenen Aufgaben im Projekt</button>
       ${watch.length ? `<button class="lnk" data-watch="1" type="button">${watch.length} Aufgaben, bei denen du nur gefragt oder informiert wirst</button>` : ""}
     </div>`;
 }
@@ -459,6 +461,57 @@ function renderMine() {
       ${panel(g.map(r => row(r.t)))}</section>`;
   }).join("") : `<div class="empty"><b>Nichts gefunden</b>Andere Filter versuchen.</div>`);
 }
+/* --- Alle offenen Aufgaben des Projekts --------------------------------- */
+let offenWer = "", offenNach = "bereich";
+function renderOffen() {
+  const wer = offenWer ? (personById(offenWer) || null) : null;
+  const alle = allTasks().filter(t => bucketOf(t) !== "done" && matches(t))
+    .filter(t => !wer || isWork(involvement(t, wer)));
+  const late = alle.filter(t => bucketOf(t) === "late").length;
+  const jetzt = alle.filter(t => bucketOf(t) === "now").length;
+  const ohne = alle.filter(t => !peopleWith(t, "A").some(p => p.name && p.name.trim())
+                             && !peopleWith(t, "R").some(p => p.name && p.name.trim())).length;
+
+  const werWahl = `<select id="offenWer" aria-label="Nach Person filtern"
+      style="border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:13.5px;background:var(--card)">
+      <option value="">alle Personen</option>
+      ${team.filter(p => p.name && p.name.trim()).map(p =>
+        `<option value="${esc(p.id)}"${p.id === offenWer ? " selected" : ""}>${esc(dispName(p))}</option>`).join("")}</select>`;
+
+  const grupp = offenNach === "bereich"
+    ? AREAS.map(a => [a, alle.filter(t => t.area === a)])
+    : [["late", "Über der Deadline"], ["now", "Jetzt dran"], ["soon", "Bald"], ["later", "Später"]]
+        .map(([k, l]) => [l, alle.filter(t => bucketOf(t) === k)]);
+
+  return `<div class="tiles">
+      <div class="tile acc"><div class="k">Offen insgesamt</div><b>${alle.length}</b>
+        <div class="s">von ${allTasks().length} Aufgaben</div></div>
+      <div class="tile ${late ? "late" : "done"}"><div class="k">Über der Deadline</div><b>${late}</b>
+        <div class="s">${late ? "brauchen eine Entscheidung" : "nichts überfällig"}</div></div>
+      <div class="tile"><div class="k">Jetzt dran</div><b>${jetzt}</b>
+        <div class="s">Zeitfenster ist offen</div></div>
+      <div class="tile"><div class="k">Ohne Namen</div><b>${ohne}</b>
+        <div class="s">niemand mit Namen zugeordnet</div></div>
+    </div>
+    <div class="toolrow">
+      <input class="search" id="q" type="search" placeholder="Aufgabe suchen …" value="${esc(filter.q)}" aria-label="Aufgabe suchen">
+      ${werWahl}
+      <div class="seg-nav" style="margin:0">${[["bereich", "nach Bereich"], ["frist", "nach Frist"]].map(([k, l]) =>
+        `<button data-offennach="${k}" aria-pressed="${offenNach === k}" type="button">${esc(l)}</button>`).join("")}</div>
+      <span style="flex:1"></span>
+      <button class="btn${filter.flag ? " pri" : ""}" data-flagf="1" type="button" aria-pressed="${filter.flag}">Geflaggt</button>
+    </div>
+    <div class="chips">${ONLY.map(([v, l]) =>
+      `<button data-only="${v}" aria-pressed="${(filter.only || "") === v}" type="button">${esc(l)}</button>`).join("")}</div>
+    ${alle.length ? grupp.filter(([, g]) => g.length).map(([lbl, g]) => {
+      const l2 = g.filter(t => bucketOf(t) === "late").length;
+      return `<section><div class="sec-h"><h2 class="disp">${esc(lbl)}</h2><span class="n">${g.length}</span>
+        ${l2 ? `<span class="pill late" style="margin-left:6px">${l2} über der Deadline</span>` : ""}</div>
+        ${panel(sortTasks(g.map(t => ({ t, inv: wer ? involvement(t, wer) : (me ? involvement(t, me) : null) })))
+          .map(r => row(r.t, { hideArea: offenNach === "bereich", showLead:true })))}</section>`;
+    }).join("") : `<div class="empty"><b>Nichts offen</b>Für diese Filter ist alles erledigt.</div>`}`;
+}
+
 function toolbar() {
   return `<div class="toolrow">
     <input class="search" id="q" type="search" placeholder="Aufgabe suchen …" value="${esc(filter.q)}" aria-label="Aufgabe suchen">
@@ -1422,6 +1475,9 @@ function render() {
     : route.v === "mine"  ? `<div class="hello"><h1 class="disp">Aufgaben</h1>
         <div class="sub">Die RACI — alles, was vor der Veranstaltung passieren muss.</div></div>`
         + aufgabenNav() + renderMine()
+    : route.v === "offen" ? `<div class="hello"><h1 class="disp">Alle offenen Aufgaben</h1>
+        <div class="sub">Das ganze Projekt auf einen Blick — nicht nur deine.</div></div>`
+        + aufgabenNav() + renderOffen()
     : route.v === "areas" ? `<div class="hello"><h1 class="disp">Aufgaben</h1>
         <div class="sub">Die RACI — alles, was vor der Veranstaltung passieren muss.</div></div>`
         + aufgabenNav() + renderAreas()
@@ -1441,7 +1497,7 @@ function render() {
 
 /* --- Unterumschalter der Aufgabenansicht -------------------------------- */
 function aufgabenNav() {
-  return `<div class="seg-nav">${[["mine", "Meine"], ["areas", "Bereiche"], ["plan", "Zeitplan"], ["matrix", "Matrix"]]
+  return `<div class="seg-nav">${[["mine", "Meine"], ["offen", "Alle offenen"], ["areas", "Bereiche"], ["plan", "Zeitplan"], ["matrix", "Matrix"]]
     .map(([k, l]) => `<button data-go="${k}" aria-pressed="${route.v === k || (k === "areas" && route.v === "area")}" type="button">${esc(l)}</button>`).join("")}</div>`;
 }
 
@@ -1773,6 +1829,9 @@ function wireAll(v) {
   v.querySelectorAll("[data-watch]").forEach(b => b.onclick = watchSheet);
   v.querySelectorAll("[data-about]").forEach(b => b.onclick = aboutSheet);
   v.querySelectorAll("[data-flagf]").forEach(b => b.onclick = () => { filter.flag = !filter.flag; render(); });
+  v.querySelectorAll("[data-offennach]").forEach(b => b.onclick = () => { offenNach = b.dataset.offennach; render(); });
+  const ow = v.querySelector("#offenWer");
+  if (ow) ow.onchange = () => { offenWer = ow.value; render(); };
   v.querySelectorAll("[data-scrollnn]").forEach(b => b.onclick = () => {
     const el = document.getElementById("nn"); if (el) el.scrollIntoView({ behavior:"smooth", block:"start" }); });
   v.querySelectorAll("[data-theme]").forEach(b => b.onclick = () => {
