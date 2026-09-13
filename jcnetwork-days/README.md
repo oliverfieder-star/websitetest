@@ -23,15 +23,16 @@ Alumni). Drei Dinge kommen in der Oberfläche dazu:
   wenn die Position der Person in der Zeile steht *und* der Bereich zu ihr
   gehört. Ohne diese zweite Bedingung bekäme die Projektleitung alle 277
   PL-Zeilen auf einmal.
-- **Nur A und R sind Arbeit.** C und I stehen getrennt unter „Rücksprache &
-  Info". S (Unterschrift) ebenfalls.
+- **Nur A und R sind Arbeit.** C, I und S stehen getrennt unter „Nur zur
+  Kenntnis". Die Buchstaben selbst tauchen nur noch in der Matrix auf —
+  überall sonst steht Klartext („Du machst das", „Verantwortlich").
 - **Zeitcodes werden zu Daten.** `3m` → 03.09.2026, `2w` → 19.11.2026,
   `Mo` → 30.11.2026 (Vorbereitungswoche), `Sa` → 05.12.2026, `+1m` →
   06.01.2027. Gerechnet vom 3. Dezember 2026. Die Excel-Spalten heißen „Max"
   und „Min"; hier stehen sie als **Fenster ab** und **Deadline**.
 
 `Wahl` und `AnmS` sind keine festen Abstände, sondern Meilensteine. Beide sind
-unter „Team & Eckdaten" einstellbar, Vorgabe 06.12.2025 und 01.10.2026.
+unter „Team" einstellbar, Vorgabe 06.12.2025 und 01.10.2026.
 
 Klammercodes der Excel (`(R)`, `(S)`) heißen „nur falls zutreffend" und werden
 blasser dargestellt.
@@ -50,8 +51,10 @@ eine verantwortliche Position (A).
 
 - **Namen des JCNetwork-Vorstands** fehlen (VV, CR, F&R, EM, HR, IM, MK, WB)
   sowie Vereinsvorstand und Alumni-Vorstand. Solange dort „N. N." steht, sind
-  die Aufgaben nur über Bereichsansicht und Matrix erreichbar.
-- **Bereichsaufteilung der Projektleitung** ist als 4/4/4 hinterlegt (Oliver:
-  Wahl & Orga, Personal, Finanzen, Alumni). Unter „Team & Eckdaten" änderbar.
+  die Aufgaben nur über Bereichsansicht, Matrix und Aufgabendetail erreichbar.
+- **Bereichsaufteilung der Projektleitung**: Oliver (Wahl & Orga, Personal,
+  Verpflegung, Finanzen, Alumni), Antonia (Unterkünfte & Check-In, Logistik,
+  Workshops), Noah (Plenen/Messe & MV, Partys, Kommunikation, Unternehmen).
+  Jeder Bereich gehört genau einer Person. Unter „Team" änderbar.
 - **Anmeldung als Person**, nicht als Login — jede Person wählt sich selbst
   aus. Wer etwas ändert, wird protokolliert, aber nicht geprüft.
