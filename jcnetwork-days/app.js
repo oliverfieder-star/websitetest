@@ -211,6 +211,7 @@ async function initStore() {
   applyTeamDoc(lsGet(LS.team, null));
   helfer = lsGet("jcnd.helfer", []); schichten = lsGet("jcnd.schicht", []);
   logi = lsGet("jcnd.logi", []); raeume = lsGet("jcnd.raum", []); workshops = lsGet("jcnd.ws", []);
+  abwesend = lsGet("jcnd.abw", []);
   opsDoc.bedarf = lsGet("jcnd.ops.bedarf", null); opsDoc.bereiche = lsGet("jcnd.ops.bereiche", null);
   try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch { db = null; }
   if (!db) { syncState = ["off", "nur auf diesem Gerät"]; return; }
@@ -228,10 +229,11 @@ async function initStore() {
     if (s.exists) { applyTeamDoc(s.data()); lsSet(LS.team, s.data()); render(); }
   }, fail);
   for (const [col, set] of [["helfer", v => helfer = v], ["schicht", v => schichten = v],
-                            ["logi", v => logi = v], ["raum", v => raeume = v], ["ws", v => workshops = v]]) {
+                            ["logi", v => logi = v], ["raum", v => raeume = v], ["ws", v => workshops = v],
+                            ["abw", v => abwesend = v]]) {
     db.collection(col).onSnapshot(sn => {
       set(sn.docs.map(d => ({ ...d.data(), id:d.id })));
-      lsSet("jcnd." + col, { helfer, schicht:schichten, logi, raum:raeume, ws:workshops }[col]);
+      lsSet("jcnd." + col, { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend }[col]);
       render();
     }, fail);
   }
@@ -557,6 +559,22 @@ function renderTeam() {
   const nn = team.filter(p => !p.name || !p.name.trim()).length;
   return `<div class="hello"><h1 class="disp">Team</h1>
       <div class="sub">Position und Bereiche entscheiden, welche Aufgaben auf welchem Board landen.</div></div>
+    <div class="setup"><h4>So kommt der Rest des Teams rein</h4>
+      <ol>
+        <li>Oben rechts im Artifact auf <b>Teilen</b> — jede Person in der Organisation kann die Seite dann öffnen.</li>
+        <li>Beim ersten Öffnen wählt sich jede Person unter <b>Wer bist du?</b> selbst aus. Kein Konto, kein Passwort.</li>
+        <li>Änderungen an Status, Schichten und Material sehen sofort alle — der Stand liegt geteilt in der Seite.</li>
+        <li>Helfende wählen sich genauso aus und sehen dann nur ihre eigenen Schichten.</li>
+      </ol>
+      <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px">
+        <button class="btn" data-exportmd="1" type="button">Planstand für Claude herunterladen</button>
+        <button class="btn" data-export="1" type="button">Plan-Liste als CSV</button>
+      </div>
+      <p style="font-size:12.5px;color:var(--ink-2);margin:11px 0 0;max-width:72ch">
+        Die Seite ruft selbst kein Claude auf — niemand zahlt fürs Öffnen. Wer Claude nutzen will,
+        lädt den Planstand herunter und hängt ihn in der eigenen Claude-App an; die CSV hat das
+        Format des Blatts „Plan Liste" aus der offiziellen Personalplan-Vorlage.</p>
+    </div>
     ${nn ? `<button class="callout" data-scrollnn="1" type="button" style="margin-bottom:24px">
       <span class="big num">${nn}</span><span class="tx"><b>Positionen ohne Namen</b>
       <span>Vor allem der JCNetwork-Vorstand. Solange dort „N. N." steht, hat niemand diese Aufgaben auf dem Board.</span></span>
@@ -612,7 +630,7 @@ const slotSort = (a, b) => slotVal(a) - slotVal(b);
 const hhmm = v => { const x = v % 1440; return String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0"); };
 
 let opsDoc = { bedarf:null, bereiche:null };
-let helfer = [], schichten = [], logi = [], raeume = [], workshops = [];
+let helfer = [], schichten = [], logi = [], raeume = [], workshops = [], abwesend = [];
 
 /* Beispiele, solange nichts Eigenes da ist — sichtbar als solche markiert. */
 const BEISPIEL_HELFER = [
@@ -633,6 +651,30 @@ const bedarfIstVorlage = () => !opsDoc.bedarf;
 const bereicheList = () => (opsDoc.bereiche && opsDoc.bereiche.list) || OPS.bereiche;
 const helferName = id => { const h = helferList().find(x => x.id === id);
   return h ? (h.vorname + " " + h.nachname).trim() : "—"; };
+const bereichInfo = name => bereicheList().find(b => b.name === name) || {};
+
+/** Hat die Person in diesem Fenster abgesagt? Die offizielle Vorlage führt
+ *  dafür rot eingefärbte Zellen ("Nicht verfügbar"). */
+const nichtVerfuegbar = (helferId, tag, von, bis) => abwesend.filter(a =>
+  a.helfer === helferId && a.tag === tag &&
+  slotVal(a.von) < slotVal(bis) && slotVal(von) < slotVal(a.bis));
+const kollision = (helferId, tag, von, bis, ausser) => schichtList().filter(s =>
+  s.helfer === helferId && s.tag === tag && s.id !== ausser &&
+  slotVal(s.von) < slotVal(bis) && slotVal(von) < slotVal(s.bis));
+
+/** Export im Format des Blatts "Plan Liste" der offiziellen Vorlage. */
+function planListeCSV() {
+  const head = ["Aufgaben ID", "Helfer ID", "Vorname", "Nachname", "Account", "Aufgabe", "Datum", "Beginn", "Ende"];
+  const rows = schichtList().slice()
+    .sort((a, b) => TAGE.findIndex(t => t.k === a.tag) - TAGE.findIndex(t => t.k === b.tag) || slotVal(a.von) - slotVal(b.von))
+    .map((s, i) => { const h = helferList().find(x => x.id === s.helfer) || {};
+      const t = TAGE.find(x => x.k === s.tag);
+      return [i + 1, s.helfer, h.vorname || "", h.nachname || "", h.mail || "",
+              s.bereich, t ? t.d.toISOString().slice(0, 10) : s.tag, s.von, s.bis]; });
+  const q = v => { const x = String(v ?? ""); return /[";\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+  return [head, ...rows].map(r => r.map(q).join(";")).join("\r\n");
+}
+
 
 function slotsOf(tag) {
   const b = bedarfAll()[tag] || {}, set = new Set();
@@ -664,21 +706,21 @@ const stundenVon = id => schichtList().filter(s => s.helfer === id)
   .reduce((a, s) => a + (slotVal(s.bis) - slotVal(s.von)) / 60, 0);
 
 /* --- Schreiben ---------------------------------------------------------- */
-const opsCols = { helfer:"helfer", schicht:"schicht", logi:"logi", raum:"raum", ws:"ws" };
+
 async function opsAdd(col, body) {
   if (db) { try { await db.collection(col).add(body); return; } catch { toast("Nicht geteilt — lokal gemerkt."); } }
-  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops }[col];
+  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend }[col];
   arr.push({ ...body, id:col + Date.now() + Math.random().toString(36).slice(2, 6) });
   lsSet("jcnd." + col, arr); render();
 }
 async function opsSet(col, id, body) {
-  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops }[col];
+  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend }[col];
   const i = arr.findIndex(x => x.id === id);
   if (i >= 0) { arr[i] = { ...arr[i], ...body }; lsSet("jcnd." + col, arr); render(); }
   if (db) { try { await db.doc(col + "/" + id).set({ ...(arr[i] || body) }); } catch {} }
 }
 async function opsDel(col, id) {
-  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops }[col];
+  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend }[col];
   const i = arr.findIndex(x => x.id === id);
   if (i >= 0) { arr.splice(i, 1); lsSet("jcnd." + col, arr); render(); }
   if (db) { try { await db.doc(col + "/" + id).delete(); } catch {} }
@@ -700,16 +742,15 @@ function renderPersonal() {
   return `<div class="hello"><h1 class="disp">Personal</h1>
       <div class="sub">Wer wird wann wo gebraucht — und wer steht schon drin.</div></div>
     <div class="seg-nav">
-      ${[["abdeckung", "Abdeckung"], ["luecken", "Lücken"], ["helfende", "Helfende"]].map(([k, l]) =>
+      ${[["abdeckung", "Abdeckung"], ["luecken", "Lücken"], ["helfende", "Helfende"], ["bereiche", "Aufgaben"]].map(([k, l]) =>
         `<button data-psub="${k}" aria-pressed="${pSub === k}" type="button">${esc(l)}</button>`).join("")}
     </div>
     ${demoAktiv() ? `<div class="callout" style="cursor:default;margin-bottom:20px">
       <span class="big num" style="color:var(--accent)">3</span>
       <span class="tx"><b>Beispieldaten</b><span>Noch keine Helfenden erfasst. Drei Beispielpersonen zeigen,
       wie das Raster arbeitet — sie verschwinden, sobald die erste echte Person angelegt ist.</span></span></div>` : ""}
-    ${askPanel(["Wo ist die größte Lücke?", "Wer hat Führerschein und ist Donnerstag frei?",
-                "Wer hat die meisten Stunden?"])}
-    ${pSub === "abdeckung" ? covView(tag) : pSub === "luecken" ? gapView(tag) : helferView()}`;
+    ${pSub === "abdeckung" ? covView(tag) : pSub === "luecken" ? gapView(tag)
+      : pSub === "helfende" ? helferView() : bereichView()}`;
 }
 function dayBar(attr) {
   return `<div class="daybar">${TAGE.map(t =>
@@ -766,17 +807,38 @@ function gapView(tag) {
 }
 function helferView() {
   const hs = helferList().slice().sort((a, b) => (a.vorname + a.nachname).localeCompare(b.vorname + b.nachname, "de"));
-  const merk = h => [h.fs && "Führerschein", h.eh && "Erste Hilfe", h.sprinter && "Sprinter", h.ernaehrung].filter(Boolean).join(" · ");
+  const merk = h => [h.fs && "Führerschein", h.eh && "Erste Hilfe", h.sprinter && "Sprinter",
+    h.ernaehrung, h.verein].filter(Boolean).join(" · ");
   return `<div class="grouped">
     <div class="gh"><h4>Helfende</h4><span class="sub">${hs.length}</span>
+      <button class="btn sm" data-export="1" type="button">Plan-Liste exportieren</button>
       <button class="btn sm pri" data-addhelfer="1" type="button">Person anlegen</button></div>
     ${hs.map(h => { const st = stundenVon(h.id), n = schichtList().filter(s => s.helfer === h.id).length;
+      const ab = abwesend.filter(a => a.helfer === h.id).length;
       return `<div class="li">
         <span class="nm"><b>${esc((h.vorname + " " + h.nachname).trim())}${h.demo ? ' <span class="pill info">Beispiel</span>' : ""}</b>
-          <span>${esc(merk(h) || "keine Merkmale hinterlegt")}</span></span>
+          <span>${esc(merk(h) || "keine Merkmale hinterlegt")}${ab ? " · " + ab + " Abwesenheit" + (ab === 1 ? "" : "en") : ""}</span></span>
         <span class="qty">${n} Schicht${n === 1 ? "" : "en"} · ${st.toFixed(1)} h</span>
         <span class="act"><button class="btn sm" data-hschicht="${esc(h.id)}" type="button">Schichten</button></span>
       </div>`; }).join("") || '<div class="li"><span class="nm">Noch niemand erfasst.</span></div>'}</div>`;
+}
+
+/** Die Aufgaben aus dem Blatt "Aufgabenbeschreibungen" der Vorlage:
+ *  Kürzel, Beschreibung, Ort und Ansprechperson. Letztere ist das, was
+ *  Helfende auf ihrer Schicht brauchen. */
+function bereichView() {
+  const bs = bereicheList();
+  const offen = bs.filter(b => !b.asp).length;
+  return `${offen ? `<div class="callout" style="cursor:default;margin-bottom:18px">
+      <span class="big num">${offen}</span><span class="tx"><b>Aufgaben ohne Ansprechperson</b>
+      <span>Helfende sehen auf ihrer Schicht, wen sie anrufen können — solange hier niemand steht, bleibt das Feld leer.</span></span></div>` : ""}
+    <div class="grouped"><div class="gh"><h4>Aufgaben</h4><span class="sub">${bs.length}</span></div>
+    ${bs.map((b, i) => `<div class="li">
+      <span class="pill plain" style="font-family:var(--mono);font-weight:600">${esc(b.kuerzel || "—")}</span>
+      <span class="nm"><b>${esc(b.name)}</b><span>${esc(b.ort || "Ort offen")} · ${
+        b.asp ? esc(b.asp) + (b.tel ? ", " + esc(b.tel) : "") : "keine Ansprechperson"}</span></span>
+      <span class="act"><button class="btn sm" data-editber="${i}" type="button">Bearbeiten</button></span>
+    </div>`).join("")}</div>`;
 }
 
 /* ======================================================================
@@ -786,8 +848,15 @@ function helferView() {
    irgendwoher. Gebrauchsgegenstände müssen wieder zurück, Verbrauch nicht.
    ====================================================================== */
 const LSTAT = { offen:"offen", gepackt:"gepackt", vorort:"vor Ort", zurueck:"zurück" };
+const LSTAT_VAR = { offen:"var(--ink-3)", gepackt:"var(--soon)", vorort:"var(--accent)", zurueck:"var(--done)" };
+/* Feste Reihenfolge der Kategoriefarben — nie durchrotieren. */
+const KAT = [["Check-In", 1], ["Verpflegung", 2], ["Workshop", 3], ["Druck", 4],
+             ["Unternehmen", 5], ["Technik", 6], ["Helfer", 7]];
+const katSlot = k => (KAT.find(x => x[0] === k) || [0, 0])[1];
+const katVar = k => `var(--c${katSlot(k)})`;
+const katChip = k => `<span class="kat k${katSlot(k)}"><i></i>${esc(k || "Sonstiges")}</span>`;
 const QUELLEN = ["JCNetwork-Lager", "Vereinslager C&C", "Einkauf", "vor Ort", "Dienstleister"];
-let lSub = "stationen";
+let lSub = "uebersicht";
 
 const stationKey = p => `${p.tag}|${p.ort}|${p.punkt}`;
 function stationen() {
@@ -802,18 +871,89 @@ function stationen() {
 }
 const anforderungen = () => logi.filter(p => p.vonBereich && p.status === "offen");
 
+const postenKat = p => p.kat || (OPS.material.find(m =>
+  m.name.toLowerCase() === String(p.material).toLowerCase()) || {}).kat || "Sonstiges";
+
 function renderLogistik() {
   return `<div class="hello"><h1 class="disp">Logistik</h1>
       <div class="sub">Welches Material wann wo sein muss — und woher es kommt.</div></div>
     <div class="seg-nav">
-      ${[["stationen", "Packlisten"], ["anforderungen", "Anforderungen"], ["rueck", "Rückführung"]].map(([k, l]) =>
+      ${[["uebersicht", "Übersicht"], ["stationen", "Packlisten"],
+         ["anforderungen", "Anforderungen"], ["rueck", "Rückführung"]].map(([k, l]) =>
         `<button data-lsub="${k}" aria-pressed="${lSub === k}" type="button">${esc(l)}</button>`).join("")}
     </div>
-    ${lSub === "stationen" ? stationView() : lSub === "anforderungen" ? anfView() : rueckView()}`;
+    ${lSub === "uebersicht" ? logiUebersicht() : lSub === "stationen" ? stationView()
+      : lSub === "anforderungen" ? anfView() : rueckView()}`;
+}
+
+/** Balkenreihe: ein Wert je Zeile, Länge am größten Wert gemessen. */
+function bars(rows, farbe) {
+  const max = Math.max(1, ...rows.map(r => r.v));
+  return `<div class="bars">${rows.map(r => `<div class="brow">
+      <span class="bl">${r.chip || esc(r.k)}</span>
+      <span class="btrack"><i style="width:${(r.v / max * 100).toFixed(1)}%;background:${farbe(r)}"></i></span>
+      <span class="bv">${r.v}</span></div>`).join("")}</div>`;
+}
+function logiUebersicht() {
+  if (!logi.length) return `<div class="empty"><b>Noch nichts geplant</b>
+      Sobald Posten angelegt sind, steht hier, was wo gebraucht wird, woher es kommt und was noch offen ist.</div>
+    <div style="margin-top:16px;display:flex;gap:9px;flex-wrap:wrap;justify-content:center">
+      <button class="btn pri" data-addposten="1" type="button">Posten anlegen</button>
+      <button class="btn" data-go="raeume" type="button">Aus der Raumplanung erzeugen</button></div>`;
+  const offen = logi.filter(p => p.status === "offen").length;
+  const zurueck = logi.filter(p => p.art !== "v" && p.status !== "zurueck").length;
+  const stk = stationen().length;
+
+  const byKat = {}; for (const p of logi) { const k = postenKat(p); byKat[k] = (byKat[k] || 0) + 1; }
+  const katRows = Object.entries(byKat).sort((a, b) => b[1] - a[1])
+    .map(([k, v]) => ({ k, v, chip:katChip(k) }));
+
+  const byQ = {}; for (const p of logi) { const q = p.quelle || "offen"; byQ[q] = (byQ[q] || 0) + 1; }
+  const qRows = Object.entries(byQ).sort((a, b) => b[1] - a[1]).map(([k, v]) => ({ k, v }));
+
+  const tage = ["Mi", ...TAGE.map(t => t.k)];
+  const dayRows = tage.map(tk => {
+    const ps = logi.filter(p => p.tag === tk);
+    return { tk, label: tk === "Mi" ? "Mittwoch (Aufbau)" : (TAGE.find(t => t.k === tk)?.lang || tk),
+             n:ps.length, st:Object.keys(LSTAT).map(k => ps.filter(p => p.status === k).length) };
+  }).filter(r => r.n);
+  const maxDay = Math.max(1, ...dayRows.map(r => r.n));
+
+  return `<div class="tiles">
+      <div class="tile acc"><div class="k">Posten insgesamt</div><b>${logi.length}</b>
+        <div class="s">über ${stk} Station${stk === 1 ? "" : "en"}</div></div>
+      <div class="tile ${offen ? "late" : "done"}"><div class="k">Noch nicht gepackt</div><b>${offen}</b>
+        <div class="s">${offen ? "offen" : "alles gepackt"}</div></div>
+      <div class="tile"><div class="k">Muss zurück</div><b>${zurueck}</b>
+        <div class="s">Gebrauchsmaterial unterwegs</div></div>
+      <div class="tile"><div class="k">Anforderungen</div><b>${anforderungen().length}</b>
+        <div class="s">aus den Bereichen gemeldet</div></div>
+    </div>
+
+    <div class="chart"><h4>Material nach Kategorie</h4>
+      <p class="cap">Wie sich die ${logi.length} Posten verteilen — die Farben laufen durch alle Listen mit.</p>
+      ${bars(katRows, r => katVar(r.k))}</div>
+
+    <div class="chart"><h4>Woher es kommt</h4>
+      <p class="cap">Alles ohne Quelle muss noch geklärt werden.</p>
+      ${bars(qRows, r => r.k === "offen" ? "var(--late)" : "var(--accent)")}</div>
+
+    <div class="chart"><h4>Je Tag und Packstatus</h4>
+      <p class="cap">Der Mittwoch ist der Aufbautag — dort liegt üblicherweise das meiste.</p>
+      <div class="bars">${dayRows.map(r => `<div class="brow">
+        <span class="bl">${esc(r.label)}</span>
+        <span class="stack" style="width:${(r.n / maxDay * 100).toFixed(1)}%">${
+          r.st.map((v, i) => v ? `<i style="flex:${v};background:${LSTAT_VAR[Object.keys(LSTAT)[i]]}"
+            title="${v} ${esc(Object.values(LSTAT)[i])}"></i>` : "").join("")}</span>
+        <span class="bv">${r.n}</span></div>`).join("")}</div>
+      <div class="slegend">${Object.entries(LSTAT).map(([k, l]) =>
+        `<span><i style="background:${LSTAT_VAR[k]}"></i>${esc(l)}</span>`).join("")}</div></div>`;
 }
 function postenRow(p) {
   const done = p.status !== "offen";
   return `<div class="li${p.status === "zurueck" ? " gone" : ""}">
+    <span style="width:4px;height:26px;border-radius:2px;flex:none;background:${katVar(postenKat(p))}"
+      title="${esc(postenKat(p))}"></span>
     <span class="nm"><b>${esc(p.material)}</b>
       <span>${esc(p.quelle || "Quelle offen")}${p.art === "v" ? " · Verbrauch" : " · muss zurück"}${
         p.vonBereich ? " · angefordert von " + esc(p.vonBereich) : ""}${p.kommentar ? " · " + esc(p.kommentar) : ""}</span></span>
@@ -833,7 +973,8 @@ function stationView() {
       <button class="btn" data-go="raeume" type="button">Zur Raumplanung</button></div>`;
   return `<div class="toolrow"><span style="flex:1"></span>${add}</div>` + st.map(x => {
     const offen = x.posten.filter(p => p.status === "offen").length;
-    return `<div class="grouped">
+    const di = ["Mi", "Do", "Fr", "Sa", "So"].indexOf(x.tag) + 1;
+    return `<div class="grouped st d${di > 0 ? di : ""}">
       <div class="gh"><h4>${esc(x.ort)} · ${esc(x.punkt)}</h4>
         <span class="sub">${esc(TAGE.find(t => t.k === x.tag)?.lang || x.tag)} · ${x.posten.length} Posten${offen ? ", " + offen + " offen" : ""}</span></div>
       ${x.posten.map(postenRow).join("")}</div>`;
@@ -884,10 +1025,10 @@ function raumLuecke(r) {
   const ws = wsList().filter(w => w.raum === r.id);
   const need = k => ws.reduce((a, w) => Math.max(a, +w[k] || 0), 0);
   const out = [];
-  for (const [k, feld, label, einheit] of [["bBeamer", "beamer", "Beamer", "Stück"],
-      ["bFlip", "flip", "Flipchart", "Stück"], ["bMeta", "meta", "Metaplanwand", "Stück"]]) {
+  for (const [k, feld, label, einheit, kat] of [["bBeamer", "beamer", "Beamer", "Stück", "Technik"],
+      ["bFlip", "flip", "Flipchart", "Stück", "Workshop"], ["bMeta", "meta", "Metaplanwand", "Stück", "Workshop"]]) {
     const d = need(k) - (+r[feld] || 0);
-    if (d > 0) out.push({ label, menge:d, einheit, feld });
+    if (d > 0) out.push({ label, menge:d, einheit, feld, kat });
   }
   return out;
 }
@@ -953,66 +1094,62 @@ function paketePlan() {
 }
 
 /* ======================================================================
-   Claude im Tool — beantwortet Fragen über den aktuellen Plan
+   Export für die eigene Claude-App
+   Bewusst keine API-Aufrufe aus der Seite heraus — niemand soll für das
+   Öffnen des Boards Token zahlen. Stattdessen: den Planstand herunterladen
+   und in der eigenen Claude-App anhängen.
    ====================================================================== */
-let sampleNs, sampleTried = false, askState = { q:"", answer:"", busy:false };
-async function getSample() {
-  if (!sampleTried) { sampleTried = true;
-    try { sampleNs = window.claude && window.claude.use ? await window.claude.use("sample") : null; } catch { sampleNs = null; } }
-  return sampleNs;
-}
-function planKontext() {
-  const l = [`Veranstaltung: JCNetwork Days 2026, Würzburg, 3.-6. Dezember. Heute: ${today().toISOString().slice(0, 10)}.`];
-  l.push("\nEINSATZBEREICHE UND BEDARF (Soll je Halbstundenfenster):");
+function planBriefing() {
+  const l = [`# JCNetwork Days 2026 — Planstand`, ``,
+    `Würzburg, 3.–6. Dezember 2026. Stand: ${fmtFull.format(today())}.`, ``];
+  l.push(`## Aufgaben (RACI)`, ``);
+  for (const a of AREAS) {
+    const ts = allTasks().filter(t => t.area === a);
+    const late = ts.filter(t => bucketOf(t) === "late").length;
+    const done = ts.filter(t => bucketOf(t) === "done").length;
+    l.push(`- **${a}**: ${ts.length} Aufgaben, ${done} erledigt${late ? `, ${late} über der Deadline` : ""}`);
+  }
+  l.push(``, `### Über der Deadline`, ``);
+  for (const t of allTasks().filter(x => bucketOf(x) === "late").slice(0, 60)) {
+    const a = peopleWith(t, "A").filter(p => p.name).map(dispName).join(", ");
+    l.push(`- ${t.area} · ${t.title} — Deadline ${fmtDM.format(windowOf(t).due)}${a ? ` · verantwortlich: ${a}` : ""}`);
+  }
+  l.push(``, `## Personal`, ``);
   for (const t of TAGE) {
-    const bd = bedarfAll()[t.k] || {};
-    for (const [ber, slots] of Object.entries(bd)) {
-      const tot = Object.values(slots).reduce((a, b) => a + b, 0);
-      l.push(`${t.lang} ${ber}: ${Object.entries(slots).map(([s, n]) => s + "=" + n).join(" ")} (Summe ${tot} Personenfenster)`);
+    const g = luecken(t.k);
+    l.push(`### ${t.lang}, ${t.d.getDate()}.12.`, ``);
+    if (!g.length) l.push(`Alle Fenster besetzt.`, ``);
+    else { for (const x of g) l.push(`- ${x.ber} ${x.von}–${x.bis}: ${x.fehlt} fehlen (${x.ist} von ${x.soll})`); l.push(``); }
+  }
+  l.push(`### Helfende`, ``);
+  for (const h of helferList()) {
+    const sch = schichtList().filter(x => x.helfer === h.id)
+      .map(x => `${x.tag} ${x.von}-${x.bis} ${x.bereich}`).join("; ");
+    l.push(`- **${helferName(h.id)}** — ${[h.fs && "Führerschein", h.eh && "Erste Hilfe", h.sprinter && "Sprinter", h.ernaehrung].filter(Boolean).join(", ") || "keine Merkmale"}; ${stundenVon(h.id).toFixed(1)} h${sch ? ` — ${sch}` : " — keine Schicht"}`);
+  }
+  if (logi.length) {
+    l.push(``, `## Logistik`, ``);
+    for (const st of stationen()) {
+      l.push(`### ${st.ort} · ${st.punkt} (${TAGE.find(t => t.k === st.tag)?.lang || st.tag})`, ``);
+      for (const x of st.posten) l.push(`- ${x.menge} ${x.einheit} ${x.material} — von ${x.quelle || "?"}, ${x.art === "v" ? "Verbrauch" : "muss zurück"}, ${LSTAT[x.status] || x.status}`);
+      l.push(``);
     }
   }
-  l.push("\nHELFENDE:");
-  for (const h of helferList()) l.push(`${helferName(h.id)} (id ${h.id}) — ${[h.fs && "Führerschein", h.eh && "Erste Hilfe", h.sprinter && "Sprinter", h.ernaehrung].filter(Boolean).join(", ") || "keine Merkmale"}; ${stundenVon(h.id).toFixed(1)} h geplant`);
-  l.push("\nSCHICHTEN:");
-  for (const s of schichtList()) l.push(`${helferName(s.helfer)}: ${s.tag} ${s.von}-${s.bis} ${s.bereich}`);
-  l.push("\nLÜCKEN:");
-  for (const t of TAGE) for (const g of luecken(t.k)) l.push(`${t.lang} ${g.ber} ${g.von}-${g.bis}: ${g.fehlt} fehlen (${g.ist}/${g.soll})`);
-  if (logi.length) { l.push("\nLOGISTIK:");
-    for (const p of logi) l.push(`${p.tag} ${p.ort}/${p.punkt}: ${p.menge} ${p.einheit} ${p.material} von ${p.quelle || "?"} [${p.status}]`); }
-  if (raumList().length) { l.push("\nRÄUME:");
-    for (const r of raumList()) { const f = raumLuecke(r);
-      l.push(`${r.loc}/${r.name} (${r.plaetze} Plätze): Beamer ${r.beamer}, Flipcharts ${r.flip}, Metaplan ${r.meta}${f.length ? " — fehlt: " + f.map(x => x.menge + " " + x.label).join(", ") : ""}`); } }
+  if (raumList().length) {
+    l.push(`## Räume`, ``);
+    for (const r of raumList()) {
+      const f = raumLuecke(r), ws = wsList().filter(w => w.raum === r.id);
+      l.push(`- **${r.loc} / ${r.name}** (${r.plaetze} Plätze): Beamer ${r.beamer}, Flipcharts ${r.flip}, Metaplanwände ${r.meta}${f.length ? ` — fehlt: ${f.map(x => x.menge + " " + x.label).join(", ")}` : ""}${ws.length ? ` — Workshops: ${ws.map(w => w.firma).join(", ")}` : ""}`);
+    }
+  }
   return l.join("\n");
 }
-function askPanel(vorschlaege) {
-  return `<div class="ask">
-    <h4>Claude fragen</h4>
-    <p class="lead2">Beantwortet Fragen über den aktuellen Stand dieses Plans — Lücken, Schichten, Material.</p>
-    <div class="askrow">
-      <input id="askQ" placeholder="z. B. Wer könnte die Lücke am Donnerstag im Lager füllen?"
-        value="${esc(askState.q)}" aria-label="Frage an Claude">
-      <button class="btn pri" data-ask="1" type="button">Fragen</button>
-    </div>
-    <div class="sugg">${vorschlaege.map(v => `<button data-sugg="${esc(v)}" type="button">${esc(v)}</button>`).join("")}</div>
-    ${askState.busy ? '<div class="ans wait">Claude denkt nach …</div>'
-      : askState.answer ? `<div class="ans">${esc(askState.answer)}</div>` : ""}
-  </div>`;
-}
-async function runAsk(q) {
-  const s = await getSample();
-  if (!s) { askState = { q, answer:"Claude ist in dieser Ansicht nicht verfügbar. Die Funktion braucht die veröffentlichte Fassung der Seite.", busy:false }; render(); return; }
-  askState = { q, answer:"", busy:true }; render();
-  try {
-    const r = await s([{ role:"user", content:
-      `Du bist Planungsassistent für die JCNetwork Days 2026. Antworte knapp, auf Deutsch, ` +
-      `mit konkreten Namen, Zeiten und Zahlen aus den Daten. Erfinde nichts; was nicht in den ` +
-      `Daten steht, sagst du klar.\n\nDATEN:\n${planKontext()}\n\nFRAGE: ${q}` }],
-      { modelTier:"default", onText:({ text }) => { askState = { q, answer:text, busy:true }; render(); } });
-    askState = { q, answer:r.text, busy:false };
-  } catch (e) {
-    askState = { q, answer:"Das hat nicht geklappt: " + (e && e.message ? e.message : "unbekannter Fehler"), busy:false };
-  }
-  render();
+async function download(filename, text, was) {
+  let dl = null;
+  try { dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null; } catch { dl = null; }
+  if (!dl) { toast("Herunterladen geht nur in der veröffentlichten Fassung."); return; }
+  try { await dl.save({ filename, data:text }); toast(was + " heruntergeladen"); }
+  catch { toast("Der Download wurde abgebrochen."); }
 }
 
 /* ======================================================================
@@ -1149,6 +1286,30 @@ function personSheet(id) {
     p.areas = all.checked ? ALL : [...o.querySelectorAll("[data-ar]:checked")].map(x => x.dataset.ar);
     if (me && me.id === p.id) me = p;
     closeSheet(); writeTeam(); toast("Gespeichert");
+  };
+}
+
+function bereichSheet(i) {
+  const list = bereicheList().map(b => ({ ...b })), b = list[i];
+  if (!b) return;
+  openSheet(`<div class="sh-h"><h3 class="disp">${esc(b.name)}</h3>
+      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
+    <div class="sh-b">
+      <div class="two"><div class="fld"><label for="bK">Kürzel</label><input id="bK" maxlength="5" value="${esc(b.kuerzel || "")}"></div>
+        <div class="fld"><label for="bN">Aufgabe</label><input id="bN" value="${esc(b.name)}"></div></div>
+      <div class="fld"><label for="bO">Ort</label><input id="bO" value="${esc(b.ort || "")}" placeholder="z. B. Uni Würzburg, Z6"></div>
+      <div class="two"><div class="fld"><label for="bA">Ansprechperson</label><input id="bA" value="${esc(b.asp || "")}"></div>
+        <div class="fld"><label for="bT">Telefon</label><input id="bT" type="tel" value="${esc(b.tel || "")}"></div></div>
+      <div class="fld"><label for="bB">Beschreibung</label><textarea id="bB">${esc(b.info || "")}</textarea>
+        <div class="hint">Ort, Ansprechperson und Beschreibung stehen später auf der Schicht jeder helfenden Person.</div></div>
+    </div>
+    <div class="sh-f"><span style="flex:1"></span><button class="btn" data-close="1" type="button">Abbrechen</button>
+      <button class="btn pri" data-save="1" type="button">Speichern</button></div>`);
+  const o = document.getElementById("overlay");
+  o.querySelector("[data-save]").onclick = async () => {
+    const g = id => o.querySelector(id).value.trim();
+    list[i] = { ...b, kuerzel:g("#bK"), name:g("#bN") || b.name, ort:g("#bO"), asp:g("#bA"), tel:g("#bT"), info:g("#bB") };
+    closeSheet(); await opsDocSet("bereiche", { list }); toast("Gespeichert");
   };
 }
 
@@ -1295,9 +1456,11 @@ function renderHelferBoard() {
         : "Für dich ist noch keine Schicht eingetragen."}</div></div>
     ${mine.length ? TAGE.filter(t => mine.some(s => s.tag === t.k)).map(t => `<section>
         <div class="sec-h"><h2 class="disp">${esc(t.lang)}</h2><span class="n">${t.d.getDate()}. Dezember</span></div>
-        <div class="panel">${mine.filter(s => s.tag === t.k).map(s => { const i = info(s.bereich);
+        <div class="panel">${mine.filter(s => s.tag === t.k).map(s => { const i = info(s.bereich) || {};
+          const zeile = [i.ort, i.asp && (i.asp + (i.tel ? " · " + i.tel : ""))].filter(Boolean).join(" · ");
           return `<div class="shift"><span class="tm">${esc(s.von)} – ${esc(s.bis)}</span>
-            <span class="bd"><b>${esc(s.bereich)}</b>${i && i.info ? `<span>${esc(i.info)}</span>` : ""}</span>
+            <span class="bd"><b>${esc(s.bereich)}</b>${zeile ? `<span>${esc(zeile)}</span>` : ""}
+              ${i.info ? `<span>${esc(i.info)}</span>` : ""}</span>
             <span class="dy">${((slotVal(s.bis) - slotVal(s.von)) / 60).toFixed(1)} h</span></div>`; }).join("")}</div>
       </section>`).join("")
     : `<div class="empty"><b>Noch nichts eingeteilt</b>Sobald die Personalplanung steht, findest du deine Schichten hier.</div>`}
@@ -1380,51 +1543,103 @@ function helferSchichtenSheet(id) {
   o.querySelector("[data-newshift]").onclick = () => { closeSheet(); schichtSheet(null, null, null, null, id); };
 }
 function postenSheet(modus) {
-  const kat = OPS.material;
-  const bers = AREAS;
-  openSheet(`<div class="sh-h"><h3 class="disp">${modus === "anfordern" ? "Material anfordern" : "Posten anlegen"}</h3>
+  const anf = modus === "anfordern";
+  let kat = "", art = "g";
+  const katOf = k => OPS.material.filter(m => m.kat === k);
+  openSheet(`<div class="sh-h"><div style="flex:1"><h3 class="disp">${anf ? "Material anfordern" : "Posten anlegen"}</h3>
+      <p style="font-size:13px;color:var(--ink-2);margin:6px 0 0">${anf
+        ? "Melde, was dein Bereich vor Ort braucht. Die Logistik plant es ein."
+        : "Was gebraucht wird, wo es hin muss und woher es kommt."}</p></div>
       <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
-    <div class="sh-b">
-      <div class="fld"><label for="mM">Material</label>
+    <div class="sh-b"><div class="steps">
+      <div class="step"><span class="no"></span><div class="sc">
+        <h5>Worum geht es?</h5>
+        <div class="katpick">${[...KAT.map(k => k[0]), "Sonstiges"].map(k =>
+          `<button class="k${katSlot(k)}" data-kat="${esc(k)}" aria-pressed="false" type="button"><i></i>${esc(k)}</button>`).join("")}</div>
+      </div></div>
+      <div class="step"><span class="no"></span><div class="sc">
+        <h5>Welches Material?</h5>
         <input id="mM" list="matlist" placeholder="Tippen — der Katalog schlägt vor">
-        <datalist id="matlist">${kat.slice(0, 260).map(m => `<option value="${esc(m.name)}">`).join("")}</datalist>
-        <div class="hint">${kat.length} Posten aus den Listen früherer Days.</div></div>
-      <div class="two"><div class="fld"><label for="mQ">Menge</label><input id="mQ" type="number" min="0" step="0.5" value="1"></div>
-        <div class="fld"><label for="mE">Einheit</label><input id="mE" value="Stück"></div></div>
-      <div class="two"><div class="fld"><label for="mT">Tag</label><select id="mT">
-          <option value="Mi">Mittwoch (Aufbau)</option>${TAGE.map(t => `<option value="${t.k}">${esc(t.lang)}</option>`).join("")}</select></div>
-        <div class="fld"><label for="mO">Ort</label><input id="mO" placeholder="z. B. Uni, Hauptgebäude"></div></div>
-      <div class="two"><div class="fld"><label for="mP">Programmpunkt</label><input id="mP" placeholder="z. B. Check-In"></div>
-        <div class="fld"><label for="mV">Kommt von</label><select id="mV">${QUELLEN.map(q => `<option>${esc(q)}</option>`).join("")}</select></div></div>
-      <div class="fld"><label>Art</label><div class="seg">
+        <datalist id="matlist"></datalist>
+        <div class="quick" id="quick"></div>
+        <div class="hint" id="qhint">Erst eine Kategorie wählen, dann kommen die häufigsten Posten daraus.</div>
+      </div></div>
+      <div class="step"><span class="no"></span><div class="sc">
+        <h5>Wie viel?</h5>
+        <div class="two"><div class="fld" style="margin:0"><label for="mQ">Menge</label>
+            <input id="mQ" type="number" min="0" step="0.5" value="1"></div>
+          <div class="fld" style="margin:0"><label for="mE">Einheit</label><input id="mE" value="Stück"></div></div>
+        <div class="fld" style="margin-top:12px"><label>Art</label><div class="seg">
           <button data-art="g" aria-pressed="true" type="button">Gebrauch — muss zurück</button>
           <button data-art="v" aria-pressed="false" type="button">Verbrauch</button></div></div>
-      ${modus === "anfordern" ? `<div class="fld"><label for="mB">Angefordert von</label>
-        <select id="mB">${bers.map(b => `<option${me && me.areas !== ALL && me.areas.includes(b) ? " selected" : ""}>${esc(b)}</option>`).join("")}</select></div>` : ""}
-      <div class="fld"><label for="mK">Kommentar</label><input id="mK" placeholder="optional"></div>
-    </div>
+      </div></div>
+      <div class="step"><span class="no"></span><div class="sc">
+        <h5>Wohin?</h5>
+        <div class="two"><div class="fld" style="margin:0"><label for="mT">Tag</label><select id="mT">
+            <option value="Mi">Mittwoch (Aufbau)</option>${TAGE.map(t => `<option value="${t.k}">${esc(t.lang)}</option>`).join("")}</select></div>
+          <div class="fld" style="margin:0"><label for="mO">Ort</label>
+            <input id="mO" list="ortlist" placeholder="z. B. Uni, Z6"></div></div>
+        <datalist id="ortlist">${[...new Set(logi.map(x => x.ort).concat(raumList().map(r => r.loc)))]
+          .filter(Boolean).map(o => `<option value="${esc(o)}">`).join("")}</datalist>
+        <div class="fld" style="margin-top:12px"><label for="mP">Programmpunkt</label>
+          <input id="mP" list="punktlist" placeholder="z. B. Check-In">
+          <datalist id="punktlist">${bereicheList().map(b => `<option value="${esc(b.name)}">`).join("")}</datalist></div>
+      </div></div>
+      <div class="step"><span class="no"></span><div class="sc">
+        <h5>Woher kommt es?</h5>
+        <div class="seg">${QUELLEN.map((q, n) =>
+          `<button data-q="${esc(q)}" aria-pressed="${n === 0}" type="button">${esc(q)}</button>`).join("")}</div>
+        <div class="fld" style="margin-top:12px"><label for="mK">Kommentar</label>
+          <input id="mK" placeholder="optional — z. B. „nicht zusammenfassen"></div>
+        ${anf ? `<div class="fld"><label for="mB">Angefordert von</label><select id="mB">${AREAS.map(b =>
+          `<option${me && me.areas !== ALL && me.areas.includes(b) ? " selected" : ""}>${esc(b)}</option>`).join("")}</select></div>` : ""}
+      </div></div>
+    </div></div>
     <div class="sh-f"><span style="flex:1"></span><button class="btn" data-close="1" type="button">Abbrechen</button>
-      <button class="btn pri" data-save="1" type="button">${modus === "anfordern" ? "Anfordern" : "Anlegen"}</button></div>`);
+      <button class="btn pri" data-save="1" type="button">${anf ? "Anfordern" : "Anlegen"}</button></div>`, true);
+
   const o = document.getElementById("overlay");
-  let art = "g";
-  o.querySelectorAll("[data-art]").forEach(b => b.onclick = () => { art = b.dataset.art;
-    o.querySelectorAll("[data-art]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.art === art))); });
-  // Einheit und Art aus dem Katalog vorbelegen, sobald das Material erkannt ist.
-  o.querySelector("#mM").oninput = e => {
-    const hit = kat.find(m => m.name.toLowerCase() === e.target.value.trim().toLowerCase());
-    if (hit) { o.querySelector("#mE").value = hit.einheit; art = hit.art === "v" ? "v" : "g";
-      o.querySelectorAll("[data-art]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.art === art))); }
+  let quelle = QUELLEN[0];
+  const setArt = a => { art = a; o.querySelectorAll("[data-art]").forEach(x =>
+    x.setAttribute("aria-pressed", String(x.dataset.art === art))); };
+  o.querySelectorAll("[data-art]").forEach(b => b.onclick = () => setArt(b.dataset.art));
+  o.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { quelle = b.dataset.q;
+    o.querySelectorAll("[data-q]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.q === quelle))); });
+
+  const uebernehmen = name => {
+    const hit = OPS.material.find(m => m.name.toLowerCase() === String(name).trim().toLowerCase());
+    if (!hit) return;
+    o.querySelector("#mE").value = hit.einheit; setArt(hit.art === "v" ? "v" : "g");
+    if (!kat) { kat = hit.kat; malen(); }
   };
+  function malen() {
+    o.querySelectorAll("[data-kat]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.kat === kat)));
+    const liste = kat ? katOf(kat) : OPS.material;
+    o.querySelector("#matlist").innerHTML = liste.slice(0, 300).map(m => `<option value="${esc(m.name)}">`).join("");
+    o.querySelector("#quick").innerHTML = liste.slice(0, 8).map(m =>
+      `<button data-quick="${esc(m.name)}" type="button">${esc(m.name)}</button>`).join("");
+    o.querySelector("#qhint").textContent = kat
+      ? `${liste.length} Posten in „${kat}" aus den Listen früherer Days.`
+      : "Erst eine Kategorie wählen, dann kommen die häufigsten Posten daraus.";
+    o.querySelectorAll("[data-quick]").forEach(b => b.onclick = () => {
+      o.querySelector("#mM").value = b.dataset.quick; uebernehmen(b.dataset.quick); });
+  }
+  o.querySelectorAll("[data-kat]").forEach(b => b.onclick = () => {
+    kat = kat === b.dataset.kat ? "" : b.dataset.kat; malen(); });
+  o.querySelector("#mM").oninput = e => uebernehmen(e.target.value);
+  malen();
+
   o.querySelector("[data-save]").onclick = async () => {
-    const g = id => o.querySelector(id).value.trim();
+    const g = id => { const el = o.querySelector(id); return el ? el.value.trim() : ""; };
     if (!g("#mM")) { o.querySelector("#mM").focus(); toast("Bitte ein Material eintragen."); return; }
     closeSheet();
-    await opsAdd("logi", { material:g("#mM"), menge:+g("#mQ") || 1, einheit:g("#mE"), tag:g("#mT"),
-      ort:g("#mO") || "noch offen", punkt:g("#mP") || "Allgemein", quelle:g("#mV"), art,
-      kommentar:g("#mK"), status:"offen", vonBereich: modus === "anfordern" ? g("#mB") : "" });
-    toast(modus === "anfordern" ? "Anforderung gemeldet" : "Posten angelegt");
+    await opsAdd("logi", { material:g("#mM"), kat:kat || "Sonstiges", menge:+g("#mQ") || 1,
+      einheit:g("#mE"), tag:g("#mT"), ort:g("#mO") || "noch offen", punkt:g("#mP") || "Allgemein",
+      quelle, art, kommentar:g("#mK"), status:"offen", vonBereich: anf ? g("#mB") : "" });
+    toast(anf ? "Anforderung gemeldet" : "Posten angelegt");
   };
 }
+
 function raumSheet(id) {
   const r = id ? raumList().find(x => x.id === id) : null;
   const f = (k, d) => r ? (r[k] ?? d) : d;
@@ -1499,8 +1714,9 @@ function paketeSheet() {
   const o = document.getElementById("overlay");
   const u = o.querySelector("[data-uebernehmen]");
   if (u) u.onclick = async () => { closeSheet();
-    for (const x of plan) await opsAdd("logi", { material:x.material, menge:x.menge, einheit:x.einheit,
-      tag:"Mi", ort:x.ort, punkt:"Aufbau", quelle:"JCNetwork-Lager", art:"g", kommentar:x.regel, status:"offen", vonBereich:"" });
+    for (const x of plan) await opsAdd("logi", { material:x.material, kat:x.kat, menge:x.menge,
+      einheit:x.einheit, tag:"Mi", ort:x.ort, punkt:"Aufbau", quelle:"JCNetwork-Lager", art:"g",
+      kommentar:x.regel, status:"offen", vonBereich:"" });
     toast(plan.length + " Posten übernommen"); };
 }
 function bedarfSheet() {
@@ -1587,6 +1803,11 @@ function wireAll(v) {
   v.querySelectorAll("[data-addhelfer]").forEach(b => b.onclick = helferSheet);
   v.querySelectorAll("[data-hschicht]").forEach(b => b.onclick = () => helferSchichtenSheet(b.dataset.hschicht));
   v.querySelectorAll("[data-bedarf]").forEach(b => b.onclick = bedarfSheet);
+  v.querySelectorAll("[data-editber]").forEach(b => b.onclick = () => bereichSheet(+b.dataset.editber));
+  v.querySelectorAll("[data-export]").forEach(b => b.onclick = () =>
+    download("Plan-Liste_JCNetwork_Days_2026.csv", "\ufeff" + planListeCSV(), "Plan-Liste"));
+  v.querySelectorAll("[data-exportmd]").forEach(b => b.onclick = () =>
+    download("Planstand_JCNetwork_Days_2026.md", planBriefing(), "Planstand"));
   v.querySelectorAll("[data-addposten]").forEach(b => b.onclick = () => postenSheet(b.dataset.addposten));
   v.querySelectorAll("[data-lstat]").forEach(b => b.onclick = () => {
     const p = logi.find(x => x.id === b.dataset.lstat); if (!p) return;
@@ -1600,24 +1821,18 @@ function wireAll(v) {
   v.querySelectorAll("[data-pakete]").forEach(b => b.onclick = paketeSheet);
   v.querySelectorAll("[data-anf]").forEach(b => b.onclick = async () => {
     const r = raumList().find(x => x.id === b.dataset.anf); if (!r) return;
-    for (const f of raumLuecke(r)) await opsAdd("logi", { material:f.label, menge:f.menge, einheit:f.einheit,
-      tag:"Mi", ort:r.loc, punkt:r.name, quelle:"JCNetwork-Lager", art:"g", status:"offen",
-      kommentar:"fehlt im Raum", vonBereich:"Workshops" });
+    for (const f of raumLuecke(r)) await opsAdd("logi", { material:f.label, kat:f.kat, menge:f.menge,
+      einheit:f.einheit, tag:"Mi", ort:r.loc, punkt:r.name, quelle:"JCNetwork-Lager", art:"g",
+      status:"offen", kommentar:"fehlt im Raum", vonBereich:"Workshops" });
     toast("Als Anforderung gemeldet");
   });
   v.querySelectorAll("[data-alleanf]").forEach(b => b.onclick = async () => {
     for (const r of raumList()) for (const f of raumLuecke(r))
-      await opsAdd("logi", { material:f.label, menge:f.menge, einheit:f.einheit, tag:"Mi", ort:r.loc,
-        punkt:r.name, quelle:"JCNetwork-Lager", art:"g", status:"offen", kommentar:"fehlt im Raum", vonBereich:"Workshops" });
+      await opsAdd("logi", { material:f.label, kat:f.kat, menge:f.menge, einheit:f.einheit, tag:"Mi",
+        ort:r.loc, punkt:r.name, quelle:"JCNetwork-Lager", art:"g", status:"offen",
+        kommentar:"fehlt im Raum", vonBereich:"Workshops" });
     toast("Alles Fehlende gemeldet");
   });
-  // Claude
-  v.querySelectorAll("[data-ask]").forEach(b => b.onclick = () => {
-    const q = v.querySelector("#askQ").value.trim(); if (q) runAsk(q);
-  });
-  v.querySelectorAll("[data-sugg]").forEach(b => b.onclick = () => runAsk(b.dataset.sugg));
-  const aq = v.querySelector("#askQ");
-  if (aq) aq.onkeydown = e => { if (e.key === "Enter") { const q = aq.value.trim(); if (q) runAsk(q); } };
 }
 
 document.getElementById("meBtn").onclick = pickerSheet;

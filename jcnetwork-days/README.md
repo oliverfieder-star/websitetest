@@ -114,18 +114,22 @@ Die Spalte „Besonderheiten" der Karlsruher Liste ist ein Regelsatz —
 `paketePlan()` rechnet daraus eine Packliste, statt sie abzutippen: aus
 Räumen und Workshops je Location entstehen die Posten automatisch.
 
-## Claude im Tool
+## Claude — über die eigene App, nicht aus der Seite
 
-Die Seite darf über die `sample`-Capability Fragen an Claude stellen —
-„Wo ist die größte Lücke?", „Wer hat Führerschein und ist Donnerstag frei?".
-Als Kontext geht der aktuelle Planstand mit (Bedarf, Schichten, Lücken,
-Material, Räume).
+Die Seite ruft **kein** Claude auf. Niemand soll dafür zahlen, dass er das
+Board öffnet. Stattdessen zwei Exporte unter „Team":
 
-**Nicht angebunden** ist der MCP-Server `Planungstool_Personal`. Er wäre der
-richtige Weg, um auf eine bestehende Helferdatenbank zu lesen, antwortete in
+- **Planstand als Markdown** — Aufgaben, Lücken, Helfende, Logistik, Räume in
+  einer Datei. In der eigenen Claude-App anhängen und fragen.
+- **Plan-Liste als CSV** — im Format des Blatts „Plan Liste" der offiziellen
+  Personalplan-Vorlage: `Aufgaben ID; Helfer ID; Vorname; Nachname; Account;
+  Aufgabe; Datum; Beginn; Ende`. Geht damit zurück nach Excel.
+
+Der MCP-Server `Planungstool_Personal` wäre der direktere Weg, antwortete in
 der Bauumgebung aber nicht. Ohne eine einmal beobachtete echte Antwort wird
 die `mcp`-Capability nicht verdrahtet — sonst steht geratenes Datenformat in
 der veröffentlichten Seite.
+
 
 ## Rollen
 
@@ -141,3 +145,32 @@ keine RACI, keine Planungsansichten.
   echte Daten angelegt sind.
 - **Fahrten** aus der Mainzer Liste (Fahrten-ID, Hin-/Rückfahrt) sind noch
   nicht abgebildet — bisher nur Station und Herkunft je Posten.
+
+## Die offizielle Personalplan-Vorlage
+
+Die Vorlage (Blatt „Erläuterung") ist die kanonische Quelle und liefert drei
+Dinge, die der ausgefüllte Stuttgarter Plan nicht hergab:
+
+- **Aufgabenbeschreibungen**: `Kürzel | Aufgabe | Beschreibung | Ort |
+  Ansprechperson | Tel.` — Ansprechperson und Telefon stehen jetzt auf der
+  Schicht jeder helfenden Person. Das ist der eigentliche Zweck.
+- **Verfügbarkeit**: die Vorlage färbt Zellen als „Nicht verfügbar". Als
+  Abwesenheiten übernommen, damit niemand in eine Absage eingeplant wird.
+- **Plan Liste** als Austauschformat — siehe CSV-Export oben.
+
+Die Vorlage selbst kennt keinen Soll-Bedarf; sie zählt nur, wer eingeteilt
+ist. Die Bedarfsplanung hat Stuttgart ergänzt. Das Tool führt beides.
+
+**Ein bewusster Unterschied:** die Vorlage legt jeden Tag von 00:00 bis 23:30
+an, Stuttgart und dieses Tool rechnen einen Veranstaltungstag von 06:00 bis
+05:30 am Folgetag — sonst landet die Schicht auf der Freitagsparty um 01:00
+im Samstag. Beim Abgleich mit der Vorlage daran denken.
+
+## Farben
+
+Die Kategoriefarben sind gegen den Validator der `dataviz`-Skill geprüft
+(sieben Slots plus Neutral für „Sonstiges", hell und dunkel, Farbfehlsichtigkeit
+und Kontrast). Sie sind bewusst getrennt von der Akzentfarbe (C&C-Blau, nur
+Bedienelemente) und den Statusfarben (überfällig, bald, erledigt). Dieselbe
+Kategorie hat überall dieselbe Farbe — im Balken, an der Posten-Kante, im
+Eingabedialog.

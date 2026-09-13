@@ -11,6 +11,10 @@
   --late:#ae4436; --late-wash:#fbeeec;
   --soon:#9a7115; --soon-wash:#faf2e1;
   --done:#48796a; --done-wash:#e9f1ee;
+  /* Kategoriefarben, gegen den dataviz-Validator geprüft (hell und dunkel).
+     Getrennt von Akzent und Statusfarben. */
+  --c1:#2a78d6; --c2:#eb6834; --c3:#1baf7a; --c4:#eda100;
+  --c5:#e87ba4; --c6:#008300; --c7:#4a3aa7; --c0:#8a969e;
   --r:14px;
   --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
   --disp:"Fraunces",Georgia,"Times New Roman",serif;
@@ -18,6 +22,8 @@
   --lift:0 1px 2px rgba(20,32,42,.04),0 8px 24px -12px rgba(20,32,42,.14);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500;
+  --c5:#d55181; --c6:#008300; --c7:#9085e9; --c0:#7d8c87;
   --accent:#68b0d4; --accent-2:#9bcde5; --accent-wash:#152e3c;
   --ink:#e8edf1; --ink-2:#9fadb6; --ink-3:#6f7d87;
   --paper:#0f1418; --card:#171d23; --card-2:#1c242b;
@@ -28,6 +34,8 @@
   --lift:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6);
 }}
 :root[data-theme="dark"]{
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500;
+  --c5:#d55181; --c6:#008300; --c7:#9085e9; --c0:#7d8c87;
   --accent:#68b0d4; --accent-2:#9bcde5; --accent-wash:#152e3c;
   --ink:#e8edf1; --ink-2:#9fadb6; --ink-3:#6f7d87;
   --paper:#0f1418; --card:#171d23; --card-2:#1c242b;
@@ -430,6 +438,73 @@ table.cov tbody tr:hover td.rn{background:var(--card-2)}
   .shift .tm{width:auto;font-size:12px}
   .seg-nav{width:100%}
 }
+
+/* ---------- Kategorien und Kennzahlen ---------- */
+.kat{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);
+  white-space:nowrap}
+.kat i{width:9px;height:9px;border-radius:3px;flex:none;background:var(--c0)}
+.kat.k1 i{background:var(--c1)} .kat.k2 i{background:var(--c2)} .kat.k3 i{background:var(--c3)}
+.kat.k4 i{background:var(--c4)} .kat.k5 i{background:var(--c5)} .kat.k6 i{background:var(--c6)}
+.kat.k7 i{background:var(--c7)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px 17px}
+.tile .k{font-size:12.5px;color:var(--ink-2);margin-bottom:3px}
+.tile b{font:500 30px/1.05 var(--mono);font-variant-numeric:tabular-nums;display:block}
+.tile .s{font-size:12px;color:var(--ink-3);margin-top:3px}
+.tile.late b{color:var(--late)} .tile.done b{color:var(--done)} .tile.acc b{color:var(--accent)}
+
+/* ---------- Balken nach Kategorie ---------- */
+.chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:17px 19px;margin-bottom:18px}
+.chart h4{font:600 14.5px/1.3 var(--sans);margin-bottom:2px}
+.chart .cap{font-size:12.5px;color:var(--ink-3);margin-bottom:14px}
+.bars{display:flex;flex-direction:column;gap:9px}
+.brow{display:grid;grid-template-columns:132px minmax(0,1fr) auto;gap:11px;align-items:center}
+.brow .bl{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btrack{height:15px;background:var(--hair);border-radius:4px;overflow:hidden}
+.btrack i{display:block;height:100%;border-radius:4px;min-width:3px}
+.brow .bv{font:500 12.5px var(--mono);color:var(--ink-2);font-variant-numeric:tabular-nums;
+  min-width:30px;text-align:right}
+.stack{display:flex;height:15px;border-radius:4px;overflow:hidden;gap:2px;background:var(--hair)}
+.stack i{display:block;height:100%}
+.slegend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:12px}
+.slegend span{display:inline-flex;align-items:center;gap:6px}
+.slegend i{width:11px;height:11px;border-radius:3px;flex:none}
+
+/* ---------- Geführte Eingabe ---------- */
+.katpick{display:flex;flex-wrap:wrap;gap:7px}
+.katpick button{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);
+  background:var(--card);border-radius:9px;padding:7px 12px;font-size:13px;cursor:pointer}
+.katpick button i{width:10px;height:10px;border-radius:3px;flex:none;background:var(--c0)}
+.katpick button.k1 i{background:var(--c1)} .katpick button.k2 i{background:var(--c2)}
+.katpick button.k3 i{background:var(--c3)} .katpick button.k4 i{background:var(--c4)}
+.katpick button.k5 i{background:var(--c5)} .katpick button.k6 i{background:var(--c6)}
+.katpick button.k7 i{background:var(--c7)}
+.katpick button:hover{border-color:var(--accent)}
+.katpick button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.quick button{border:1px dashed var(--line);background:none;border-radius:8px;padding:5px 10px;
+  font-size:12.5px;cursor:pointer;color:var(--ink-2)}
+.quick button:hover{border-style:solid;border-color:var(--accent);color:var(--accent)}
+.steps{counter-reset:st;display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;padding:0 0 18px}
+.step .no{counter-increment:st;width:22px;height:22px;border-radius:50%;background:var(--accent-wash);
+  color:var(--accent-2);display:grid;place-items:center;font:600 11px var(--mono)}
+.step .no::before{content:counter(st)}
+.step .sc{min-width:0}
+.step .sc h5{font:600 13px/1.3 var(--sans);margin-bottom:7px}
+.step .sc > input,.step .sc > select,.step .sc > textarea{width:100%;border:1px solid var(--line);
+  border-radius:9px;padding:9px 11px;font-size:14px;background:var(--card)}
+
+/* ---------- Station mit Farbkante ---------- */
+.grouped.st{border-left:3px solid var(--c0)}
+.grouped.st.d1{border-left-color:var(--c1)} .grouped.st.d2{border-left-color:var(--c2)}
+.grouped.st.d3{border-left-color:var(--c3)} .grouped.st.d4{border-left-color:var(--c4)}
+.grouped.st.d5{border-left-color:var(--c5)}
+.setup{background:var(--accent-wash);border-radius:var(--r);padding:17px 19px;margin-bottom:22px}
+.setup h4{font:600 14.5px/1.3 var(--sans);margin-bottom:9px}
+.setup ol{margin:0;padding-left:19px;font-size:13.5px;line-height:1.7}
+.setup code{font:400 12.5px var(--mono);background:var(--card);padding:1px 6px;border-radius:5px}
 </style>
 
 <header class="bar"><div class="bar-in">

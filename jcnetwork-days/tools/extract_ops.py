@@ -115,12 +115,27 @@ INHALTE = {
 
 # --- Einsatzbereiche und Bedarfsvorlage aus dem Stuttgarter Personalplan -
 wb = openpyxl.load_workbook(ST, data_only=True)
+# Schema nach der offiziellen Vorlage, Blatt "Aufgabenbeschreibungen":
+#   Kuerzel | Aufgabe | Beschreibung | Ort | Ansprechperson | Tel.
+# Ort und Ansprechperson bleiben leer - die aus Stuttgart gelten dort,
+# nicht in Wuerzburg.
+def kuerzel(name, vergeben):
+    w = [x for x in re.split(r"[\s/&-]+", name) if x]
+    cand = ("".join(x[0] for x in w) if len(w) > 1 else name[:3]).upper()
+    cand = re.sub(r"[^A-ZÄÖÜ0-9]", "", cand)[:4] or "X"
+    base, i = cand, 2
+    while cand in vergeben: cand = base + str(i); i += 1
+    vergeben.add(cand)
+    return cand
+
 ws = wb["Stammdaten"]
-bereiche = []
+bereiche, vergeben = [], set()
 for r in range(2, ws.max_row + 1):
     name = clean(ws.cell(r, 1).value)
     if not name: continue
-    bereiche.append({"name": name, "info": clean(ws.cell(r, 3).value)[:150],
+    bereiche.append({"kuerzel": kuerzel(name, vergeben), "name": name,
+                     "info": clean(ws.cell(r, 3).value)[:180],
+                     "ort": "", "asp": "", "tel": "",
                      "tracking": clean(ws.cell(r, 6).value) == "Ja",
                      "ws": clean(ws.cell(r, 7).value) == "Ja"})
 
