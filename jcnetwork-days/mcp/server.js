@@ -8,6 +8,9 @@
  * Nur lesend. Geändert wird im Board.
  */
 import express from "express";
+import { timingSafeEqual } from "node:crypto";
+import { dirname, join, normalize } from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
@@ -18,6 +21,9 @@ import {
 
 const TOKEN = process.env.MCP_TOKEN || "";
 const PORT = process.env.PORT || 8080;
+const BOARD_PW = process.env.BOARD_PASSWORD || "";
+const BOARD_USER = process.env.BOARD_USER || "team";
+const BOARD_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
 const text = t => ({ content: [{ type: "text", text: t }] });
 const liste = (xs, f) => xs.length ? xs.map(f).join("\n") : "— nichts gefunden —";
 
@@ -239,11 +245,33 @@ function bauen() {
   return s;
 }
 
+/* Zeitkonstanter Vergleich — verrät über die Antwortdauer nichts. */
+function gleich(a, b) {
+  const x = Buffer.from(String(a)), y = Buffer.from(String(b));
+  if (x.length !== y.length) return false;
+  return timingSafeEqual(x, y);
+}
+/* Passwortschutz fürs Board. Render bietet für Static Sites keinen an —
+   deshalb liefert dieser Dienst das Board gleich mit aus, hinter
+   HTTP-Basisauthentifizierung. Damit ist auch config.js geschützt, in der
+   der Supabase-Schlüssel steht. */
+function schutz(q, r, next) {
+  if (!BOARD_PW) return next();
+  const [typ, wert] = String(q.headers.authorization || "").split(" ");
+  if (typ === "Basic" && wert) {
+    const roh = Buffer.from(wert, "base64").toString("utf8");
+    const i = roh.indexOf(":");
+    if (i > 0 && gleich(roh.slice(0, i), BOARD_USER) && gleich(roh.slice(i + 1), BOARD_PW)) return next();
+  }
+  r.set("WWW-Authenticate", 'Basic realm="JCNetwork Days 2026", charset="UTF-8"');
+  r.status(401).type("text/plain").send("Zugang nur mit Passwort.");
+}
+
 const app = express();
 app.use(express.json({ limit: "4mb" }));
-app.get("/", (_q, r) => r.type("text/plain").send(
-  "MCP-Server der JCNetwork Days 2026. Endpunkt: POST /mcp/<token>"));
 app.get("/gesund", (_q, r) => r.json({ ok: true }));
+app.get("/mcp", (_q, r) => r.type("text/plain").send(
+  "MCP-Server der JCNetwork Days 2026. Endpunkt: POST /mcp/<token>"));
 
 app.post("/mcp/:token", async (q, r) => {
   if (!TOKEN || q.params.token !== TOKEN) {
@@ -264,8 +292,25 @@ app.post("/mcp/:token", async (q, r) => {
   }
 });
 
+/* Ab hier das Board. config.js wird zur Laufzeit aus den Umgebungsvariablen
+   erzeugt, damit der Supabase-Schlüssel nirgends auf der Platte liegt. */
+app.get(["/config.js", "/jcnetwork-days/config.js"], schutz, (_q, r) =>
+  r.type("application/javascript").send(
+    `"use strict";\n/* Zur Laufzeit erzeugt. */\nwindow.JCND_CONFIG = ` +
+    JSON.stringify({ supabaseUrl: process.env.SUPABASE_URL || "",
+                     supabaseKey: process.env.SUPABASE_KEY || "" }) + ";\n"));
+
+// Der Ordner mcp/ selbst wird nie ausgeliefert — dort liegt der Quelltext
+// dieses Dienstes.
+app.use((q, r, next) =>
+  normalize(decodeURIComponent(q.path)).startsWith("/mcp")
+    ? r.status(404).type("text/plain").send("Nicht gefunden") : next());
+app.use(schutz, express.static(BOARD_DIR, { index: "index.html", extensions: ["html"] }));
+
 app.listen(PORT, () => {
   console.log(`MCP-Server lauscht auf Port ${PORT}`);
-  if (!TOKEN) console.warn("WARNUNG: MCP_TOKEN ist nicht gesetzt — der Endpunkt antwortet auf nichts.");
+  if (!TOKEN) console.warn("WARNUNG: MCP_TOKEN ist nicht gesetzt — der MCP-Endpunkt antwortet auf nichts.");
+  if (!BOARD_PW) console.warn("WARNUNG: BOARD_PASSWORD ist nicht gesetzt — das Board ist ohne Passwort erreichbar.");
+  else console.log(`Board unter / mit Passwortschutz (Benutzer „${BOARD_USER}").`);
   if (!process.env.SUPABASE_URL) console.warn("Hinweis: ohne SUPABASE_URL kommt nur die RACI, kein geteilter Stand.");
 });

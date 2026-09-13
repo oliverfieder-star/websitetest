@@ -10,7 +10,10 @@
 # Siehe jcnetwork-days/README.md, Abschnitt „Selbst hosten".
 
 services:
-  # Das Board selbst — reine Dateien, kein Build.
+  # Das Board als reine Dateien. FREIWILLIG: Render bietet für Static Sites
+  # keinen Passwortschutz. Wer einen braucht, lässt diesen Dienst weg — der
+  # Dienst jcnd-mcp unten liefert das Board ebenfalls aus, dann hinter
+  # Passwort.
   - type: web
     name: jcnd-board
     runtime: static
@@ -32,8 +35,9 @@ services:
         name: Referrer-Policy
         value: no-referrer
 
-  # Der MCP-Server — liest denselben Stand und wird in der Claude-App
-  # jeder Person als Connector eingehängt.
+  # Liefert zwei Dinge aus:
+  #   1. das Board unter / — hinter Passwort, wenn BOARD_PASSWORD gesetzt ist
+  #   2. den MCP-Server unter /mcp/<token> für die Claude-App jeder Person
   - type: web
     name: jcnd-mcp
     runtime: node
@@ -47,7 +51,12 @@ services:
       # Dashboard nachlesen und in die Connector-URL einsetzen.
       - key: MCP_TOKEN
         generateValue: true
-      # Dieselben Werte wie in jcnetwork-days/config.js.
+      # Passwort fürs Board. Ohne diesen Wert ist das Board offen erreichbar.
+      - key: BOARD_PASSWORD
+        sync: false
+      - key: BOARD_USER
+        value: team
+      # Dieselben Werte wie im Board.
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_KEY

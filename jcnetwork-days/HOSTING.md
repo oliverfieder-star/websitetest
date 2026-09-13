@@ -122,19 +122,32 @@ Dann **Apply**. Der erste Deploy dauert zwei bis vier Minuten.
 Ohne diesen Schritt kann jede Person, die die Adresse kennt, alles lesen und
 ändern — samt Handynummern.
 
-**Der einfache Weg:** Im Render-Dashboard bei **jcnd-board** unter
-**Settings → Protect Site** (auch **Password Protection**) ein Passwort
-setzen. Das Passwort teilst du im Team. Fertig.
+**Render kann das für Static Sites nicht.** Ein Passwortschutz für Static Sites
+ist dort seit Jahren ein offener Feature-Request. Deshalb liefert der Dienst
+**jcnd-mcp** das Board gleich mit aus — hinter HTTP-Basisauthentifizierung.
+Geschützt ist damit alles, auch `config.js` mit dem Supabase-Schlüssel.
 
-**Der bessere Weg** für ein Team mit Helfenden: die Seite über **Cloudflare
-Pages** ausliefern und **Cloudflare Access** davorhängen — kostenlos bis
-50 Personen, Anmeldung per E-Mail-Code, jede Person einzeln entziehbar. Mehr
-Aufwand, aber sauberer, sobald mehr als eine Handvoll Leute Zugang haben.
+1. Im Render-Dashboard **jcnd-mcp** öffnen, Reiter **Environment**.
+2. Zwei Variablen anlegen:
 
-**Wenn beides gerade nicht geht:** Handynummern leer lassen. Dann ist das
-Board ein Nachschlagewerk für die Planung, kein Adressbuch.
+   | Variable | Wert |
+   |---|---|
+   | `BOARD_PASSWORD` | ein Passwort deiner Wahl, das du im Team teilst |
+   | `BOARD_USER` | `team` (oder was du magst) |
 
----
+3. **Save, rebuild, and deploy**.
+4. Danach ist das Board unter der Adresse von **jcnd-mcp** erreichbar —
+   `https://jcnd-mcp-xxxx.onrender.com/`. Der Browser fragt einmal nach
+   Benutzer und Passwort.
+
+Die Adresse von **jcnd-board** aus Schritt 4 bleibt ohne Schutz. Entweder du
+löschst den Dienst und benutzt nur noch die geschützte Adresse, oder du lässt
+ihn stehen und trägst dort keine Telefonnummern ein.
+
+> Basisauthentifizierung heißt: ein Passwort für alle. Wer ausscheidet, kann
+> weiter rein, bis ihr es ändert. Für ein Projektteam über ein paar Monate
+> vertretbar. Wenn ihr pro Person aussperren wollt, ist **Cloudflare Access**
+> der nächste Schritt — kostenlos bis 50 Personen, Anmeldung per E-Mail-Code.
 
 ## Schritt 8 — Claude anbinden (freiwillig)
 
@@ -146,6 +159,7 @@ nichts auf.
 1. Im Render-Dashboard **jcnd-mcp** öffnen, Reiter **Environment**.
 2. Bei `MCP_TOKEN` auf das Auge klicken und den Wert kopieren.
 3. Die Adresse des Dienstes steht oben (`https://jcnd-mcp-xxxx.onrender.com`).
+   Das ist dieselbe Adresse, unter der auch das Board läuft.
 4. Die Connector-Adresse ist beides zusammen:
 
    ```
@@ -170,7 +184,8 @@ Days"*. Es muss der Countdown und die Zahl der überfälligen Aufgaben kommen.
 | Fußzeile sagt *nur auf diesem Gerät* | `SUPABASE_URL`/`SUPABASE_KEY` fehlen beim **jcnd-board**. Unter Environment prüfen, neu deployen. |
 | Fußzeile sagt *Verbindung unterbrochen* | Das SQL aus Schritt 2 lief nicht durch. Im Supabase **Table Editor** nachsehen, ob die Tabelle `jcnd` existiert. |
 | Board lädt, aber bleibt leer | Ein Skript fehlt. Unter **Logs** beim Board nachsehen, ob `build.sh` durchlief. |
-| Claude findet den Connector nicht | Tippfehler in der Adresse oder fehlendes `/mcp/` vor dem Token. Zum Prüfen die Adresse ohne `/mcp/...` im Browser öffnen — da muss ein Einzeiler stehen. |
+| Claude findet den Connector nicht | Tippfehler in der Adresse oder fehlendes `/mcp/` vor dem Token. Zum Prüfen `https://…onrender.com/mcp` im Browser öffnen — da muss ein Einzeiler stehen. |
+| Board fragt kein Passwort | `BOARD_PASSWORD` fehlt bei **jcnd-mcp**, oder du bist auf der Adresse von jcnd-board. |
 | Erster Aufruf dauert ewig | Der Render-Free-Plan schläft nach 15 Minuten Leerlauf ein. Der nächste Aufruf weckt ihn in etwa 30 Sekunden. Für die Veranstaltungstage lohnen die 7 $/Monat für den bezahlten Plan. |
 
 ## Was danach automatisch passiert
