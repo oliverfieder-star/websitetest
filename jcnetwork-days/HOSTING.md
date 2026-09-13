@@ -177,3 +177,69 @@ Days"*. Es muss der Countdown und die Zahl der überfälligen Aufgaben kommen.
 
 Jeder Push auf den Branch löst einen neuen Deploy aus — beide Dienste
 aktualisieren sich von selbst. Die Daten in Supabase bleiben davon unberührt.
+
+---
+
+## Ohne GitHub-Konto: die Dienste von Hand anlegen
+
+Das Repository ist **öffentlich**. Render kann von einer öffentlichen Git-URL
+deployen, ohne dass ein GitHub-Konto verbunden ist. Der Blueprint aus Schritt 4
+funktioniert dann nicht — dafür legst du die zwei Dienste einzeln an. Dauert
+fünf Minuten länger, kommt aber am selben Ziel heraus.
+
+Die Git-URL ist in beiden Fällen:
+
+    https://github.com/oliverfieder-star/websitetest
+
+und der Branch immer `claude/zen-faraday-13q37w`.
+
+### Dienst 1 — das Board
+
+*New → Static Site*, dann **Public Git Repository** wählen und die URL oben
+einsetzen.
+
+| Feld | Wert |
+|---|---|
+| Name | `jcnd-board` |
+| Branch | `claude/zen-faraday-13q37w` |
+| Root Directory | `jcnetwork-days` |
+| Build Command | `./build.sh` |
+| Publish Directory | `.` |
+
+Danach unter **Environment** zwei Variablen anlegen: `SUPABASE_URL` und
+`SUPABASE_KEY` mit den Werten aus Schritt 3.
+
+### Dienst 2 — der MCP-Server
+
+*New → Web Service*, wieder **Public Git Repository** und dieselbe URL.
+
+| Feld | Wert |
+|---|---|
+| Name | `jcnd-mcp` |
+| Branch | `claude/zen-faraday-13q37w` |
+| Root Directory | `jcnetwork-days/mcp` |
+| Language / Runtime | Node |
+| Build Command | `npm install` |
+| Start Command | `npm start` |
+| Health Check Path | `/gesund` |
+| Instance Type | Free |
+
+Unter **Environment** drei Variablen: `SUPABASE_URL`, `SUPABASE_KEY` und
+`MCP_TOKEN`. Den Token denkst du dir selbst aus — eine lange zufällige
+Zeichenfolge ohne Leerzeichen, etwa 30 Stellen. Er ist der ganze Zugangsschutz
+des MCP-Servers.
+
+### Der eine Unterschied
+
+Bei einem öffentlichen Repository ohne verbundenes Konto darf Render keinen
+Webhook setzen. Neue Stände kommen deshalb nicht von selbst an: im Dashboard
+**Manual Deploy → Deploy latest commit** anklicken. Für ein Planungswerkzeug,
+das sich alle paar Tage ändert, reicht das.
+
+## Ganz ohne Render
+
+`jcnetwork-days-board.zip` enthält alle Dateien. Der Ordner `jcnetwork-days`
+daraus läuft auf jedem Webspace, der statische Dateien ausliefert — hochladen,
+fertig. Für den geteilten Stand dann `config.js` von Hand mit den
+Supabase-Werten füllen (statt über `build.sh`). Das ist nur vertretbar, wenn
+der Webspace nicht öffentlich erreichbar ist.
