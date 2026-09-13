@@ -111,8 +111,11 @@ const GRP = {
   pl: ["Projektleitung", "teilt sich die zwölf Bereiche"],
   pt: ["Projektteam Würzburg", "je ein Bereich, manchmal zwei"],
   jcn:["Vorstand JCNetwork e.V.", "Namen eintragen, dann greifen die Boards"],
-  gr: ["Weitere Gremien", "Ausrichterverein und Alumniverein"]
+  fel:["JCNetwork Fellows", "unterstützen den Vorstand, oft in mehreren Funktionen"],
+  gr: ["Weitere Gremien", "Ausrichterverein und Alumniverein"],
+  helfer:["Helfende", "eingeteilt über die Personalplanung"]
 };
+const GRP_ORDER = ["pl", "pt", "jcn", "fel", "gr"];
 let team = DEFAULT_TEAM.map(p => ({ ...p, areas: p.areas === ALL ? ALL : [...p.areas] }));
 const personById = id => team.find(p => p.id === id);
 /** Auch Helfende dürfen sich anmelden — sie sehen dann nur ihren Einsatz. */
@@ -211,7 +214,7 @@ async function initStore() {
   applyTeamDoc(lsGet(LS.team, null));
   helfer = lsGet("jcnd.helfer", []); schichten = lsGet("jcnd.schicht", []);
   logi = lsGet("jcnd.logi", []); raeume = lsGet("jcnd.raum", []); workshops = lsGet("jcnd.ws", []);
-  abwesend = lsGet("jcnd.abw", []);
+  abwesend = lsGet("jcnd.abw", []); chat = lsGet("jcnd.chat", []);
   opsDoc.bedarf = lsGet("jcnd.ops.bedarf", null); opsDoc.bereiche = lsGet("jcnd.ops.bereiche", null);
   const st = await window.JCNDStore.open();
   db = st.db; speicherModus = st.modus;
@@ -231,10 +234,10 @@ async function initStore() {
   }, fail);
   for (const [col, set] of [["helfer", v => helfer = v], ["schicht", v => schichten = v],
                             ["logi", v => logi = v], ["raum", v => raeume = v], ["ws", v => workshops = v],
-                            ["abw", v => abwesend = v]]) {
+                            ["abw", v => abwesend = v], ["chat", v => chat = v]]) {
     db.collection(col).onSnapshot(sn => {
       set(sn.docs.map(d => ({ ...d.data(), id:d.id })));
-      lsSet("jcnd." + col, { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend }[col]);
+      lsSet("jcnd." + col, { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend, chat }[col]);
       render();
     }, fail);
   }
@@ -291,7 +294,7 @@ function row(t, o = {}) {
   const when = humanDue(due);
   const cls = b === "late" ? "late" : (b === "now" || b === "soon" ? "soon" : "");
   const meta = [];
-  if (!o.hideArea) meta.push(`<span class="tag">${esc(t.area)}</span>`);
+  if (!o.hideArea) meta.push(`<span class="tag">${areaDot(t.area)} ${esc(t.area)}</span>`);
   if (o.showLead) {
     const a = peopleWith(t, "A").filter(p => p.name)[0] || peopleWith(t, "R").filter(p => p.name)[0];
     if (a) meta.push(`<span class="lead">${av(a, "sm")}${esc(dispName(a))}</span>`);
@@ -305,6 +308,7 @@ function row(t, o = {}) {
     <span class="mid" data-open="${esc(t.key)}" role="button" tabindex="0">
       <span class="t">${esc(t.title)}</span>
       ${meta.length ? `<span class="m">${meta.join("")}</span>` : ""}
+      ${ov(t.key).note ? `<span class="rownote"><i>&#9998;</i><span>${esc(ov(t.key).note)}</span></span>` : ""}
     </span>
     ${f ? '<span class="fl" title="Geflaggt">●</span>' : ""}
     <span class="when ${cls}" data-open="${esc(t.key)}">${esc(when)}</span>
@@ -386,6 +390,8 @@ function renderBoard() {
       </div>
     </div>
 
+    ${hubCards(work, late, watch)}
+
     ${late.length ? `<section><button class="callout" data-only="late" type="button">
       <span class="big num">${late.length}</span>
       <span class="tx"><b>Über der Deadline</b>
@@ -419,6 +425,35 @@ function renderBoard() {
       ${watch.length ? `<button class="lnk" data-watch="1" type="button">${watch.length} Aufgaben, bei denen du nur gefragt oder informiert wirst</button>` : ""}
     </div>`;
 }
+/** Startkacheln: von hier kommt jede Person in ihren Teil des Werkzeugs. */
+function hubCards(work, late, watch) {
+  const offenAlle = allTasks().filter(t => bucketOf(t) !== "done").length;
+  const arbeit = allTasks().filter(t => ["laeuft", "blockiert"].includes(statusOf(t.key))).length;
+  const gaps = TAGE.reduce((a, t) => a + luecken(t.k).length, 0);
+  const lOffen = logi.filter(x => x.status === "offen").length;
+  const rKurz = raumList().filter(r => raumLuecke(r).length).length;
+  const meinOffen = work.filter(r => bucketOf(r.t) !== "done").length;
+  const gremium = ["jcn", "fel", "gr"].includes(me.grp);
+
+  const karte = (ziel, farbe, kicker, titel, text, zahl, einheit, warn) =>
+    `<button class="hubcard" data-go="${ziel}" type="button" style="--hc:var(--c${farbe})">
+      <span class="ic">${esc(kicker)}</span><h3>${esc(titel)}</h3>
+      <span class="d">${esc(text)}</span>
+      <span class="cnt"><b${warn ? ' class="warn"' : ""}>${zahl}</b> ${esc(einheit)}</span></button>`;
+
+  return `<section><div class="sec-h"><h2 class="disp">Wohin willst du?</h2></div>
+    <div class="hub">
+      ${gremium
+        ? karte("rolle", 7, "RACI", "Meine Rolle", "Was deine Position verantwortet und mitentscheidet.", meinOffen, "offen", late.length)
+        : karte("mine", 1, "RACI", "Meine Aufgaben", "Alles, was du selbst machst oder verantwortest.", meinOffen, "offen", late.length)}
+      ${karte("arbeit", 4, "Stand", "In Arbeit", "Woran gerade jemand sitzt und wo es klemmt.", arbeit, "in Arbeit", 0)}
+      ${karte("offen", 2, "Projekt", "Alle offenen", "Das ganze Projekt, nicht nur dein Teil.", offenAlle, "offen", 0)}
+      ${karte("personal", 3, "Vor Ort", "Personal", "Bedarf gegen Einteilung, Tag für Tag.", gaps, "Lücken", gaps)}
+      ${karte("logistik", 5, "Vor Ort", "Logistik", "Material, Packlisten und kurze Notizen.", lOffen, "nicht gepackt", 0)}
+      ${karte("raeume", 6, "Vor Ort", "Räume", "Workshops, Ausstattung und Aufbau-Checkliste.", rKurz, "unvollständig", rKurz)}
+    </div></section>`;
+}
+
 /** Was in den drei Betriebsmodulen gerade offen ist — erst zeigen, wenn es etwas gibt. */
 function vorOrtBlock() {
   const gaps = TAGE.reduce((a, t) => a + luecken(t.k).length, 0);
@@ -441,7 +476,7 @@ function areaCard(a) {
   const late = ts.filter(t => bucketOf(t) === "late").length;
   const lead = team.filter(p => p.grp === "pt" && p.areas !== ALL && p.areas.includes(a) && p.name)[0]
             || team.filter(p => p.grp === "pl" && p.areas !== ALL && p.areas.includes(a) && p.name)[0];
-  return `<button class="card" data-area="${esc(a)}" type="button">
+  return `<button class="card acol" data-area="${esc(a)}" type="button" style="--ac:${areaVar(a)}">
     ${ring(done, ts.length)}
     <span class="tx"><h3>${esc(a)}</h3>
       <span class="who">${lead ? av(lead, "sm") + esc(dispName(lead)) : "niemand zugeordnet"}</span>
@@ -510,6 +545,51 @@ function renderOffen() {
         ${panel(sortTasks(g.map(t => ({ t, inv: wer ? involvement(t, wer) : (me ? involvement(t, me) : null) })))
           .map(r => row(r.t, { hideArea: offenNach === "bereich", showLead:true })))}</section>`;
     }).join("") : `<div class="empty"><b>Nichts offen</b>Für diese Filter ist alles erledigt.</div>`}`;
+}
+
+/** Was gerade läuft — mit dem Stand, den jemand dazugeschrieben hat. */
+function renderArbeit() {
+  const alle = allTasks().filter(t => matches(t));
+  const laeuft = sortTasks(alle.filter(t => statusOf(t.key) === "laeuft").map(t => ({ t, inv:me ? involvement(t, me) : null })));
+  const haengt = sortTasks(alle.filter(t => statusOf(t.key) === "blockiert").map(t => ({ t, inv:me ? involvement(t, me) : null })));
+  const notiz = sortTasks(alle.filter(t => ov(t.key).note && !["laeuft", "blockiert"].includes(statusOf(t.key)))
+    .map(t => ({ t, inv:me ? involvement(t, me) : null })));
+  const flag = sortTasks(alle.filter(t => ov(t.key).flag).map(t => ({ t, inv:me ? involvement(t, me) : null })));
+  const blocks = [["Hängt", haengt, "jemand kommt nicht weiter"], ["In Arbeit", laeuft, "läuft gerade"],
+                  ["Geflaggt", flag, "zur Aufmerksamkeit markiert"], ["Mit Notiz", notiz, "Stand festgehalten"]];
+  const leer = !blocks.some(([, g]) => g.length);
+  return `<p style="font-size:13px;color:var(--ink-2);margin:0 0 18px;max-width:70ch">
+      Alles, woran gerade jemand sitzt oder wo etwas klemmt. Status und Notiz setzt du in jeder
+      Aufgabe selbst — beides sehen alle Beteiligten.</p>
+    ${leer ? `<div class="empty"><b>Nichts in Arbeit</b>Setze eine Aufgabe auf „Läuft" oder „Hängt"
+      und schreib dazu, wo sie steht.</div>`
+    : blocks.filter(([, g]) => g.length).map(([lbl, g, hint]) => `<section>
+        <div class="sec-h"><h2 class="disp">${esc(lbl)}</h2><span class="n">${g.length}</span>
+          <span style="font-size:12.5px;color:var(--ink-3);margin-left:auto">${esc(hint)}</span></div>
+        ${panel(g.map(r => row(r.t, { showLead:true })))}</section>`).join("")}`;
+}
+
+/** Für Vorstand und Gremien: nicht „meine Aufgaben", sondern die eigene
+ *  Rolle in der RACI — verantworten, ausführen, gefragt werden, unterschreiben. */
+function renderRolle() {
+  if (!me) return "";
+  const rows = allTasks().filter(t => matches(t)).map(t => ({ t, inv:involvement(t, me) })).filter(r => r.inv);
+  const offen = rows.filter(r => bucketOf(r.t) !== "done");
+  const blocks = ["A", "R", "S", "C", "I"].map(l => [l, offen.filter(r => r.inv.letters.includes(l))]);
+  const pos = me.pos.map(x => POS_LABEL[x] || x).join(", ");
+  return `<p style="font-size:13px;color:var(--ink-2);margin:0 0 18px;max-width:70ch">
+      Deine Position in der RACI: <b>${esc(pos || "keine")}</b>${me.areas === ALL
+        ? " — über alle zwölf Bereiche." : " — in " + me.areas.length + " Bereichen."}
+      Sortiert nach dem, was die RACI von dieser Position verlangt.</p>
+    <div class="tiles">${blocks.map(([l, g]) => `<div class="tile"${l === "A" ? ' style="border-left:3px solid var(--accent)"' : ""}>
+        <div class="k">${esc(ROLE[l].lbl)}</div><b>${g.length}</b>
+        <div class="s">${esc(ROLE[l].desc)}</div></div>`).join("")}</div>
+    ${blocks.filter(([, g]) => g.length).map(([l, g]) => `<section>
+      <div class="sec-h"><h2 class="disp">${esc(ROLE[l].lbl)}</h2><span class="n">${g.length}</span>
+        <span style="font-size:12.5px;color:var(--ink-3);margin-left:auto">${esc(ROLE[l].you)}</span></div>
+      ${panel(sortTasks(g).slice(0, 40).map(r => row(r.t, { showLead: l === "C" || l === "I" })))}
+      ${g.length > 40 ? `<p style="font-size:12.5px;color:var(--ink-3);margin:9px 2px 0">… und ${g.length - 40} weitere.</p>` : ""}
+    </section>`).join("") || `<div class="empty"><b>Nichts offen</b>Für deine Position ist alles erledigt.</div>`}`;
 }
 
 function toolbar() {
@@ -643,23 +723,56 @@ function renderTeam() {
         <p style="margin:12px 0 0;font-size:12.5px;color:var(--ink-3)">
           Die RACI nennt beides ohne Datum. Alle „Wahl"- und „AnmS"-Deadlines rechnen von hier.</p>
       </div></section>` +
-    ["pl", "pt", "jcn", "gr"].map(g => {
-      const ps = team.filter(p => p.grp === g); if (!ps.length) return "";
-      return `<div class="grp-h" ${g === "jcn" ? 'id="nn"' : ""}><h3 class="disp">${esc(GRP[g][0])}</h3><p>${esc(GRP[g][1])}</p></div>
+    GRP_ORDER.map(g => {
+      const ps = team.filter(p => p.grp === g);
+      if (!ps.length && g !== "fel") return "";
+      return `<div class="grp-h" ${g === "jcn" ? 'id="nn"' : ""}><h3 class="disp">${esc(GRP[g][0])}</h3><p>${esc(GRP[g][1])}</p>
+        <button class="btn sm" data-addperson="${g}" type="button" style="margin-top:9px">Person hinzufügen</button></div>
+      ${!ps.length ? '<p style="font-size:13px;color:var(--ink-3);margin:0 0 10px">Noch niemand eingetragen.</p>' : ""}
       <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(258px,1fr))">${ps.map(p => {
         const w = tasksFor(p, "work");
         const open = w.filter(r => bucketOf(r.t) !== "done").length;
         const late = w.filter(r => bucketOf(r.t) === "late").length;
-        return `<div class="pc${!p.name || !p.name.trim() ? " nn" : ""}">
+        return `<div class="pc${!p.name || !p.name.trim() ? " nn" : ""}${g === "fel" ? " fellow" : ""}">
           <div class="top">${av(p, "lg")}<div style="min-width:0">
             <div class="nm">${esc(dispName(p))}</div><div class="rl">${esc(p.role)}</div></div></div>
           <div class="ar">${p.areas === ALL ? '<span class="pill plain">alle Bereiche</span>'
-            : p.areas.map(a => `<span class="pill plain">${esc(a)}</span>`).join("")}</div>
+            : p.areas.map(a => `<span class="pill plain" style="border-left:3px solid ${areaVar(a)}">${esc(a)}</span>`).join("")}</div>
+          ${p.tel || p.mail ? `<div class="kt">
+            ${p.tel ? `<span>&#9742; <a href="tel:${esc(String(p.tel).replace(/\s/g, ""))}">${esc(p.tel)}</a></span>` : ""}
+            ${p.mail ? `<span>&#9993; <a href="mailto:${esc(p.mail)}">${esc(p.mail)}</a></span>` : ""}</div>` : ""}
           <div class="fg"><b>${open}</b> offen${late ? ` · <span class="l">${late} drüber</span>` : ""} · ${w.length} gesamt</div>
           <div class="ed"><button class="btn sm" data-editp="${esc(p.id)}" type="button">Bearbeiten</button>
             ${p.name && p.name.trim() ? `<button class="btn sm gho" data-beid="${esc(p.id)}" type="button">Board ansehen</button>` : ""}</div>
         </div>`; }).join("")}</div>`;
-    }).join("");
+    }).join("") + helferTeamBlock();
+}
+
+/** Helfende stehen in der Personalplanung — im Team gehören sie trotzdem hin,
+ *  samt Handynummer für den kurzen Draht. */
+function helferTeamBlock() {
+  const hs = helferList().filter(h => !h.demo)
+    .sort((a, b) => (a.vorname + a.nachname).localeCompare(b.vorname + b.nachname, "de"));
+  return `<div class="grp-h"><h3 class="disp">${esc(GRP.helfer[0])}</h3><p>${esc(GRP.helfer[1])}</p>
+      <button class="btn sm" data-addhelfer="1" type="button" style="margin-top:9px">Helfende Person anlegen</button></div>
+    ${hs.length ? `<div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(258px,1fr))">${hs.map(h => {
+      const n = schichtList().filter(s => s.helfer === h.id).length, st = stundenVon(h.id);
+      const merk = [h.fs && "Führerschein", h.eh && "Erste Hilfe", h.sprinter && "Sprinter"].filter(Boolean);
+      return `<div class="pc helfer">
+        <div class="top"><span class="av lg" style="background:var(--c3)">${
+          esc(((h.vorname[0] || "") + (h.nachname[0] || "")).toUpperCase() || "?")}</span>
+          <div style="min-width:0"><div class="nm">${esc(helferName(h.id))}</div>
+          <div class="rl">${esc(h.verein || "Helfende/r")}${h.ernaehrung ? " · " + esc(h.ernaehrung) : ""}</div></div></div>
+        ${merk.length ? `<div class="ar">${merk.map(m => `<span class="pill plain">${esc(m)}</span>`).join("")}</div>` : ""}
+        ${h.tel || h.mail ? `<div class="kt">
+          ${h.tel ? `<span>&#9742; <a href="tel:${esc(String(h.tel).replace(/\s/g, ""))}">${esc(h.tel)}</a></span>` : ""}
+          ${h.mail ? `<span>&#9993; <a href="mailto:${esc(h.mail)}">${esc(h.mail)}</a></span>` : ""}</div>` : ""}
+        <div class="fg"><b>${n}</b> Schicht${n === 1 ? "" : "en"} · ${st.toFixed(1)} h</div>
+        <div class="ed"><button class="btn sm" data-hschicht="${esc(h.id)}" type="button">Schichten</button>
+          <button class="btn sm gho" data-edithelfer="${esc(h.id)}" type="button">Bearbeiten</button></div>
+      </div>`; }).join("")}</div>`
+    : `<p style="font-size:13px;color:var(--ink-3);margin:0">Noch niemand erfasst. Helfende erscheinen hier,
+       sobald sie in der Personalplanung angelegt sind.</p>`}`;
 }
 
 /* ======================================================================
@@ -683,7 +796,7 @@ const slotSort = (a, b) => slotVal(a) - slotVal(b);
 const hhmm = v => { const x = v % 1440; return String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0"); };
 
 let opsDoc = { bedarf:null, bereiche:null };
-let helfer = [], schichten = [], logi = [], raeume = [], workshops = [], abwesend = [];
+let helfer = [], schichten = [], logi = [], raeume = [], workshops = [], abwesend = [], chat = [];
 
 /* Beispiele, solange nichts Eigenes da ist — sichtbar als solche markiert. */
 const BEISPIEL_HELFER = [
@@ -762,18 +875,18 @@ const stundenVon = id => schichtList().filter(s => s.helfer === id)
 
 async function opsAdd(col, body) {
   if (db) { try { await db.collection(col).add(body); return; } catch { toast("Nicht geteilt — lokal gemerkt."); } }
-  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend }[col];
+  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend, chat }[col];
   arr.push({ ...body, id:col + Date.now() + Math.random().toString(36).slice(2, 6) });
   lsSet("jcnd." + col, arr); render();
 }
 async function opsSet(col, id, body) {
-  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend }[col];
+  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend, chat }[col];
   const i = arr.findIndex(x => x.id === id);
   if (i >= 0) { arr[i] = { ...arr[i], ...body }; lsSet("jcnd." + col, arr); render(); }
   if (db) { try { await db.doc(col + "/" + id).set({ ...(arr[i] || body) }); } catch {} }
 }
 async function opsDel(col, id) {
-  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend }[col];
+  const arr = { helfer, schicht:schichten, logi, raum:raeume, ws:workshops, abw:abwesend, chat }[col];
   const i = arr.findIndex(x => x.id === id);
   if (i >= 0) { arr.splice(i, 1); lsSet("jcnd." + col, arr); render(); }
   if (db) { try { await db.doc(col + "/" + id).delete(); } catch {} }
@@ -908,6 +1021,11 @@ const KAT = [["Check-In", 1], ["Verpflegung", 2], ["Workshop", 3], ["Druck", 4],
 const katSlot = k => (KAT.find(x => x[0] === k) || [0, 0])[1];
 const katVar = k => `var(--c${katSlot(k)})`;
 const katChip = k => `<span class="kat k${katSlot(k)}"><i></i>${esc(k || "Sonstiges")}</span>`;
+/* Jeder Bereich bekommt eine feste Farbe aus derselben geprüften Reihe.
+   Zwölf Bereiche auf sieben Farben heißt Wiederholung — deshalb steht der
+   Name immer daneben, die Farbe trägt nie allein die Bedeutung. */
+const areaVar = a => `var(--c${(AREAS.indexOf(a) % 7) + 1})`;
+const areaDot = a => `<span class="adot" style="--ac:${areaVar(a)}"></span>`;
 const QUELLEN = ["JCNetwork-Lager", "Vereinslager C&C", "Einkauf", "vor Ort", "Dienstleister"];
 let lSub = "uebersicht";
 
@@ -931,12 +1049,12 @@ function renderLogistik() {
   return `<div class="hello"><h1 class="disp">Logistik</h1>
       <div class="sub">Welches Material wann wo sein muss — und woher es kommt.</div></div>
     <div class="seg-nav">
-      ${[["uebersicht", "Übersicht"], ["stationen", "Packlisten"],
-         ["anforderungen", "Anforderungen"], ["rueck", "Rückführung"]].map(([k, l]) =>
+      ${[["uebersicht", "Übersicht"], ["stationen", "Packlisten"], ["anforderungen", "Anforderungen"],
+         ["rueck", "Rückführung"], ["chat", "Notizen"]].map(([k, l]) =>
         `<button data-lsub="${k}" aria-pressed="${lSub === k}" type="button">${esc(l)}</button>`).join("")}
     </div>
     ${lSub === "uebersicht" ? logiUebersicht() : lSub === "stationen" ? stationView()
-      : lSub === "anforderungen" ? anfView() : rueckView()}`;
+      : lSub === "anforderungen" ? anfView() : lSub === "chat" ? chatView() : rueckView()}`;
 }
 
 /** Balkenreihe: ein Wert je Zeile, Länge am größten Wert gemessen. */
@@ -972,7 +1090,12 @@ function logiUebersicht() {
   }).filter(r => r.n);
   const maxDay = Math.max(1, ...dayRows.map(r => r.n));
 
-  return `<div class="tiles">
+  return `<button class="hubcard" data-addposten="anfordern" type="button"
+      style="--hc:var(--c2);width:100%;min-height:0;margin-bottom:22px">
+      <span class="ic">Für alle Bereiche</span>
+      <h3>Material anfordern</h3>
+      <span class="d">Du brauchst vor Ort etwas? Hier melden — die Logistik plant es ein.</span></button>
+    <div class="tiles">
       <div class="tile acc"><div class="k">Posten insgesamt</div><b>${logi.length}</b>
         <div class="s">über ${stk} Station${stk === 1 ? "" : "en"}</div></div>
       <div class="tile ${offen ? "late" : "done"}"><div class="k">Noch nicht gepackt</div><b>${offen}</b>
@@ -1044,6 +1167,29 @@ function anfView() {
       ${a.map(postenRow).join("")}</div>`
     : `<div class="empty"><b>Keine offenen Anforderungen</b>Alles, was gemeldet wurde, ist eingeplant.</div>`}`;
 }
+function chatView() {
+  const msgs = chat.slice().sort((a, b) => String(b.ts || "").localeCompare(String(a.ts || "")));
+  const wer = id => personById(id) || { name:helferName(id), color:"#8a969e", role:"" };
+  return `<p style="font-size:13px;color:var(--ink-2);margin:0 0 16px;max-width:70ch">
+      Für alles, was keine Aufgabe ist: „Sprinter steht hinterm Z6", „Kaffeemaschine kaputt",
+      „Kisten für Raum 3 sind schon oben". Alle im Team sehen es sofort.</p>
+    <div class="chat">
+      <div class="chatbox">
+        <input id="chatIn" placeholder="Kurz reinschreiben …" aria-label="Nachricht" maxlength="600">
+        <button class="btn pri" data-chatsend="1" type="button">Senden</button>
+      </div>
+      <div class="chatlist">${msgs.length ? msgs.map(m => { const w = wer(m.von);
+        const d = m.ts ? new Date(m.ts) : null;
+        return `<div class="msg">
+          <span class="av sm" style="background:${esc(w.color || "#8a969e")}">${esc(initials(w))}</span>
+          <span class="mb"><span class="mh"><b>${esc(w.name || "?")}</b>
+            <time>${d ? esc(d.toLocaleString("de-DE", { weekday:"short", hour:"2-digit", minute:"2-digit" })) : ""}</time></span>
+            <span class="mt">${esc(m.text)}</span></span>
+          ${me && m.von === me.id ? `<button class="del" data-chatdel="${esc(m.id)}" type="button" aria-label="Löschen">&times;</button>` : ""}
+        </div>`; }).join("")
+        : '<p style="padding:22px;margin:0;color:var(--ink-3);text-align:center">Noch nichts geschrieben.</p>'}</div>
+    </div>`;
+}
 function rueckView() {
   const g = logi.filter(p => p.art !== "v" && p.status !== "zurueck");
   const zur = logi.filter(p => p.status === "zurueck").length;
@@ -1061,17 +1207,8 @@ function rueckView() {
    einen Bedarf. Die Differenz ist exakt das, was die Logistik hinbringen
    muss — deshalb erzeugt sie hier direkt Logistikposten.
    ====================================================================== */
-const BEISPIEL_RAEUME = [
-  { id:"r1", loc:"Beispiel-Location", name:"Seminarraum 1", plaetze:40, beamer:1, flip:2, meta:0, koffer:1, demo:true },
-  { id:"r2", loc:"Beispiel-Location", name:"Seminarraum 2", plaetze:24, beamer:0, flip:0, meta:0, koffer:0, demo:true }
-];
-const BEISPIEL_WS = [
-  { id:"w1", firma:"Beispiel GmbH", titel:"Case-Workshop", tag:"Fr", slot:"1", raum:"r1", bBeamer:1, bFlip:2, bMeta:2, demo:true },
-  { id:"w2", firma:"Beispiel AG",   titel:"Recruiting",    tag:"Fr", slot:"2", raum:"r2", bBeamer:1, bFlip:1, bMeta:0, demo:true }
-];
-const raumList = () => raeume.length ? raeume : BEISPIEL_RAEUME;
-const wsList = () => raeume.length ? workshops : BEISPIEL_WS;
-const raumDemo = () => !raeume.length;
+const raumList = () => raeume;
+const wsList = () => workshops;
 
 /** Was fehlt dem Raum gegenüber dem grössten Bedarf seiner Workshops? */
 function raumLuecke(r) {
@@ -1085,20 +1222,39 @@ function raumLuecke(r) {
   }
   return out;
 }
+/** Aufbau-Checkliste eines Raums: was fehlt, plus die Standardposten
+ *  je Raum, je Workshop und je Flipchart. Dieselben Regeln wie die
+ *  Packliste — nur hier zum Abhaken vor Ort. */
+function raumCheckliste(r) {
+  const ws = wsList().filter(w => w.raum === r.id);
+  const out = [];
+  for (const f of raumLuecke(r))
+    out.push({ key:"lk-" + f.feld, text:f.label + " besorgen", menge:f.menge, einheit:f.einheit, dring:true });
+  for (const x of OPS.pakete.raum.posten)
+    out.push({ key:"rm-" + x.name, text:x.name, menge:x.menge, einheit:x.einheit });
+  if (ws.length) for (const x of OPS.pakete.workshop.posten)
+    out.push({ key:"ws-" + x.name, text:x.name, menge:x.menge * ws.length, einheit:x.einheit });
+  const flip = Math.max(+r.flip || 0, ...ws.map(w => +w.bFlip || 0));
+  if (flip) out.push({ key:"fp", text:"Flipchartpapier", menge:flip, einheit:"Rollen" });
+  if (ws.some(w => (+w.bMeta || 0) > 0))
+    out.push({ key:"pn", text:"Pinnadeln", menge:ws.filter(w => (+w.bMeta || 0) > 0).length, einheit:"Packungen" });
+  out.push({ key:"test", text:"Technik einmal durchgetestet", menge:"", einheit:"" });
+  return out;
+}
 function renderRaeume() {
   const locs = [...new Set(raumList().map(r => r.loc))];
   const alleLuecken = raumList().flatMap(r => raumLuecke(r).map(l => ({ ...l, r })));
   return `<div class="hello"><h1 class="disp">Räume</h1>
       <div class="sub">Welcher Workshop in welchem Raum — und was dort noch fehlt.</div></div>
-    ${raumDemo() ? `<div class="callout" style="cursor:default;margin-bottom:20px">
-      <span class="big num" style="color:var(--accent)">2</span>
-      <span class="tx"><b>Beispielräume</b><span>Sobald der erste echte Raum angelegt ist, verschwinden sie.</span></span></div>` : ""}
     <div class="toolrow">
       <span style="flex:1"></span>
       ${alleLuecken.length ? `<button class="btn" data-alleanf="1" type="button">Alles Fehlende anfordern (${alleLuecken.length})</button>` : ""}
       <button class="btn" data-pakete="1" type="button">Standardpakete rechnen</button>
       <button class="btn pri" data-addraum="1" type="button">Raum anlegen</button>
     </div>
+    ${!raumList().length ? `<div class="empty"><b>Noch keine Räume</b>
+      Lege die Workshopräume an — Location, Raum, Sitzplätze und was schon im Raum steht.
+      Daraus rechnen sich Checkliste und Packliste von selbst.</div>` : ""}
     ${locs.map(loc => {
       const rs = raumList().filter(r => r.loc === loc);
       return `<section><div class="sec-h"><h2 class="disp">${esc(loc)}</h2>
@@ -1121,6 +1277,15 @@ function roomCard(r) {
         <span class="sn">Slot ${esc(String(w.slot))}</span>
         <span class="sw2"><b>${esc(w.firma)}</b><span>${esc(w.titel || "ohne Titel")} · ${esc(TAGE.find(t => t.k === w.tag)?.lang || w.tag)}</span></span>
       </div>`).join("") : '<div class="slot free"><span class="sw2">Noch kein Workshop zugeordnet</span></div>'}</div>
+    ${(() => { const cl = raumCheckliste(r), ch = r.checks || {};
+      const fertig = cl.filter(x => ch[x.key]).length;
+      return `<div class="cl"><h6>Aufbau-Checkliste <span>${fertig} von ${cl.length}</span></h6>
+        <div class="clbar"><i style="width:${(fertig / cl.length * 100).toFixed(1)}%"></i></div>
+        ${cl.map(x => `<label class="clrow${ch[x.key] ? " on" : ""}">
+          <input type="checkbox" data-check="${esc(r.id)}|${esc(x.key)}"${ch[x.key] ? " checked" : ""}>
+          <span class="t">${esc(x.text)}${x.dring && !ch[x.key] ? ' <span class="pill late">fehlt</span>' : ""}</span>
+          <span class="q">${x.menge ? esc(String(x.menge)) + " " + esc(x.einheit) : ""}</span></label>`).join("")}</div>`;
+    })()}
     <div style="margin-top:12px;display:flex;gap:7px;flex-wrap:wrap">
       <button class="btn sm" data-addws="${esc(r.id)}" type="button">+ Workshop</button>
       <button class="btn sm gho" data-editraum="${esc(r.id)}" type="button">Ausstattung</button>
@@ -1305,15 +1470,26 @@ function addSheet() {
   };
 }
 
-function personSheet(id) {
-  const p = personById(id); if (!p) return;
+const FARBEN = ["#226D94", "#c2185b", "#0e8f9e", "#6f42c1", "#2e9e4f", "#e08600",
+                "#00897b", "#5e35b1", "#d32f2f", "#0097a7", "#5f9e28", "#a626a6"];
+function personSheet(id, neuGrp) {
+  const neu = !id;
+  const p = neu
+    ? { id:"p" + Date.now().toString(36), name:"", role:"", pos:[], areas:[], grp:neuGrp || "pt",
+        color:FARBEN[team.length % FARBEN.length], tel:"", mail:"" }
+    : personById(id);
+  if (!p) return;
   openSheet(`
-    <div class="sh-h"><h3 class="disp">${esc(dispName(p))}</h3>
+    <div class="sh-h"><h3 class="disp">${neu ? esc(GRP[p.grp] ? GRP[p.grp][0] : "Person") + " ergänzen" : esc(dispName(p))}</h3>
       <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
     <div class="sh-b">
       <div class="two">
         <div class="fld"><label for="pN">Name</label><input id="pN" value="${esc(p.name || "")}" placeholder="Vorname"></div>
-        <div class="fld"><label for="pR">Funktion</label><input id="pR" value="${esc(p.role || "")}"></div>
+        <div class="fld"><label for="pR">Funktion</label><input id="pR" value="${esc(p.role || "")}" placeholder="z. B. Fellow Marketing"></div>
+      </div>
+      <div class="two">
+        <div class="fld"><label for="pT">Telefon</label><input id="pT" type="tel" value="${esc(p.tel || "")}" placeholder="+49 …"></div>
+        <div class="fld"><label for="pM">E-Mail</label><input id="pM" type="email" value="${esc(p.mail || "")}"></div>
       </div>
       <div class="fld"><label>Position in der RACI</label>
         <div class="checks">${POS.map(x => `<label><input type="checkbox" data-pos="${esc(x)}"${
@@ -1325,20 +1501,32 @@ function personSheet(id) {
         <div class="checks" id="pAreas">${AREAS.map(a => `<label><input type="checkbox" data-ar="${esc(a)}"${
           p.areas !== ALL && p.areas.includes(a) ? " checked" : ""}>${esc(a)}</label>`).join("")}</div></div>
     </div>
-    <div class="sh-f"><span style="flex:1"></span>
+    <div class="sh-f">${neu ? "" : '<button class="btn" data-pdel="1" type="button">Entfernen</button>'}
+      <span style="flex:1"></span>
       <button class="btn" data-close="1" type="button">Abbrechen</button>
-      <button class="btn pri" data-save="1" type="button">Speichern</button></div>`);
+      <button class="btn pri" data-save="1" type="button">${neu ? "Anlegen" : "Speichern"}</button></div>`);
   const o = document.getElementById("overlay"), all = o.querySelector("#pAll"), wrap = o.querySelector("#pAreas");
   const sync = () => { wrap.style.opacity = all.checked ? ".4" : "1";
     wrap.querySelectorAll("input").forEach(i => i.disabled = all.checked); };
   all.onchange = sync; sync();
   o.querySelector("[data-save]").onclick = () => {
     p.name = o.querySelector("#pN").value.trim();
-    p.role = o.querySelector("#pR").value.trim() || p.role;
+    p.role = o.querySelector("#pR").value.trim() || p.role || "Mitglied";
+    p.tel  = o.querySelector("#pT").value.trim();
+    p.mail = o.querySelector("#pM").value.trim();
     p.pos = [...o.querySelectorAll("[data-pos]:checked")].map(x => x.dataset.pos);
     p.areas = all.checked ? ALL : [...o.querySelectorAll("[data-ar]:checked")].map(x => x.dataset.ar);
+    if (neu) team.push(p);
     if (me && me.id === p.id) me = p;
-    closeSheet(); writeTeam(); toast("Gespeichert");
+    closeSheet(); writeTeam(); toast(neu ? "Person angelegt" : "Gespeichert");
+  };
+  const pd = o.querySelector("[data-pdel]");
+  if (pd) pd.onclick = () => {
+    const i = team.findIndex(x => x.id === p.id);
+    if (i >= 0) team.splice(i, 1);
+    if (me && me.id === p.id) { me = null; lsSet(LS.me, null); }
+    closeSheet(); writeTeam(); toast("Entfernt");
+    if (!me) pickerSheet();
   };
 }
 
@@ -1392,7 +1580,7 @@ function pickerSheet() {
       <p style="font-size:13.5px;color:var(--ink-2);margin:6px 0 0">Dein Board zeigt danach nur, was du
       selbst machst oder verantwortest — nicht die Zeilen, bei denen du nur informiert wirst.</p></div>
       ${me ? '<button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button>' : ""}</div>
-    <div class="sh-b">${["pl", "pt", "jcn", "gr"].map(blk).join("")}${helferBlock}
+    <div class="sh-b">${GRP_ORDER.map(blk).join("")}${helferBlock}
       <p style="font-size:12.5px;color:var(--ink-3);margin:18px 0 0">Nicht dabei? Unter <b>Team</b> ergänzen.</p></div>`, true);
   document.getElementById("overlay").querySelectorAll("[data-pick]").forEach(b => b.onclick = () => {
     me = resolveMe(b.dataset.pick); lsSet(LS.me, me.id);
@@ -1475,6 +1663,10 @@ function render() {
     : route.v === "mine"  ? `<div class="hello"><h1 class="disp">Aufgaben</h1>
         <div class="sub">Die RACI — alles, was vor der Veranstaltung passieren muss.</div></div>`
         + aufgabenNav() + renderMine()
+    : route.v === "rolle" ? `<div class="hello"><h1 class="disp">Meine Rolle</h1>
+        <div class="sub">Was die RACI von deiner Position verlangt.</div></div>` + aufgabenNav() + renderRolle()
+    : route.v === "arbeit" ? `<div class="hello"><h1 class="disp">In Arbeit</h1>
+        <div class="sub">Woran gerade jemand sitzt — und wo es klemmt.</div></div>` + aufgabenNav() + renderArbeit()
     : route.v === "offen" ? `<div class="hello"><h1 class="disp">Alle offenen Aufgaben</h1>
         <div class="sub">Das ganze Projekt auf einen Blick — nicht nur deine.</div></div>`
         + aufgabenNav() + renderOffen()
@@ -1497,7 +1689,8 @@ function render() {
 
 /* --- Unterumschalter der Aufgabenansicht -------------------------------- */
 function aufgabenNav() {
-  return `<div class="seg-nav">${[["mine", "Meine"], ["offen", "Alle offenen"], ["areas", "Bereiche"], ["plan", "Zeitplan"], ["matrix", "Matrix"]]
+  return `<div class="seg-nav">${[["mine", "Meine"], ["rolle", "Meine Rolle"], ["arbeit", "In Arbeit"],
+      ["offen", "Alle offenen"], ["areas", "Bereiche"], ["plan", "Zeitplan"], ["matrix", "Matrix"]]
     .map(([k, l]) => `<button data-go="${k}" aria-pressed="${route.v === k || (k === "areas" && route.v === "area")}" type="button">${esc(l)}</button>`).join("")}</div>`;
 }
 
@@ -1525,32 +1718,44 @@ function renderHelferBoard() {
 }
 
 /* --- Dialoge der Betriebsmodule ------------------------------------------ */
-function helferSheet() {
-  openSheet(`<div class="sh-h"><h3 class="disp">Helfende Person anlegen</h3>
+function helferSheet(id) {
+  const h = id ? helferList().find(x => x.id === id) : null;
+  const f = (k, d) => h ? (h[k] ?? d) : d;
+  openSheet(`<div class="sh-h"><h3 class="disp">${h ? esc(helferName(h.id)) : "Helfende Person anlegen"}</h3>
       <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
     <div class="sh-b">
-      <div class="two"><div class="fld"><label for="hV">Vorname</label><input id="hV"></div>
-        <div class="fld"><label for="hN">Nachname</label><input id="hN"></div></div>
-      <div class="two"><div class="fld"><label for="hT">Telefon</label><input id="hT" type="tel" placeholder="+49 …"></div>
-        <div class="fld"><label for="hE">Ernährung</label><select id="hE">
-          <option>omnivor</option><option>vegetarisch</option><option>vegan</option></select></div></div>
+      <div class="two"><div class="fld"><label for="hV">Vorname</label><input id="hV" value="${esc(f("vorname", ""))}"></div>
+        <div class="fld"><label for="hN">Nachname</label><input id="hN" value="${esc(f("nachname", ""))}"></div></div>
+      <div class="two"><div class="fld"><label for="hT">Telefon</label>
+          <input id="hT" type="tel" value="${esc(f("tel", ""))}" placeholder="+49 …"></div>
+        <div class="fld"><label for="hM">E-Mail</label><input id="hM" type="email" value="${esc(f("mail", ""))}"></div></div>
+      <div class="two"><div class="fld"><label for="hVer">Verein</label>
+          <input id="hVer" value="${esc(f("verein", ""))}" placeholder="z. B. C&amp;C Würzburg"></div>
+        <div class="fld"><label for="hE">Ernährung</label><select id="hE">${
+          ["omnivor", "vegetarisch", "vegan"].map(x =>
+            `<option${x === f("ernaehrung", "omnivor") ? " selected" : ""}>${x}</option>`).join("")}</select></div></div>
       <div class="fld"><label>Merkmale</label><div class="checks">
-        <label><input type="checkbox" id="hFs">Führerschein</label>
-        <label><input type="checkbox" id="hEh">Erste Hilfe</label>
-        <label><input type="checkbox" id="hSp">fährt Sprinter</label></div>
+        <label><input type="checkbox" id="hFs"${f("fs", false) ? " checked" : ""}>Führerschein</label>
+        <label><input type="checkbox" id="hEh"${f("eh", false) ? " checked" : ""}>Erste Hilfe</label>
+        <label><input type="checkbox" id="hSp"${f("sprinter", false) ? " checked" : ""}>fährt Sprinter</label></div>
         <div class="hint">Danach lässt sich filtern, wenn für eine Schicht etwas Bestimmtes gebraucht wird.</div></div>
     </div>
-    <div class="sh-f"><span style="flex:1"></span><button class="btn" data-close="1" type="button">Abbrechen</button>
-      <button class="btn pri" data-save="1" type="button">Anlegen</button></div>`);
+    <div class="sh-f">${h && !h.demo ? '<button class="btn" data-hdel="1" type="button">Entfernen</button>' : ""}
+      <span style="flex:1"></span><button class="btn" data-close="1" type="button">Abbrechen</button>
+      <button class="btn pri" data-save="1" type="button">${h ? "Speichern" : "Anlegen"}</button></div>`);
   const o = document.getElementById("overlay");
   o.querySelector("[data-save]").onclick = async () => {
-    const v = id => o.querySelector(id).value.trim();
+    const v = q => o.querySelector(q).value.trim();
     if (!v("#hV") && !v("#hN")) { o.querySelector("#hV").focus(); toast("Bitte einen Namen eintragen."); return; }
+    const body = { vorname:v("#hV"), nachname:v("#hN"), tel:v("#hT"), mail:v("#hM"),
+      verein:v("#hVer"), ernaehrung:v("#hE"), fs:o.querySelector("#hFs").checked,
+      eh:o.querySelector("#hEh").checked, sprinter:o.querySelector("#hSp").checked };
     closeSheet();
-    await opsAdd("helfer", { vorname:v("#hV"), nachname:v("#hN"), tel:v("#hT"), ernaehrung:v("#hE"),
-      fs:o.querySelector("#hFs").checked, eh:o.querySelector("#hEh").checked, sprinter:o.querySelector("#hSp").checked });
-    toast("Person angelegt");
+    if (h && !h.demo) await opsSet("helfer", h.id, body); else await opsAdd("helfer", body);
+    toast(h ? "Gespeichert" : "Person angelegt");
   };
+  const hd = o.querySelector("[data-hdel]");
+  if (hd) hd.onclick = async () => { closeSheet(); await opsDel("helfer", h.id); toast("Entfernt"); };
 }
 function schichtSheet(tag, bereich, von, bis, helferId) {
   const hs = helferList().filter(h => !h.demo).length ? helferList().filter(h => !h.demo) : helferList();
@@ -1574,9 +1779,15 @@ function schichtSheet(tag, bereich, von, bis, helferId) {
   o.querySelector("[data-save]").onclick = async () => {
     const g = id => o.querySelector(id).value;
     if (slotVal(g("#sBi")) <= slotVal(g("#sV"))) { toast("Das Ende muss nach dem Beginn liegen."); return; }
+    // Erst alle Werte einsammeln - closeSheet() räumt das Formular weg.
+    const body = { helfer:g("#sH"), tag:g("#sT"), bereich:g("#sB"), von:g("#sV"), bis:g("#sBi") };
+    const ab = nichtVerfuegbar(body.helfer, body.tag, body.von, body.bis);
+    const ko = kollision(body.helfer, body.tag, body.von, body.bis);
     closeSheet();
-    await opsAdd("schicht", { helfer:g("#sH"), tag:g("#sT"), bereich:g("#sB"), von:g("#sV"), bis:g("#sBi") });
-    toast("Schicht eingetragen");
+    await opsAdd("schicht", body);
+    toast(ab.length ? helferName(body.helfer) + " hatte für dieses Fenster abgesagt."
+      : ko.length ? helferName(body.helfer) + " ist zur selben Zeit im Bereich " + ko[0].bereich + "."
+      : "Schicht eingetragen");
   };
 }
 function helferSchichtenSheet(id) {
@@ -1688,10 +1899,11 @@ function postenSheet(modus) {
   o.querySelector("[data-save]").onclick = async () => {
     const g = id => { const el = o.querySelector(id); return el ? el.value.trim() : ""; };
     if (!g("#mM")) { o.querySelector("#mM").focus(); toast("Bitte ein Material eintragen."); return; }
-    closeSheet();
-    await opsAdd("logi", { material:g("#mM"), kat:kat || "Sonstiges", menge:+g("#mQ") || 1,
+    const body = { material:g("#mM"), kat:kat || "Sonstiges", menge:+g("#mQ") || 1,
       einheit:g("#mE"), tag:g("#mT"), ort:g("#mO") || "noch offen", punkt:g("#mP") || "Allgemein",
-      quelle, art, kommentar:g("#mK"), status:"offen", vonBereich: anf ? g("#mB") : "" });
+      quelle, art, kommentar:g("#mK"), status:"offen", vonBereich: anf ? g("#mB") : "" };
+    closeSheet();
+    await opsAdd("logi", body);
     toast(anf ? "Anforderung gemeldet" : "Posten angelegt");
   };
 }
@@ -1711,7 +1923,7 @@ function raumSheet(id) {
       <div class="fld"><label for="rK">Moderationskoffer</label><input id="rK" type="number" min="0" value="${f("koffer", 0)}"></div>
       <div class="hint">Gezählt wird, was im Raum schon vorhanden ist. Was der Workshop darüber hinaus braucht, wird zur Logistikanforderung.</div>
     </div>
-    <div class="sh-f">${r && !r.demo ? '<button class="btn" data-rdel="1" type="button">Löschen</button>' : ""}
+    <div class="sh-f">${r ? '<button class="btn" data-rdel="1" type="button">Raum löschen</button>' : ""}
       <span style="flex:1"></span><button class="btn" data-close="1" type="button">Abbrechen</button>
       <button class="btn pri" data-save="1" type="button">Speichern</button></div>`);
   const o = document.getElementById("overlay");
@@ -1721,11 +1933,15 @@ function raumSheet(id) {
     const body = { loc:g("#rL") || "Ohne Location", name:g("#rN"), plaetze:n("#rP"),
       beamer:n("#rB"), flip:n("#rF"), meta:n("#rM"), koffer:n("#rK") };
     closeSheet();
-    if (r && !r.demo) await opsSet("raum", r.id, body); else await opsAdd("raum", body);
+    if (r) await opsSet("raum", r.id, body); else await opsAdd("raum", body);
     toast("Gespeichert");
   };
   const d = o.querySelector("[data-rdel]");
-  if (d) d.onclick = async () => { closeSheet(); await opsDel("raum", r.id); toast("Raum gelöscht"); };
+  if (d) d.onclick = async () => {
+    closeSheet();
+    for (const w of workshops.filter(x => x.raum === r.id)) await opsDel("ws", w.id);
+    await opsDel("raum", r.id); toast("Raum gelöscht");
+  };
 }
 function wsSheet(raumId) {
   openSheet(`<div class="sh-h"><h3 class="disp">Workshop zuordnen</h3>
@@ -1747,9 +1963,10 @@ function wsSheet(raumId) {
   o.querySelector("[data-save]").onclick = async () => {
     const g = i => o.querySelector(i).value.trim(), n = i => +o.querySelector(i).value || 0;
     if (!g("#wF")) { o.querySelector("#wF").focus(); toast("Bitte das Unternehmen eintragen."); return; }
+    const body = { firma:g("#wF"), titel:g("#wT"), tag:g("#wD"), slot:g("#wS"), raum:raumId,
+      bBeamer:n("#wB"), bFlip:n("#wFl"), bMeta:n("#wM") };
     closeSheet();
-    await opsAdd("ws", { firma:g("#wF"), titel:g("#wT"), tag:g("#wD"), slot:g("#wS"), raum:raumId,
-      bBeamer:n("#wB"), bFlip:n("#wFl"), bMeta:n("#wM") });
+    await opsAdd("ws", body);
     toast("Workshop zugeordnet");
   };
 }
@@ -1859,7 +2076,9 @@ function wireAll(v) {
   v.querySelectorAll("[data-fill]").forEach(b => b.onclick = () => {
     const [t, ber, von, bis] = b.dataset.fill.split("|"); schichtSheet(t, ber, von, bis);
   });
-  v.querySelectorAll("[data-addhelfer]").forEach(b => b.onclick = helferSheet);
+  v.querySelectorAll("[data-addhelfer]").forEach(b => b.onclick = () => helferSheet(null));
+  v.querySelectorAll("[data-edithelfer]").forEach(b => b.onclick = () => helferSheet(b.dataset.edithelfer));
+  v.querySelectorAll("[data-addperson]").forEach(b => b.onclick = () => personSheet(null, b.dataset.addperson));
   v.querySelectorAll("[data-hschicht]").forEach(b => b.onclick = () => helferSchichtenSheet(b.dataset.hschicht));
   v.querySelectorAll("[data-bedarf]").forEach(b => b.onclick = bedarfSheet);
   v.querySelectorAll("[data-editber]").forEach(b => b.onclick = () => bereichSheet(+b.dataset.editber));
@@ -1874,6 +2093,17 @@ function wireAll(v) {
     opsSet("logi", p.id, { status:next });
   });
   v.querySelectorAll("[data-ldel]").forEach(b => b.onclick = () => opsDel("logi", b.dataset.ldel));
+  v.querySelectorAll("[data-check]").forEach(b => b.onchange = () => {
+    const [rid, key] = b.dataset.check.split("|");
+    const r = raumList().find(x => x.id === rid); if (!r) return;
+    opsSet("raum", rid, { checks: { ...(r.checks || {}), [key]: b.checked } });
+  });
+  const ci = v.querySelector("#chatIn");
+  const senden = async () => { const t = ci.value.trim(); if (!t) return;
+    ci.value = ""; await opsAdd("chat", { text:t, von: me ? me.id : "", ts:new Date().toISOString() }); };
+  if (ci) { ci.onkeydown = e => { if (e.key === "Enter") senden(); };
+    v.querySelectorAll("[data-chatsend]").forEach(b => b.onclick = senden); }
+  v.querySelectorAll("[data-chatdel]").forEach(b => b.onclick = () => opsDel("chat", b.dataset.chatdel));
   v.querySelectorAll("[data-addraum]").forEach(b => b.onclick = () => raumSheet(null));
   v.querySelectorAll("[data-editraum]").forEach(b => b.onclick = () => raumSheet(b.dataset.editraum));
   v.querySelectorAll("[data-addws]").forEach(b => b.onclick = () => wsSheet(b.dataset.addws));

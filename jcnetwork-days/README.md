@@ -141,8 +141,8 @@ keine RACI, keine Planungsansichten.
 
 - **Bedarfsverlauf** ist Stuttgart 2024. Für Würzburg anpassen.
 - **Einsatzbereiche** ebenso — Ort und Ansprechperson fehlen noch.
-- **Beispieldaten** (3 Helfende, 2 Räume, 2 Workshops) verschwinden, sobald
-  echte Daten angelegt sind.
+- **Beispieldaten** gibt es nur noch bei den Helfenden (drei Personen, als
+  solche markiert). Räume und Workshops starten leer.
 - **Fahrten** aus der Mainzer Liste (Fahrten-ID, Hin-/Rückfahrt) sind noch
   nicht abgebildet — bisher nur Station und Herkunft je Posten.
 
@@ -232,3 +232,38 @@ Planung, kein gemeinsames Werkzeug.
 Nichts an der Planung. Nur die beiden Exporte unter „Team" nutzen die
 `downloads`-Capability des Artifacts; selbst gehostet fehlen sie. Wer sie
 braucht, öffnet die Artifact-Fassung.
+
+## Startseite und Rollen
+
+Das Board ist die Startseite für alle: Begrüßung, Projektphase, dann sechs
+Kacheln, von denen aus jede Person in ihren Teil abbiegt. Wer im Vorstand,
+bei den Fellows oder in einem Gremium steht, bekommt statt „Meine Aufgaben"
+die Kachel **Meine Rolle** — die RACI-Sicht auf die eigene Position, sortiert
+nach verantworten, ausführen, gefragt werden, informiert werden,
+unterschreiben.
+
+## In Arbeit
+
+Status und Notiz hängen an der Aufgabe, nicht an der Person. Die Ansicht
+**In Arbeit** sammelt alles, was auf „Läuft" oder „Hängt" steht, geflaggt ist
+oder eine Notiz trägt. Notizen stehen auch direkt in der Aufgabenzeile — wer
+die Liste überfliegt, sieht den Stand ohne Klick.
+
+## Raum-Checkliste
+
+Jede Raumkarte rechnet ihre Aufbau-Checkliste aus denselben Regeln wie die
+Packliste: was dem Raum gegenüber dem Workshop-Bedarf fehlt, die Standardposten
+je Raum und je Workshop, Flipchartpapier je Flipchart, Pinnadeln bei
+Stellwandbedarf. Abgehakt wird pro Raum, sichtbar für alle.
+
+## Logistik-Notizen
+
+Ein schlichter Nachrichtenstrom unter „Notizen" für alles, was keine Aufgabe
+ist — „Sprinter steht hinterm Z6", „Kaffeemaschine kaputt". Eigene Nachrichten
+lassen sich löschen.
+
+## Farben
+
+Kategoriefarben und Bereichsfarben kommen aus derselben geprüften Reihe
+(sieben Slots). Zwölf Bereiche auf sieben Farben heißt Wiederholung — deshalb
+steht der Name immer daneben und die Farbe trägt nie allein die Bedeutung.
