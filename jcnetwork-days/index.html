@@ -307,6 +307,129 @@ table.mx td.wd{font:400 11.5px var(--mono);color:var(--ink-3);white-space:nowrap
   .trail-top{flex-direction:column;gap:3px}
   .role-line{flex-direction:column;gap:6px} .role-line .lbl{width:auto}
 }
+
+/* ---------- Betrieb: gemeinsame Bausteine ---------- */
+.seg-nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);
+  border-radius:11px;padding:4px;margin-bottom:20px;width:fit-content;max-width:100%;
+  overflow-x:auto;scrollbar-width:none}
+.seg-nav::-webkit-scrollbar{display:none}
+.seg-nav button{border:0;background:none;padding:6px 14px;border-radius:8px;cursor:pointer;
+  font-size:13.5px;color:var(--ink-2);white-space:nowrap}
+.seg-nav button:hover{color:var(--ink)}
+.seg-nav button[aria-pressed="true"]{background:var(--ink);color:var(--paper);font-weight:600}
+.daybar{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.daybar button{border:1px solid var(--line);background:var(--card);border-radius:10px;
+  padding:7px 15px;cursor:pointer;font-size:13.5px;display:flex;flex-direction:column;
+  align-items:flex-start;gap:1px;line-height:1.25}
+.daybar button b{font-weight:600}
+.daybar button span{font:400 11px var(--mono);color:var(--ink-3)}
+.daybar button:hover{border-color:var(--accent)}
+.daybar button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.daybar button[aria-pressed="true"] span{color:rgba(255,255,255,.75)}
+
+/* ---------- Abdeckungsraster (Soll gegen Ist) ---------- */
+.cov-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+table.cov{border-collapse:separate;border-spacing:0;width:100%;min-width:760px}
+table.cov th,table.cov td{padding:0;text-align:center}
+table.cov thead th{position:sticky;top:0;background:var(--card-2);z-index:2;
+  font:400 10px var(--mono);color:var(--ink-3);padding:8px 0 7px;font-weight:500;
+  border-bottom:1px solid var(--line);min-width:26px}
+table.cov thead th.hr{color:var(--ink-2);font-weight:600}
+table.cov th.rn,table.cov td.rn{text-align:left;position:sticky;left:0;background:var(--card);
+  z-index:1;padding:0 12px;min-width:212px;width:212px;border-right:1px solid var(--hair)}
+table.cov thead th.rn{background:var(--card-2);z-index:3}
+table.cov tbody tr:hover td.rn{background:var(--card-2)}
+.rn-in{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0}
+.rn-in b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rn-in i{font:400 11px var(--mono);color:var(--ink-3);font-style:normal;flex:none}
+.cell{display:block;width:100%;height:26px;border:0;background:none;cursor:pointer;
+  font:500 10.5px var(--mono);color:var(--ink-3);padding:0;position:relative}
+.cell i{position:absolute;inset:2px 1px;border-radius:3px;display:grid;place-items:center;font-style:normal}
+.cell.none i{background:transparent}
+.cell.full i{background:var(--done-wash);color:var(--done)}
+.cell.part i{background:var(--soon-wash);color:var(--soon)}
+.cell.gap  i{background:var(--late-wash);color:var(--late);font-weight:600}
+.cell:hover i{outline:2px solid var(--accent);outline-offset:-1px}
+.cov-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);margin-top:12px;align-items:center}
+.cov-legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:15px;height:15px;border-radius:4px;display:inline-block;flex:none}
+.sw.full{background:var(--done-wash);box-shadow:inset 0 0 0 1px var(--done)}
+.sw.part{background:var(--soon-wash);box-shadow:inset 0 0 0 1px var(--soon)}
+.sw.gap{background:var(--late-wash);box-shadow:inset 0 0 0 1px var(--late)}
+
+/* ---------- Listen mit Kopfzeile ---------- */
+.grouped{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
+.gh{display:flex;align-items:center;gap:11px;padding:12px 17px;background:var(--card-2);
+  border-bottom:1px solid var(--hair)}
+.gh h4{font:600 14.5px/1.3 var(--sans);flex:1;min-width:0}
+.gh .sub{font:400 12px var(--mono);color:var(--ink-3)}
+.gh .btn{flex:none}
+.li{display:flex;align-items:center;gap:12px;padding:10px 17px;border-top:1px solid var(--hair);
+  font-size:14px}
+.li:first-of-type{border-top:0}
+.li .nm{flex:1;min-width:0}
+.li .nm b{font-weight:500;display:block;overflow-wrap:anywhere}
+.li .nm span{font-size:12.5px;color:var(--ink-3)}
+.li .qty{font:500 13px var(--mono);color:var(--ink-2);flex:none;white-space:nowrap;
+  font-variant-numeric:tabular-nums}
+.li .act{flex:none;display:flex;gap:6px;align-items:center}
+.li.gone .nm b{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px}
+
+/* ---------- Räume ---------- */
+.roomgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.room{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 17px}
+.room.short{border-color:var(--late)}
+.room .rh{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
+.room .rh h4{font:600 15.5px/1.25 var(--sans);flex:1;min-width:0}
+.room .rh .seats{font:400 12px var(--mono);color:var(--ink-3);flex:none}
+.room .loc{font-size:12.5px;color:var(--ink-3);margin-bottom:11px}
+.kit{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px}
+.kv{display:inline-flex;align-items:center;gap:5px;background:var(--card-2);border-radius:7px;
+  padding:3px 9px;font-size:12px}
+.kv b{font:500 12px var(--mono)}
+.kv.short{background:var(--late-wash);color:var(--late)}
+.kv.short b{font-weight:700}
+.slots{border-top:1px solid var(--hair);padding-top:10px;display:flex;flex-direction:column;gap:7px}
+.slot{display:flex;align-items:center;gap:9px;font-size:13px}
+.slot .sn{width:46px;flex:none;font:500 11px var(--mono);color:var(--ink-3)}
+.slot .sw2{flex:1;min-width:0}
+.slot .sw2 b{font-weight:600;display:block;overflow-wrap:anywhere}
+.slot .sw2 span{font-size:12px;color:var(--ink-3)}
+.slot.free .sw2{color:var(--ink-3);font-style:italic}
+
+/* ---------- Claude-Assistent ---------- */
+.ask{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px 18px;margin-bottom:22px}
+.ask h4{font:600 14.5px/1.3 var(--sans);margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.ask p.lead2{font-size:12.5px;color:var(--ink-3);margin:0 0 12px}
+.ask .askrow{display:flex;gap:8px}
+.ask input{flex:1;min-width:0;border:1px solid var(--line);border-radius:9px;
+  padding:9px 12px;font-size:14px;background:var(--card)}
+.ask .sugg{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ask .sugg button{border:1px solid var(--line);background:var(--card-2);border-radius:999px;
+  padding:4px 11px;font-size:12.5px;cursor:pointer;color:var(--ink-2)}
+.ask .sugg button:hover{border-color:var(--accent);color:var(--accent)}
+.ans{margin-top:14px;padding-top:14px;border-top:1px solid var(--hair);font-size:14px;
+  line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.ans.wait{color:var(--ink-3);font-style:italic}
+
+/* ---------- Meine Schichten ---------- */
+.shift{display:flex;align-items:center;gap:12px;padding:11px 17px;border-top:1px solid var(--hair)}
+.shift:first-of-type{border-top:0}
+.shift .tm{font:500 13px var(--mono);color:var(--ink);flex:none;width:106px;
+  font-variant-numeric:tabular-nums}
+.shift .bd{flex:1;min-width:0}
+.shift .bd b{font-weight:600;display:block}
+.shift .bd span{font-size:12.5px;color:var(--ink-3)}
+.shift .dy{font:500 12px var(--mono);color:var(--ink-3);flex:none}
+
+@media (max-width:720px){
+  .li{padding:10px 14px;gap:9px}
+  .li .qty{font-size:12px}
+  .gh{padding:11px 14px}
+  .shift .tm{width:auto;font-size:12px}
+  .seg-nav{width:100%}
+}
 </style>
 
 <header class="bar"><div class="bar-in">
@@ -322,849 +445,5 @@ table.mx td.wd{font:400 11.5px var(--mono);color:var(--ink-3);white-space:nowrap
 <div id="toast"></div>
 
 <script src="data.js"></script>
-<script>
-"use strict";
-/* ==========================================================================
-   JCNetwork Days 2026 — Planungsboard
-   data.js kommt aus der RACI-Excel und wird nie veraendert. Darueber liegt
-   nur eine Schicht aus Status, Flags, Notizen und ergaenzten Aufgaben,
-   die ueber die db-Capability im Team geteilt wird.
-   ========================================================================== */
-const D = window.RACI_DATA, AREAS = D.areas, POS = D.positions;
-const P = Object.fromEntries(POS.map((p, i) => [p, i]));
-const EVENT_START = new Date(2026, 11, 3), EVENT_END = new Date(2026, 11, 6), DAY = 864e5;
-
-const POS_LABEL = {
-  VV:"Vorstandsvorsitz", CR:"Customer Relations", "F&R":"Finanzen & Recht", EM:"Eventmanagement",
-  HR:"Human Resources", IM:"Informationsmanagement", MK:"Marketing", WB:"Weiterbildung",
-  PL:"Projektleitung", PT:"Projektteam", VerV:"Vereinsvorstand Ausrichter",
-  MV:"Mitgliederversammlung", Alumni:"JCNetwork Alumni e.V."
-};
-/* Die RACI-Buchstaben tauchen in der Oberflaeche nur noch in der Matrix auf.
-   Ueberall sonst steht, was sie bedeuten. */
-const ROLE = {
-  A:{ lbl:"Verantwortlich", you:"Du verantwortest das", desc:"sorgt dafür, dass es passiert" },
-  R:{ lbl:"Macht es",       you:"Du machst das",        desc:"erledigt die Aufgabe" },
-  C:{ lbl:"Vorher fragen",  you:"Du wirst vorher gefragt", desc:"wird vor der Entscheidung gefragt" },
-  I:{ lbl:"Wird informiert",you:"Du wirst informiert",  desc:"erfährt, wenn es erledigt ist" },
-  S:{ lbl:"Unterschreibt",  you:"Du unterschreibst",    desc:"unterschreibt" }
-};
-
-/* --- Zeitcodes der Excel -> echte Daten -------------------------------- */
-const DEFAULT_MS = { wahl:"2025-12-06", anms:"2026-10-01" };
-let milestones = { ...DEFAULT_MS };
-const WEEKDAY = { Mo:-3, Di:-2, Mi:-1, Do:0, Fr:1, Sa:2, So:3 };
-function shiftMonths(d, n) {
-  const x = new Date(d.getTime()), day = x.getDate();
-  x.setDate(1); x.setMonth(x.getMonth() + n);
-  x.setDate(Math.min(day, new Date(x.getFullYear(), x.getMonth() + 1, 0).getDate()));
-  return x;
-}
-const parseISO = s => { const [y, m, d] = String(s).split("-").map(Number); return new Date(y, m - 1, d); };
-function codeToDate(code) {
-  if (!code) return null;
-  const c = String(code).trim();
-  if (c === "Wahl") return parseISO(milestones.wahl);
-  if (c === "AnmS") return parseISO(milestones.anms);
-  if (c in WEEKDAY) { const d = new Date(EVENT_START.getTime()); d.setDate(d.getDate() + WEEKDAY[c]); return d; }
-  let m = c.match(/^\+(\d+)([dwm])?$/);
-  if (m) { const n = +m[1], u = m[2] || "d";
-    if (u === "m") return shiftMonths(EVENT_END, n);
-    const d = new Date(EVENT_END.getTime()); d.setDate(d.getDate() + n * (u === "w" ? 7 : 1)); return d; }
-  m = c.match(/^(\d+)([wm])$/);
-  if (m) { const n = +m[1];
-    if (m[2] === "m") return shiftMonths(EVENT_START, -n);
-    const d = new Date(EVENT_START.getTime()); d.setDate(d.getDate() - n * 7); return d; }
-  return null;
-}
-const fmtDM = new Intl.DateTimeFormat("de-DE", { day:"numeric", month:"short" });
-const fmtFull = new Intl.DateTimeFormat("de-DE", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
-const fmtMon = new Intl.DateTimeFormat("de-DE", { month:"long", year:"numeric" });
-const fmtWd = new Intl.DateTimeFormat("de-DE", { weekday:"long" });
-const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
-const daysTo = d => Math.round((d - today()) / DAY);
-
-/** Datum in Alltagssprache — exakte Daten stehen im Detail. */
-function humanDue(d) {
-  if (!d) return "offen";
-  const n = daysTo(d);
-  if (n < -1) return `${-n} Tage drüber`;
-  if (n === -1) return "gestern";
-  if (n === 0) return "heute";
-  if (n === 1) return "morgen";
-  if (n < 7) return fmtWd.format(d);
-  if (n < 14) return "nächste Woche";
-  if (n < 75) return fmtDM.format(d);
-  return fmtMon.format(d);
-}
-
-/* --- Wer ist wofuer zustaendig ----------------------------------------- */
-const ALL = "*";
-const A_WAHL="Wahl & Orga", A_HOTEL="Unterkünfte & Check-In", A_PLEN="Plenen, Messe & MV",
-      A_WS="Workshops", A_PARTY="Partys", A_PERS="Personal", A_LOG="Logistik",
-      A_FOOD="Verpflegung", A_FIN="Finanzen", A_KOM="Kommunikation", A_ALU="Alumni", A_UN="Unternehmen";
-
-const DEFAULT_TEAM = [
-  { id:"oliver",  name:"Oliver",     role:"Projektleitung",          pos:["PL"], areas:[A_WAHL,A_PERS,A_FOOD,A_FIN,A_ALU], grp:"pl", color:"#14202a" },
-  { id:"antonia", name:"Antonia",    role:"Projektleitung",          pos:["PL"], areas:[A_HOTEL,A_LOG,A_WS],               grp:"pl", color:"#0e8f9e" },
-  { id:"noah",    name:"Noah",       role:"Projektleitung",          pos:["PL"], areas:[A_PLEN,A_PARTY,A_KOM,A_UN],        grp:"pl", color:"#c2185b" },
-  { id:"nyle",    name:"Nyle",       role:"Hotel & Check-In",        pos:["PT"], areas:[A_HOTEL], grp:"pt", color:"#0f9b8e" },
-  { id:"jonas",   name:"Jonas",      role:"Logistik",                pos:["PT"], areas:[A_LOG],   grp:"pt", color:"#2e9e4f" },
-  { id:"fabio",   name:"Fabio",      role:"Workshops",               pos:["PT"], areas:[A_WS],    grp:"pt", color:"#6f42c1" },
-  { id:"elias",   name:"Elias",      role:"Events",                  pos:["PT"], areas:[A_PARTY,A_PLEN], grp:"pt", color:"#e08600" },
-  { id:"basti",   name:"Basti",      role:"Events",                  pos:["PT"], areas:[A_PARTY,A_PLEN], grp:"pt", color:"#d2601a" },
-  { id:"paul",    name:"Paul",       role:"Firmenkontaktmesse",      pos:["PT"], areas:[A_UN,A_PLEN],    grp:"pt", color:"#5e35b1" },
-  { id:"eileen",  name:"Eileen",     role:"Marketing",               pos:["PT"], areas:[A_KOM],   grp:"pt", color:"#d32f2f" },
-  { id:"luis",    name:"Luis",       role:"Catering",                pos:["PT"], areas:[A_FOOD],  grp:"pt", color:"#ef6c00" },
-  { id:"anna",    name:"Anna",       role:"Finanzen",                pos:["PT"], areas:[A_FIN],   grp:"pt", color:"#00897b" },
-  { id:"maxi",    name:"Maximilian", role:"Personal",                pos:["PT"], areas:[A_PERS],  grp:"pt", color:"#5f9e28" },
-  { id:"megan",   name:"Megan",      role:"Personal",                pos:["PT"], areas:[A_PERS],  grp:"pt", color:"#a626a6" },
-  { id:"mehmet",  name:"Mehmet",     role:"Alumni",                  pos:["PT"], areas:[A_ALU],   grp:"pt", color:"#0097a7" },
-  { id:"lilly",   name:"Lilly",      role:"Alumni",                  pos:["PT"], areas:[A_ALU],   grp:"pt", color:"#26a69a" },
-  { id:"vv",   name:"", role:"Vorstandsvorsitz",       pos:["VV"],   areas:ALL, grp:"jcn", color:"#37474f" },
-  { id:"cr",   name:"", role:"Customer Relations",     pos:["CR"],   areas:ALL, grp:"jcn", color:"#455a64" },
-  { id:"fr",   name:"", role:"Finanzen & Recht",       pos:["F&R"],  areas:ALL, grp:"jcn", color:"#546e7a" },
-  { id:"em",   name:"", role:"Eventmanagement",        pos:["EM"],   areas:ALL, grp:"jcn", color:"#226D94" },
-  { id:"hr",   name:"", role:"Human Resources",        pos:["HR"],   areas:ALL, grp:"jcn", color:"#607d8b" },
-  { id:"im",   name:"", role:"Informationsmanagement", pos:["IM"],   areas:ALL, grp:"jcn", color:"#4e6a78" },
-  { id:"mk",   name:"", role:"Marketing",              pos:["MK"],   areas:ALL, grp:"jcn", color:"#3f5b6b" },
-  { id:"wb",   name:"", role:"Weiterbildung",          pos:["WB"],   areas:ALL, grp:"jcn", color:"#5a7382" },
-  { id:"verv", name:"", role:"Vereinsvorstand C&C Würzburg", pos:["VerV"],   areas:ALL, grp:"gr", color:"#17516f" },
-  { id:"alu",  name:"", role:"Vorstand Alumni e.V.",         pos:["Alumni"], areas:ALL, grp:"gr", color:"#00838f" }
-];
-const GRP = {
-  pl: ["Projektleitung", "teilt sich die zwölf Bereiche"],
-  pt: ["Projektteam Würzburg", "je ein Bereich, manchmal zwei"],
-  jcn:["Vorstand JCNetwork e.V.", "Namen eintragen, dann greifen die Boards"],
-  gr: ["Weitere Gremien", "Ausrichterverein und Alumniverein"]
-};
-let team = DEFAULT_TEAM.map(p => ({ ...p, areas: p.areas === ALL ? ALL : [...p.areas] }));
-const personById = id => team.find(p => p.id === id);
-const dispName = p => p.name && p.name.trim() ? p.name.trim() : "N. N.";
-const initials = p => (p.name && p.name.trim())
-  ? p.name.trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()
-  : "–";
-const covers = (p, area) => p.areas === ALL || p.areas.includes(area);
-
-/* --- Aufgaben ----------------------------------------------------------- */
-const STATUS = { offen:"Offen", laeuft:"Läuft", erledigt:"Erledigt", blockiert:"Hängt" };
-const baseTasks = D.tasks.map((t, i) => ({
-  key:"t" + i, area:AREAS[t[0]], title:t[1], max:t[2], min:t[3], raci:t[4], custom:false }));
-let customTasks = [], overlay = new Map();
-const allTasks = () => baseTasks.concat(customTasks);
-const ov = k => overlay.get(k) || {};
-const statusOf = k => ov(k).status || "offen";
-
-function windowOf(t) {
-  if (t.custom) return { start: t.startISO ? parseISO(t.startISO) : null, due: t.dueISO ? parseISO(t.dueISO) : null };
-  const a = codeToDate(t.max), b = codeToDate(t.min);
-  return { start:a, due: b || a };
-}
-function bucketOf(t) {
-  if (statusOf(t.key) === "erledigt") return "done";
-  const { start, due } = windowOf(t);
-  if (!due) return "later";
-  const n = daysTo(due);
-  if (n < 0) return "late";
-  if (start && daysTo(start) <= 0) return "now";
-  if (start ? daysTo(start) <= 45 : n <= 45) return "soon";
-  return "later";
-}
-const RANK = { late:0, now:1, soon:2, later:3, done:4 };
-
-function involvement(t, p) {
-  if (!p) return null;
-  if (t.custom) {
-    if (t.owner === p.id) return { letters:["A"], opt:false };
-    if ((t.helpers || []).includes(p.id)) return { letters:["R"], opt:false };
-    return null;
-  }
-  if (!covers(p, t.area)) return null;
-  const letters = new Set(); let opt = true, any = false;
-  for (const pos of p.pos) {
-    const raw = t.raci[P[pos]];
-    if (!raw) continue;
-    any = true;
-    if (!raw.endsWith("?")) opt = false;
-    for (const ch of raw.replace("?", "")) letters.add(ch);
-  }
-  return any ? { letters:[...letters], opt } : null;
-}
-const isWork = i => !!i && (i.letters.includes("R") || i.letters.includes("A"));
-const isSign = i => !!i && i.letters.includes("S");
-
-function tasksFor(p, mode) {
-  const out = [];
-  for (const t of allTasks()) {
-    const inv = involvement(t, p); if (!inv) continue;
-    const w = isWork(inv);
-    if (mode === "work" ? w : (!w && (!inv.opt || isSign(inv)))) out.push({ t, inv });
-  }
-  return out;
-}
-const sortTasks = rows => rows.sort((x, y) => {
-  const a = RANK[bucketOf(x.t)], b = RANK[bucketOf(y.t)];
-  if (a !== b) return a - b;
-  const dx = windowOf(x.t).due, dy = windowOf(y.t).due;
-  if (dx && dy && +dx !== +dy) return dx - dy;
-  if (!dx) return 1; if (!dy) return -1;
-  return x.t.title.localeCompare(y.t.title, "de");
-});
-const peopleWith = (t, l) => team.filter(p => { const i = involvement(t, p); return i && i.letters.includes(l); });
-
-/* --- Geteilter Stand: db-Capability, sonst nur dieses Geraet ------------ */
-let db = null;
-const LS = { state:"jcnd.state.v1", custom:"jcnd.custom.v1", team:"jcnd.team.v2", me:"jcnd.me.v1" };
-const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
-const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
-let syncState = ["", "verbinde …"];
-function applyTeamDoc(doc) {
-  if (doc && Array.isArray(doc.people) && doc.people.length)
-    team = doc.people.map(p => ({ ...p, areas: p.areas === ALL ? ALL : [...(p.areas || [])] }));
-  if (doc && doc.milestones) milestones = { ...DEFAULT_MS, ...doc.milestones };
-}
-async function initStore() {
-  overlay = new Map(Object.entries(lsGet(LS.state, {})));
-  customTasks = lsGet(LS.custom, []);
-  applyTeamDoc(lsGet(LS.team, null));
-  try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch { db = null; }
-  if (!db) { syncState = ["off", "nur auf diesem Gerät"]; return; }
-  syncState = ["on", "geteilt mit dem Team"];
-  const fail = e => { syncState = ["off", "Verbindung unterbrochen"]; console.warn(e); render(); };
-  db.collection("state").onSnapshot(s => {
-    overlay = new Map(s.docs.map(d => [d.id, d.data()]));
-    lsSet(LS.state, Object.fromEntries(overlay)); render();
-  }, fail);
-  db.collection("custom").onSnapshot(s => {
-    customTasks = s.docs.map(d => ({ ...d.data(), key:"c" + d.id, docId:d.id, custom:true }));
-    lsSet(LS.custom, customTasks); render();
-  }, fail);
-  db.doc("config/team").onSnapshot(s => {
-    if (s.exists) { applyTeamDoc(s.data()); lsSet(LS.team, s.data()); render(); }
-  }, fail);
-}
-async function writeState(key, patch) {
-  const next = { ...ov(key), ...patch, updatedBy: me ? me.id : "", updatedAt: new Date().toISOString() };
-  overlay.set(key, next); lsSet(LS.state, Object.fromEntries(overlay)); render();
-  if (db) { try { await db.doc("state/" + key).set(next); } catch { toast("Nicht geteilt — lokal gemerkt."); } }
-}
-async function writeCustom(body) {
-  if (db) { try { await db.collection("custom").add(body); return; } catch { toast("Nicht geteilt — lokal gemerkt."); } }
-  customTasks = customTasks.concat([{ ...body, key:"c" + Date.now(), docId:null, custom:true }]);
-  lsSet(LS.custom, customTasks); render();
-}
-async function removeCustom(t) {
-  customTasks = customTasks.filter(c => c.key !== t.key);
-  lsSet(LS.custom, customTasks); overlay.delete(t.key); render();
-  if (db && t.docId) { try { await db.doc("custom/" + t.docId).delete(); } catch {} }
-}
-async function writeTeam() {
-  const doc = { people:team, milestones, updatedAt:new Date().toISOString() };
-  lsSet(LS.team, doc); render();
-  if (db) { try { await db.doc("config/team").set(doc); } catch { toast("Nicht geteilt — lokal gemerkt."); } }
-}
-
-/* --- Bausteine ---------------------------------------------------------- */
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-const av = (p, cls) => `<span class="av ${cls || ""}" style="background:${esc(p.color || "#667")}">${esc(initials(p))}</span>`;
-const CHECK = '<svg viewBox="0 0 12 12"><polyline points="2,6.5 4.8,9 10,3.5"/></svg>';
-let toastT;
-function toast(m) {
-  const el = document.getElementById("toast");
-  el.innerHTML = `<div class="toast">${esc(m)}</div>`;
-  clearTimeout(toastT); toastT = setTimeout(() => el.innerHTML = "", 3000);
-}
-function closeSheet() { document.getElementById("overlay").innerHTML = ""; document.body.style.overflow = ""; }
-function openSheet(html, wide) {
-  const o = document.getElementById("overlay");
-  o.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet${wide ? " wide" : ""}" role="dialog" aria-modal="true">${html}</div></div>`;
-  document.body.style.overflow = "hidden";
-  o.querySelector("[data-scrim]").addEventListener("mousedown", e => { if (e.target.dataset.scrim) closeSheet(); });
-  o.querySelectorAll("[data-close]").forEach(b => b.onclick = closeSheet);
-}
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
-
-/** Eine Aufgabenzeile. Ohne RACI-Buchstaben — die stehen im Detail. */
-function row(t, o = {}) {
-  const b = bucketOf(t), { due } = windowOf(t), s = statusOf(t.key), f = ov(t.key).flag;
-  const when = humanDue(due);
-  const cls = b === "late" ? "late" : (b === "now" || b === "soon" ? "soon" : "");
-  const meta = [];
-  if (!o.hideArea) meta.push(`<span class="tag">${esc(t.area)}</span>`);
-  if (o.showLead) {
-    const a = peopleWith(t, "A").filter(p => p.name)[0] || peopleWith(t, "R").filter(p => p.name)[0];
-    if (a) meta.push(`<span class="lead">${av(a, "sm")}${esc(dispName(a))}</span>`);
-  }
-  if (s === "laeuft") meta.push('<span class="pill plain">läuft</span>');
-  if (s === "blockiert") meta.push('<span class="pill late">hängt</span>');
-  if (t.custom) meta.push('<span class="pill info">ergänzt</span>');
-  return `<div class="row${s === "erledigt" ? " done" : ""}">
-    <span class="tick${s === "erledigt" ? " on" : ""}" role="button" tabindex="0"
-      data-tick="${esc(t.key)}" aria-label="Als erledigt markieren">${CHECK}</span>
-    <span class="mid" data-open="${esc(t.key)}" role="button" tabindex="0">
-      <span class="t">${esc(t.title)}</span>
-      ${meta.length ? `<span class="m">${meta.join("")}</span>` : ""}
-    </span>
-    ${f ? '<span class="fl" title="Geflaggt">●</span>' : ""}
-    <span class="when ${cls}" data-open="${esc(t.key)}">${esc(when)}</span>
-  </div>`;
-}
-const panel = rows => `<div class="panel">${rows.join("")}</div>`;
-function ring(done, total) {
-  const pct = total ? done / total : 0, r = 18, c = 2 * Math.PI * r;
-  return `<span class="ring"><svg width="44" height="44" viewBox="0 0 44 44">
-    <circle class="bg" cx="22" cy="22" r="${r}"></circle>
-    <circle class="fg" cx="22" cy="22" r="${r}" stroke-dasharray="${(c * pct).toFixed(1)} ${c.toFixed(1)}"></circle>
-  </svg><b>${Math.round(pct * 100)}</b></span>`;
-}
-
-/* ======================================================================
-   Ansichten
-   ====================================================================== */
-let me = null, route = { v:"board", area:null }, filter = { q:"", flag:false, only:null };
-const PHASES = [
-  { id:"wahl",  n:"Bewerbung & Wahl",   t:d => d > 365, w:"bis Ende 2025", s:"Wahl" },
-  { id:"grund", n:"Grundsteine",        t:d => d > 180, w:"Dez 25 – Jun 26", s:"Grundsteine" },
-  { id:"ausbau",n:"Ausbau",             t:d => d > 90,  w:"Jun – Sep 26", s:"Ausbau" },
-  { id:"fein",  n:"Feinplanung",        t:d => d > 30,  w:"Sep – Nov 26", s:"Feinplanung" },
-  { id:"end",   n:"Endspurt",           t:d => d > 3,   w:"letzter Monat", s:"Endspurt" },
-  { id:"vorb",  n:"Vorbereitungswoche", t:d => d >= 0,  w:"30. Nov – 2. Dez", s:"Vorwoche" },
-  { id:"event", n:"Veranstaltung",      t:d => d >= -3, w:"3. – 6. Dez", s:"Event" },
-  { id:"nach",  n:"Nachbereitung",      t:() => true,   w:"danach", s:"Danach" }
-];
-function phaseOf(due) {
-  if (!due) return PHASES[PHASES.length - 1];
-  const d = Math.round((EVENT_START - due) / DAY);
-  return PHASES.find(p => p.t(d)) || PHASES[PHASES.length - 1];
-}
-const nowPhase = () => phaseOf(today()).id;
-
-function matches(t) {
-  if (filter.flag && !ov(t.key).flag) return false;
-  if (filter.only && bucketOf(t) !== filter.only) return false;
-  if (filter.q) { const s = filter.q.toLowerCase();
-    if (!t.title.toLowerCase().includes(s) && !t.area.toLowerCase().includes(s)) return false; }
-  return true;
-}
-
-/* --- Board -------------------------------------------------------------- */
-function renderBoard() {
-  const n = daysTo(EVENT_START);
-  const hour = new Date().getHours();
-  const hi = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
-  const work = sortTasks(tasksFor(me, "work"));
-  const late = work.filter(r => bucketOf(r.t) === "late");
-  const now = work.filter(r => bucketOf(r.t) === "now");
-  const soon = work.filter(r => bucketOf(r.t) === "soon");
-  const done = work.filter(r => bucketOf(r.t) === "done");
-  const watch = tasksFor(me, "watch");
-
-  // Zeitstrahl von der Wahl bis drei Monate nach der Veranstaltung
-  const t0 = parseISO(milestones.wahl), t1 = shiftMonths(EVENT_END, 3);
-  const pct = Math.max(0, Math.min(1, (today() - t0) / (t1 - t0))) * 100;
-  const cur = nowPhase();
-
-  const open = work.length - done.length;
-  const sub = open === 0
-    ? `Alles abgehakt — ${work.length} Aufgaben erledigt.`
-    : `<b>${open} offene Aufgaben</b> in ${me.areas === ALL ? "allen Bereichen" : me.areas.length + " Bereichen"}` +
-      (late.length ? ` · <b style="color:var(--late)">${late.length} über der Deadline</b>` : "");
-
-  return `<div class="hello">
-      <h1 class="disp">${esc(hi)}, ${esc(dispName(me))}</h1>
-      <div class="sub">${sub}</div>
-      <div class="trail">
-        <div class="trail-top">
-          <span class="now">Wir sind in der Phase <b>${esc(PHASES.find(p => p.id === cur).n)}</b></span>
-          <span class="cd num">${n > 0 ? n + " Tage bis Würzburg" : n === 0 ? "Es geht los" : Math.abs(n) + " Tage danach"}</span>
-        </div>
-        <div class="track"><span class="fill" style="width:${pct.toFixed(1)}%"></span>
-          <span class="pin" style="left:${pct.toFixed(1)}%"></span></div>
-        <div class="ticks">${PHASES.map(p =>
-          `<span class="${p.id === cur ? "on" : ""}">${esc(p.s)}</span>`).join("")}</div>
-      </div>
-    </div>
-
-    ${late.length ? `<section><button class="callout" data-only="late" type="button">
-      <span class="big num">${late.length}</span>
-      <span class="tx"><b>Über der Deadline</b>
-        <span>Termine aus der RACI, die vorbei sind. Durchgehen und abhaken oder neu datieren.</span></span>
-      <span class="go">→</span></button></section>` : ""}
-
-    ${now.length ? `<section>
-      <div class="sec-h"><h2 class="disp">Jetzt dran</h2><span class="n">${now.length}</span>
-        ${now.length > 7 ? '<button class="more" data-go="mine" type="button">alle ansehen</button>' : ""}</div>
-      ${panel(now.slice(0, 7).map(r => row(r.t)))}</section>` : ""}
-
-    ${soon.length ? `<section>
-      <div class="sec-h"><h2 class="disp">Bald</h2><span class="n">${soon.length}</span>
-        ${soon.length > 5 ? '<button class="more" data-go="mine" type="button">alle ansehen</button>' : ""}</div>
-      ${panel(soon.slice(0, 5).map(r => row(r.t)))}</section>` : ""}
-
-    ${!work.length ? `<div class="empty"><b>Keine Aufgaben für dich</b>
-      Deine Position ist in keinem deiner Bereiche als ausführend oder verantwortlich eingetragen.</div>` : ""}
-
-    <section>
-      <div class="sec-h"><h2 class="disp">Deine Bereiche</h2>
-        <button class="more" data-go="areas" type="button">alle zwölf</button></div>
-      <div class="cards">${(me.areas === ALL ? AREAS : me.areas).map(areaCard).join("")}</div>
-    </section>
-
-    <div class="foot">
-      <button class="lnk" data-go="mine" type="button">Alle ${work.length} Aufgaben von dir</button>
-      ${watch.length ? `<button class="lnk" data-watch="1" type="button">${watch.length} Aufgaben, bei denen du nur gefragt oder informiert wirst</button>` : ""}
-    </div>`;
-}
-function areaCard(a) {
-  const ts = allTasks().filter(t => t.area === a);
-  const done = ts.filter(t => bucketOf(t) === "done").length;
-  const late = ts.filter(t => bucketOf(t) === "late").length;
-  const lead = team.filter(p => p.grp === "pt" && p.areas !== ALL && p.areas.includes(a) && p.name)[0]
-            || team.filter(p => p.grp === "pl" && p.areas !== ALL && p.areas.includes(a) && p.name)[0];
-  return `<button class="card" data-area="${esc(a)}" type="button">
-    ${ring(done, ts.length)}
-    <span class="tx"><h3>${esc(a)}</h3>
-      <span class="who">${lead ? av(lead, "sm") + esc(dispName(lead)) : "niemand zugeordnet"}</span>
-      <span class="fig">${done}/${ts.length} erledigt${late ? ` · <span class="l">${late} drüber</span>` : ""}</span>
-    </span></button>`;
-}
-
-/* --- Alle meine Aufgaben ------------------------------------------------ */
-const ONLY = [["", "Alle"], ["late", "Über Deadline"], ["now", "Jetzt dran"], ["soon", "Bald"], ["later", "Später"], ["done", "Erledigt"]];
-function renderMine() {
-  const rows = sortTasks(tasksFor(me, "work")).filter(r => matches(r.t));
-  const groups = [["late", "Über der Deadline"], ["now", "Jetzt dran"], ["soon", "Bald"], ["later", "Später"], ["done", "Erledigt"]];
-  return toolbar() + (rows.length ? groups.map(([b, lbl]) => {
-    const g = rows.filter(r => bucketOf(r.t) === b);
-    if (!g.length) return "";
-    return `<section><div class="sec-h"><h2 class="disp">${esc(lbl)}</h2><span class="n">${g.length}</span></div>
-      ${panel(g.map(r => row(r.t)))}</section>`;
-  }).join("") : `<div class="empty"><b>Nichts gefunden</b>Andere Filter versuchen.</div>`);
-}
-function toolbar() {
-  return `<div class="toolrow">
-    <input class="search" id="q" type="search" placeholder="Aufgabe suchen …" value="${esc(filter.q)}" aria-label="Aufgabe suchen">
-    <button class="btn${filter.flag ? " pri" : ""}" data-flagf="1" type="button" aria-pressed="${filter.flag}">Geflaggt</button>
-    <span style="flex:1"></span>
-    <button class="btn pri" data-add="1" type="button">Aufgabe ergänzen</button>
-  </div>
-  <div class="chips">${ONLY.map(([v, l]) =>
-    `<button data-only="${v}" aria-pressed="${(filter.only || "") === v}" type="button">${esc(l)}</button>`).join("")}</div>`;
-}
-
-/* --- Bereiche ----------------------------------------------------------- */
-function renderAreas() {
-  const mine = me && me.areas !== ALL ? me.areas : [];
-  const rest = AREAS.filter(a => !mine.includes(a));
-  return (mine.length ? `<section><div class="sec-h"><h2 class="disp">Deine Bereiche</h2></div>
-      <div class="cards">${mine.map(areaCard).join("")}</div></section>` : "") +
-    `<section><div class="sec-h"><h2 class="disp">${mine.length ? "Die übrigen" : "Alle Bereiche"}</h2></div>
-      <div class="cards">${rest.map(areaCard).join("")}</div></section>`;
-}
-function renderArea(a) {
-  const ts = allTasks().filter(t => t.area === a && matches(t));
-  const groups = [["late", "Über der Deadline"], ["now", "Jetzt dran"], ["soon", "Bald"], ["later", "Später"], ["done", "Erledigt"]];
-  const crew = team.filter(p => p.areas !== ALL && p.areas.includes(a) && p.name);
-  return `<div class="hello"><h1 class="disp">${esc(a)}</h1>
-      <div class="sub">${allTasks().filter(t => t.area === a).length} Aufgaben${crew.length
-        ? " · " + crew.map(p => esc(dispName(p))).join(", ") : ""}</div></div>` +
-    toolbar() + (ts.length ? groups.map(([b, lbl]) => {
-      const g = ts.filter(t => bucketOf(t) === b);
-      if (!g.length) return "";
-      return `<section><div class="sec-h"><h2 class="disp">${esc(lbl)}</h2><span class="n">${g.length}</span></div>
-        ${panel(g.map(t => row(t, { hideArea:true, showLead:true })))}</section>`;
-    }).join("") : `<div class="empty"><b>Nichts gefunden</b>Andere Filter versuchen.</div>`) +
-    `<div class="foot"><button class="lnk" data-mx="${esc(a)}" type="button">Diesen Bereich als RACI-Matrix ansehen</button></div>`;
-}
-
-/* --- Zeitplan ----------------------------------------------------------- */
-function renderPlan() {
-  const ts = allTasks().filter(matches), cur = nowPhase();
-  return `<div class="hello"><h1 class="disp">Zeitplan</h1>
-      <div class="sub">${ts.length} Aufgaben nach Deadline, gerechnet vom 3. Dezember 2026.</div></div>
-    <div class="panel" style="padding:6px 20px">` +
-    PHASES.map(ph => {
-      const g = ts.filter(t => phaseOf(windowOf(t).due).id === ph.id);
-      if (!g.length) return "";
-      const done = g.filter(t => bucketOf(t) === "done").length;
-      const late = g.filter(t => bucketOf(t) === "late").length;
-      const open = g.length - done - late;
-      const w = x => (x / g.length * 100).toFixed(1) + "%";
-      const mine = me ? g.filter(t => isWork(involvement(t, me))).length : 0;
-      return `<div class="ph${ph.id === cur ? " now" : ""}">
-        <div><h4>${esc(ph.n)}</h4><div class="dt">${esc(ph.w)}</div></div>
-        <div><div class="phbar">
-            ${done ? `<i style="width:${w(done)};background:var(--done)"></i>` : ""}
-            ${late ? `<i style="width:${w(late)};background:var(--late)"></i>` : ""}
-            ${open ? `<i style="width:${w(open)};background:var(--accent)"></i>` : ""}</div>
-          <div class="mt">${g.length} Aufgaben · ${done} erledigt${late ? ` · <b style="color:var(--late)">${late} drüber</b>` : ""}${mine ? ` · <b>${mine} bei dir</b>` : ""}</div>
-        </div></div>`;
-    }).join("") + `</div>`;
-}
-
-/* --- RACI-Matrix (die Excel-Ansicht) ------------------------------------ */
-function renderMatrix() {
-  const a = route.area || AREAS[0];
-  const ts = allTasks().filter(t => t.area === a && matches(t));
-  const cell = (t, pos) => {
-    const raw = t.custom
-      ? (t.owner && personById(t.owner) && personById(t.owner).pos.includes(pos) ? "A"
-        : (t.helpers || []).some(h => personById(h) && personById(h).pos.includes(pos)) ? "R" : null)
-      : t.raci[P[pos]];
-    if (!raw) return "<td></td>";
-    const opt = String(raw).endsWith("?");
-    return `<td>${[...String(raw).replace("?", "")].map(l =>
-      `<span class="rc ${l}${opt ? " opt" : ""}" title="${esc(ROLE[l] ? ROLE[l].lbl : l)}">${l}</span>`).join("")}</td>`;
-  };
-  return `<div class="hello"><h1 class="disp">RACI-Matrix</h1>
-      <div class="sub">Die Excel-Ansicht — eine Zeile je Aufgabe, eine Spalte je Position.</div></div>
-    <div class="chips">${AREAS.map(x =>
-      `<button data-mx="${esc(x)}" aria-pressed="${x === a}" type="button">${esc(x)}</button>`).join("")}</div>
-    <div class="mx-wrap"><table class="mx">
-      <thead><tr><th class="tn">Aufgabe</th><th>Fenster ab</th><th>Deadline</th>
-        ${POS.map(p => `<th title="${esc(POS_LABEL[p])}">${esc(p)}</th>`).join("")}</tr></thead>
-      <tbody>${ts.map(t => { const { start, due } = windowOf(t);
-        return `<tr data-open="${esc(t.key)}" style="cursor:pointer">
-          <td class="tn">${esc(t.title)}</td>
-          <td class="wd">${start ? esc(fmtDM.format(start)) + " " + String(start.getFullYear()).slice(2) : "–"}</td>
-          <td class="wd">${due ? esc(fmtDM.format(due)) + " " + String(due.getFullYear()).slice(2) : "–"}</td>
-          ${POS.map(p => cell(t, p)).join("")}</tr>`; }).join("")
-        || `<tr><td class="tn" colspan="${POS.length + 3}">Keine Aufgaben für diese Filter.</td></tr>`}</tbody>
-    </table></div>
-    <div class="legend">${["A","R","C","I","S"].map(l =>
-      `<span><span class="rc ${l}">${l}</span> ${esc(ROLE[l].lbl)}</span>`).join("")}
-      <span><span class="rc R opt">R</span> in der Excel geklammert: nur falls zutreffend</span></div>`;
-}
-
-/* --- Team --------------------------------------------------------------- */
-function renderTeam() {
-  const nn = team.filter(p => !p.name || !p.name.trim()).length;
-  return `<div class="hello"><h1 class="disp">Team</h1>
-      <div class="sub">Position und Bereiche entscheiden, welche Aufgaben auf welchem Board landen.</div></div>
-    ${nn ? `<button class="callout" data-scrollnn="1" type="button" style="margin-bottom:24px">
-      <span class="big num">${nn}</span><span class="tx"><b>Positionen ohne Namen</b>
-      <span>Vor allem der JCNetwork-Vorstand. Solange dort „N. N." steht, hat niemand diese Aufgaben auf dem Board.</span></span>
-      <span class="go">↓</span></button>` : ""}
-    <section><div class="sec-h"><h2 class="disp">Eckdaten</h2></div>
-      <div class="panel" style="padding:18px 20px">
-        <div class="two" style="max-width:460px">
-          <div class="fld" style="margin:0"><label for="msWahl">Wahl des Ausrichters</label>
-            <input id="msWahl" type="date" value="${esc(milestones.wahl)}"></div>
-          <div class="fld" style="margin:0"><label for="msAnms">Anmeldeschluss</label>
-            <input id="msAnms" type="date" value="${esc(milestones.anms)}"></div>
-        </div>
-        <p style="margin:12px 0 0;font-size:12.5px;color:var(--ink-3)">
-          Die RACI nennt beides ohne Datum. Alle „Wahl"- und „AnmS"-Deadlines rechnen von hier.</p>
-      </div></section>` +
-    ["pl", "pt", "jcn", "gr"].map(g => {
-      const ps = team.filter(p => p.grp === g); if (!ps.length) return "";
-      return `<div class="grp-h" ${g === "jcn" ? 'id="nn"' : ""}><h3 class="disp">${esc(GRP[g][0])}</h3><p>${esc(GRP[g][1])}</p></div>
-      <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(258px,1fr))">${ps.map(p => {
-        const w = tasksFor(p, "work");
-        const open = w.filter(r => bucketOf(r.t) !== "done").length;
-        const late = w.filter(r => bucketOf(r.t) === "late").length;
-        return `<div class="pc${!p.name || !p.name.trim() ? " nn" : ""}">
-          <div class="top">${av(p, "lg")}<div style="min-width:0">
-            <div class="nm">${esc(dispName(p))}</div><div class="rl">${esc(p.role)}</div></div></div>
-          <div class="ar">${p.areas === ALL ? '<span class="pill plain">alle Bereiche</span>'
-            : p.areas.map(a => `<span class="pill plain">${esc(a)}</span>`).join("")}</div>
-          <div class="fg"><b>${open}</b> offen${late ? ` · <span class="l">${late} drüber</span>` : ""} · ${w.length} gesamt</div>
-          <div class="ed"><button class="btn sm" data-editp="${esc(p.id)}" type="button">Bearbeiten</button>
-            ${p.name && p.name.trim() ? `<button class="btn sm gho" data-beid="${esc(p.id)}" type="button">Board ansehen</button>` : ""}</div>
-        </div>`; }).join("")}</div>`;
-    }).join("");
-}
-
-/* ======================================================================
-   Dialoge
-   ====================================================================== */
-function taskSheet(key) {
-  const t = allTasks().find(x => x.key === key); if (!t) return;
-  const o = ov(key), st = statusOf(key), { start, due } = windowOf(t), b = bucketOf(t);
-  const mine = involvement(t, me);
-  const roleLine = l => {
-    const ps = peopleWith(t, l).filter(p => p.name && p.name.trim());
-    const anon = peopleWith(t, l).filter(p => !p.name || !p.name.trim());
-    if (!ps.length && !anon.length) return "";
-    return `<div class="role-line"><span class="lbl">${esc(ROLE[l].lbl)}</span>
-      <span class="ppl">${ps.map(p => `<span class="who-chip">${av(p, "sm")}${esc(dispName(p))}</span>`).join("")}
-      ${anon.map(p => `<span class="who-chip" style="opacity:.6">${av(p, "sm")}${esc(p.role)}</span>`).join("")}</span></div>`;
-  };
-  openSheet(`
-    <div class="sh-h"><div style="flex:1;min-width:0">
-        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px">
-          <span class="pill plain">${esc(t.area)}</span>
-          ${t.custom ? '<span class="pill info">ergänzt</span>' : ""}
-          ${o.flag ? '<span class="pill late">geflaggt</span>' : ""}
-          ${mine ? `<span class="pill info">${esc(mine.letters.map(l => ROLE[l].you).join(" · "))}</span>` : ""}
-        </div><h3 class="disp">${esc(t.title)}</h3></div>
-      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
-    <div class="sh-b">
-      <div class="facts">
-        <div class="fact"><div class="k">Kann losgehen ab</div>
-          <div class="v">${start ? esc(fmtFull.format(start)) : "–"}</div></div>
-        <div class="fact"><div class="k">Deadline</div>
-          <div class="v${b === "late" ? " late" : ""}">${due ? esc(fmtFull.format(due)) : "–"}
-            <span>· ${esc(humanDue(due))}</span></div></div>
-      </div>
-      <div class="fld"><label>Status</label><div class="seg">${Object.entries(STATUS).map(([k, v]) =>
-        `<button data-st="${k}" aria-pressed="${st === k}" type="button">${esc(v)}</button>`).join("")}</div></div>
-      <div class="fld"><label for="tnote">Notiz fürs Team</label>
-        <textarea id="tnote" placeholder="Was hakt, was ist abgestimmt, was fehlt noch?">${esc(o.note || "")}</textarea></div>
-      <div style="border-top:1px solid var(--hair);padding-top:14px;margin-top:4px">
-        <div style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px">Wer ist beteiligt</div>
-        ${["A","R","C","I","S"].map(roleLine).join("") ||
-          '<p style="font-size:13px;color:var(--ink-3);margin:0">Niemand aus dem Team zugeordnet.</p>'}
-      </div>
-    </div>
-    <div class="sh-f">
-      <button class="btn" data-flag="1" type="button">${o.flag ? "Flag weg" : "Flaggen"}</button>
-      ${t.custom ? '<button class="btn" data-del="1" type="button">Löschen</button>' : ""}
-      <span style="flex:1"></span>
-      <button class="btn pri" data-save="1" type="button">Speichern</button></div>`);
-  const o2 = document.getElementById("overlay");
-  o2.querySelectorAll("[data-st]").forEach(b2 => b2.onclick = () => {
-    writeState(key, { status:b2.dataset.st }); closeSheet(); toast(STATUS[b2.dataset.st]);
-  });
-  o2.querySelector("[data-flag]").onclick = () => {
-    writeState(key, { flag: !o.flag }); closeSheet(); toast(o.flag ? "Flag entfernt" : "Geflaggt");
-  };
-  o2.querySelector("[data-save]").onclick = () => {
-    writeState(key, { note:o2.querySelector("#tnote").value.trim() }); closeSheet(); toast("Gespeichert");
-  };
-  const d = o2.querySelector("[data-del]");
-  if (d) d.onclick = () => { removeCustom(t); closeSheet(); toast("Gelöscht"); };
-}
-
-function addSheet() {
-  const def = route.v === "area" ? route.area : (route.v === "matrix" ? (route.area || AREAS[0])
-    : (me && me.areas !== ALL ? me.areas[0] : AREAS[0]));
-  const named = team.filter(p => p.name && p.name.trim());
-  openSheet(`
-    <div class="sh-h"><h3 class="disp">Aufgabe ergänzen</h3>
-      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
-    <div class="sh-b">
-      <div class="fld"><label for="nT">Was ist zu tun?</label>
-        <input id="nT" placeholder="z. B. Shuttle zur Samstagslocation buchen"></div>
-      <div class="two">
-        <div class="fld"><label for="nA">Bereich</label><select id="nA">${AREAS.map(a =>
-          `<option${a === def ? " selected" : ""}>${esc(a)}</option>`).join("")}</select></div>
-        <div class="fld"><label for="nO">Verantwortlich</label><select id="nO">${named.map(p =>
-          `<option value="${esc(p.id)}"${me && p.id === me.id ? " selected" : ""}>${esc(dispName(p))} — ${esc(p.role)}</option>`).join("")}</select></div>
-      </div>
-      <div class="fld"><label>Wer macht mit?</label><div class="checks">${named.map(p =>
-        `<label><input type="checkbox" data-h="${esc(p.id)}">${esc(dispName(p))}</label>`).join("")}</div></div>
-      <div class="two">
-        <div class="fld"><label for="nS">Kann losgehen ab</label>
-          <input id="nS" type="date" value="${new Date().toISOString().slice(0, 10)}"></div>
-        <div class="fld"><label for="nD">Deadline</label><input id="nD" type="date"></div>
-      </div>
-    </div>
-    <div class="sh-f"><span style="flex:1"></span>
-      <button class="btn" data-close="1" type="button">Abbrechen</button>
-      <button class="btn pri" data-save="1" type="button">Anlegen</button></div>`);
-  const o = document.getElementById("overlay");
-  o.querySelector("[data-save]").onclick = async () => {
-    const title = o.querySelector("#nT").value.trim();
-    if (!title) { o.querySelector("#nT").focus(); toast("Die Aufgabe braucht einen Titel."); return; }
-    const body = { area:o.querySelector("#nA").value, title, owner:o.querySelector("#nO").value,
-      helpers:[...o.querySelectorAll("[data-h]:checked")].map(x => x.dataset.h),
-      startISO:o.querySelector("#nS").value || null, dueISO:o.querySelector("#nD").value || null,
-      createdBy: me ? me.id : "", createdAt:new Date().toISOString() };
-    closeSheet(); await writeCustom(body); toast("Aufgabe ergänzt");
-  };
-}
-
-function personSheet(id) {
-  const p = personById(id); if (!p) return;
-  openSheet(`
-    <div class="sh-h"><h3 class="disp">${esc(dispName(p))}</h3>
-      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
-    <div class="sh-b">
-      <div class="two">
-        <div class="fld"><label for="pN">Name</label><input id="pN" value="${esc(p.name || "")}" placeholder="Vorname"></div>
-        <div class="fld"><label for="pR">Funktion</label><input id="pR" value="${esc(p.role || "")}"></div>
-      </div>
-      <div class="fld"><label>Position in der RACI</label>
-        <div class="checks">${POS.map(x => `<label><input type="checkbox" data-pos="${esc(x)}"${
-          p.pos.includes(x) ? " checked" : ""}>${esc(x)}</label>`).join("")}</div>
-        <div class="hint">Bestimmt, welche Spalte der Excel für diese Person gilt — ${esc(p.pos.map(x => POS_LABEL[x]).join(", ") || "keine")}.</div></div>
-      <div class="fld"><label>Zuständige Bereiche</label>
-        <div class="checks" style="margin-bottom:7px"><label><input type="checkbox" id="pAll"${
-          p.areas === ALL ? " checked" : ""}>alle zwölf</label></div>
-        <div class="checks" id="pAreas">${AREAS.map(a => `<label><input type="checkbox" data-ar="${esc(a)}"${
-          p.areas !== ALL && p.areas.includes(a) ? " checked" : ""}>${esc(a)}</label>`).join("")}</div></div>
-    </div>
-    <div class="sh-f"><span style="flex:1"></span>
-      <button class="btn" data-close="1" type="button">Abbrechen</button>
-      <button class="btn pri" data-save="1" type="button">Speichern</button></div>`);
-  const o = document.getElementById("overlay"), all = o.querySelector("#pAll"), wrap = o.querySelector("#pAreas");
-  const sync = () => { wrap.style.opacity = all.checked ? ".4" : "1";
-    wrap.querySelectorAll("input").forEach(i => i.disabled = all.checked); };
-  all.onchange = sync; sync();
-  o.querySelector("[data-save]").onclick = () => {
-    p.name = o.querySelector("#pN").value.trim();
-    p.role = o.querySelector("#pR").value.trim() || p.role;
-    p.pos = [...o.querySelectorAll("[data-pos]:checked")].map(x => x.dataset.pos);
-    p.areas = all.checked ? ALL : [...o.querySelectorAll("[data-ar]:checked")].map(x => x.dataset.ar);
-    if (me && me.id === p.id) me = p;
-    closeSheet(); writeTeam(); toast("Gespeichert");
-  };
-}
-
-function pickerSheet() {
-  const blk = g => {
-    const ps = team.filter(p => p.grp === g && p.name && p.name.trim());
-    if (!ps.length) return "";
-    return `<div class="grp-h"><h3 class="disp">${esc(GRP[g][0])}</h3></div>
-      <div class="pickgrid">${ps.map(p => {
-        const open = tasksFor(p, "work").filter(r => bucketOf(r.t) !== "done").length;
-        return `<button class="pick" data-pick="${esc(p.id)}" type="button">${av(p)}
-          <span style="min-width:0"><span class="nm">${esc(dispName(p))}</span>
-          <span class="rl">${esc(p.role)} · ${open} offen</span></span></button>`;
-      }).join("")}</div>`;
-  };
-  openSheet(`
-    <div class="sh-h"><div style="flex:1"><h3 class="disp">Wer bist du?</h3>
-      <p style="font-size:13.5px;color:var(--ink-2);margin:6px 0 0">Dein Board zeigt danach nur, was du
-      selbst machst oder verantwortest — nicht die Zeilen, bei denen du nur informiert wirst.</p></div>
-      ${me ? '<button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button>' : ""}</div>
-    <div class="sh-b">${["pl", "pt", "jcn", "gr"].map(blk).join("")}
-      <p style="font-size:12.5px;color:var(--ink-3);margin:18px 0 0">Nicht dabei? Unter <b>Team</b> ergänzen.</p></div>`, true);
-  document.getElementById("overlay").querySelectorAll("[data-pick]").forEach(b => b.onclick = () => {
-    me = personById(b.dataset.pick); lsSet(LS.me, me.id);
-    filter = { q:"", flag:false, only:null }; route = { v:"board", area:null };
-    closeSheet(); window.scrollTo(0, 0); render();
-  });
-}
-
-function watchSheet() {
-  const rows = sortTasks(tasksFor(me, "watch"));
-  openSheet(`
-    <div class="sh-h"><div style="flex:1"><h3 class="disp">Nur zur Kenntnis</h3>
-      <p style="font-size:13.5px;color:var(--ink-2);margin:6px 0 0">${rows.length} Aufgaben, bei denen du
-      gefragt oder informiert wirst. Kein Arbeitsauftrag — jemand anderes macht sie.</p></div>
-      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
-    <div class="sh-b" style="padding:0">${panel(rows.slice(0, 80).map(r => row(r.t, { showLead:true })))}
-      ${rows.length > 80 ? `<p style="font-size:12.5px;color:var(--ink-3);padding:14px 22px;margin:0">… und ${rows.length - 80} weitere.</p>` : ""}</div>`, true);
-  wireRows(document.getElementById("overlay"));
-}
-
-function aboutSheet() {
-  openSheet(`
-    <div class="sh-h"><h3 class="disp">Woher die Aufgaben kommen</h3>
-      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
-    <div class="sh-b" style="font-size:14px;line-height:1.65">
-      <p style="margin-top:0">Grundlage ist die RACI-Excel der JCNetwork Days mit
-      <b>${allTasks().length} Aufgaben in zwölf Bereichen</b>. Sie verteilt Aufgaben auf Positionen —
-      nicht auf Menschen. Hier kommt die Zuordnung des Projektteams dazu: eine Aufgabe ist deine, wenn
-      <b>deine Position in der Zeile steht</b> und <b>der Bereich zu dir gehört</b>.</p>
-      <p><b>Nur zwei der fünf Rollen sind Arbeit.</b> Wer etwas macht oder verantwortet, hat es auf dem
-      Board. Wer gefragt oder informiert wird, findet es unter „Nur zur Kenntnis" — sonst hätte die
-      Projektleitung hunderte vermeintlicher Aufgaben.</p>
-      <p><b>Aus Kürzeln werden Termine.</b> Die Excel schreibt <span class="num">3m</span>,
-      <span class="num">2w</span> oder <span class="num">Mo</span>. Gerechnet vom 3. Dezember 2026 sind das
-      der 3. September, der 19. November und der Montag der Vorbereitungswoche.</p>
-      <p><b>Der Status hängt an der Aufgabe, nicht an dir.</b> Jede Zeile hat genau eine verantwortliche
-      Position. Hakt jemand ab, sehen es alle Beteiligten.</p>
-      <p style="color:var(--ink-2);font-size:13px;margin-bottom:0">Die RACI ist bewusst kein starres Gerüst.
-      Selbst angelegte Aufgaben sind als <span class="pill info">ergänzt</span> gekennzeichnet.</p>
-    </div>`);
-}
-
-/* ======================================================================
-   Rendern
-   ====================================================================== */
-const TABS = [["board", "Board"], ["mine", "Aufgaben"], ["areas", "Bereiche"],
-              ["plan", "Zeitplan"], ["matrix", "Matrix"], ["team", "Team"]];
-function wireRows(scope) {
-  scope.querySelectorAll("[data-open]").forEach(el => {
-    el.onclick = () => taskSheet(el.dataset.open);
-    el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); taskSheet(el.dataset.open); } };
-  });
-  scope.querySelectorAll("[data-tick]").forEach(el => {
-    const go = e => { e.stopPropagation();
-      const k = el.dataset.tick;
-      writeState(k, { status: statusOf(k) === "erledigt" ? "offen" : "erledigt" });
-    };
-    el.onclick = go;
-    el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(e); } };
-  });
-}
-function render() {
-  if (!me) { document.getElementById("view").innerHTML = ""; return; }
-  document.getElementById("meAv").style.background = me.color || "#667";
-  document.getElementById("meAv").textContent = initials(me);
-  document.getElementById("meNm").textContent = dispName(me);
-  document.getElementById("tabs").innerHTML = TABS.map(([id, l]) =>
-    `<button data-tab="${id}" aria-current="${route.v === id || (id === "areas" && route.v === "area")}" type="button">${esc(l)}</button>`).join("");
-
-  const v = document.getElementById("view");
-  v.innerHTML = route.v === "board" ? renderBoard()
-    : route.v === "mine"  ? `<div class="hello"><h1 class="disp">Deine Aufgaben</h1>
-        <div class="sub">Alles, was du machst oder verantwortest.</div></div>` + renderMine()
-    : route.v === "areas" ? `<div class="hello"><h1 class="disp">Bereiche</h1>
-        <div class="sub">Zwölf Bereiche aus der RACI, aufgeteilt auf die Projektleitung.</div></div>` + renderAreas()
-    : route.v === "area"  ? renderArea(route.area)
-    : route.v === "plan"  ? renderPlan()
-    : route.v === "matrix"? renderMatrix()
-    : renderTeam();
-
-  if (route.v === "board" || route.v === "team")
-    v.insertAdjacentHTML("beforeend", `<div class="foot">
-      <span class="sync"><span class="dot ${syncState[0]}"></span>${esc(syncState[1])}</span>
-      <button class="lnk" data-about="1" type="button">Woher die Aufgaben kommen</button>
-      <button class="lnk" data-theme="1" type="button">Darstellung wechseln</button></div>`);
-
-  wireRows(v);
-  document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => {
-    route = { v:b.dataset.tab, area: b.dataset.tab === "matrix" ? (route.area || AREAS[0]) : null };
-    filter.only = null; window.scrollTo(0, 0); render();
-  });
-  v.querySelectorAll("[data-area]").forEach(b => b.onclick = () => {
-    route = { v:"area", area:b.dataset.area }; window.scrollTo(0, 0); render(); });
-  v.querySelectorAll("[data-mx]").forEach(b => b.onclick = () => {
-    route = { v:"matrix", area:b.dataset.mx }; window.scrollTo(0, 0); render(); });
-  v.querySelectorAll("[data-go]").forEach(b => b.onclick = () => {
-    route = { v:b.dataset.go, area:null }; window.scrollTo(0, 0); render(); });
-  v.querySelectorAll("[data-only]").forEach(b => b.onclick = () => {
-    const val = b.dataset.only || null;
-    filter.only = filter.only === val ? null : val;
-    if (route.v === "board") route = { v:"mine", area:null };
-    window.scrollTo(0, 0); render();
-  });
-  v.querySelectorAll("[data-editp]").forEach(b => b.onclick = () => personSheet(b.dataset.editp));
-  v.querySelectorAll("[data-beid]").forEach(b => b.onclick = () => {
-    me = personById(b.dataset.beid); lsSet(LS.me, me.id);
-    route = { v:"board", area:null }; window.scrollTo(0, 0); render(); });
-  v.querySelectorAll("[data-add]").forEach(b => b.onclick = addSheet);
-  v.querySelectorAll("[data-watch]").forEach(b => b.onclick = watchSheet);
-  v.querySelectorAll("[data-about]").forEach(b => b.onclick = aboutSheet);
-  v.querySelectorAll("[data-flagf]").forEach(b => b.onclick = () => { filter.flag = !filter.flag; render(); });
-  v.querySelectorAll("[data-scrollnn]").forEach(b => b.onclick = () => {
-    const el = document.getElementById("nn"); if (el) el.scrollIntoView({ behavior:"smooth", block:"start" }); });
-  v.querySelectorAll("[data-theme]").forEach(b => b.onclick = () => {
-    const r = document.documentElement, cur = r.getAttribute("data-theme");
-    const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-    r.setAttribute("data-theme", dark ? "light" : "dark");
-  });
-  const q = v.querySelector("#q");
-  if (q) { let t2; q.oninput = e => { const val = e.target.value;
-    clearTimeout(t2); t2 = setTimeout(() => { filter.q = val.trim();
-      const at = document.activeElement === q; render();
-      if (at) { const n2 = document.querySelector("#q"); if (n2) { n2.focus(); n2.setSelectionRange(n2.value.length, n2.value.length); } }
-    }, 200); }; }
-  const mw = v.querySelector("#msWahl"), ma = v.querySelector("#msAnms");
-  if (mw) mw.onchange = () => { milestones.wahl = mw.value; writeTeam(); toast("Termin übernommen"); };
-  if (ma) ma.onchange = () => { milestones.anms = ma.value; writeTeam(); toast("Termin übernommen"); };
-}
-document.getElementById("meBtn").onclick = pickerSheet;
-
-(async function start() {
-  await initStore();
-  const saved = lsGet(LS.me, null);
-  me = (saved && personById(saved)) || null;
-  render();
-  if (!me) pickerSheet();
-})();
-</script>
+<script src="ops.js"></script>
+<script src="app.js"></script>
