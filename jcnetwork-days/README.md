@@ -332,3 +332,32 @@ nur eben ohne Status, Schichten und Material.
 - Der Server hält keine Sitzung (staatenlos), damit mehrere Personen
   gleichzeitig fragen können, ohne dass Render klebrige Sitzungen braucht.
 - Supabase-Antworten werden fünf Sekunden zwischengespeichert.
+
+## Wer bist du? — jetzt auch als Ansicht
+
+Die Personenwahl war bisher nur ein Dialog beim ersten Öffnen und zeigte nur
+Personen **mit Namen**. Damit fehlte ausgerechnet der JCNetwork-Vorstand: Wer
+noch keinen Namen eingetragen hat, konnte sein Amt nicht auswählen und seine
+RACI-Zeilen nicht sehen.
+
+Jetzt stehen alle Ämter in der Auswahl, auch ohne Namen — gestrichelt umrandet
+und mit dem Amt als Überschrift. Vorstandsvorsitz, Customer Relations,
+Finanzen & Recht, Eventmanagement, Human Resources, Informationsmanagement,
+Marketing, Weiterbildung sowie Vereinsvorstand und Alumni-Vorstand. Wer ein Amt
+wählt, bekommt auf dem Board die Kachel **Meine Rolle** statt „Meine Aufgaben".
+
+Eventmanagement etwa führt 151 Aufgaben, 67 davon über der Deadline — die
+Position, die in der RACI am häufigsten ausführend oder verantwortlich steht.
+
+Die Auswahl ist über den Personenknopf oben rechts und über einen Link auf dem
+Board erreichbar; das Logo links führt zurück aufs Board.
+
+## Claude verbinden — im Board erklärt
+
+Unter **Team** steht die Anleitung in fünf Schritten, samt Kopierknopf für die
+Connector-Adresse. Die Projektleitung trägt sie einmal ein (Knopf *Adresse
+eintragen*), danach kopiert sie jede Person selbst.
+
+Der vierte Schritt ist hervorgehoben, weil er die Stelle ist, an der es hakt:
+**Authentifizierung „Keine Anmeldung"**, nicht „Jetzt anmelden". Der Server
+kennt kein OAuth — der Schutz steckt im Token der Adresse.

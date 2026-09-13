@@ -117,6 +117,7 @@ const GRP = {
 };
 const GRP_ORDER = ["pl", "pt", "jcn", "fel", "gr"];
 let team = DEFAULT_TEAM.map(p => ({ ...p, areas: p.areas === ALL ? ALL : [...p.areas] }));
+let mcpUrl = "";
 const personById = id => team.find(p => p.id === id);
 /** Auch Helfende dürfen sich anmelden — sie sehen dann nur ihren Einsatz. */
 function resolveMe(id) {
@@ -207,6 +208,7 @@ function applyTeamDoc(doc) {
   if (doc && Array.isArray(doc.people) && doc.people.length)
     team = doc.people.map(p => ({ ...p, areas: p.areas === ALL ? ALL : [...(p.areas || [])] }));
   if (doc && doc.milestones) milestones = { ...DEFAULT_MS, ...doc.milestones };
+  mcpUrl = (doc && doc.mcpUrl) || "";
 }
 async function initStore() {
   overlay = new Map(Object.entries(lsGet(LS.state, {})));
@@ -263,7 +265,7 @@ async function removeCustom(t) {
   if (db && t.docId) { try { await db.doc("custom/" + t.docId).delete(); } catch {} }
 }
 async function writeTeam() {
-  const doc = { people:team, milestones, updatedAt:new Date().toISOString() };
+  const doc = { people:team, milestones, mcpUrl, updatedAt:new Date().toISOString() };
   lsSet(LS.team, doc); render();
   if (db) { try { await db.doc("config/team").set(doc); } catch { toast("Nicht geteilt — lokal gemerkt."); } }
 }
@@ -422,6 +424,7 @@ function renderBoard() {
     <div class="foot">
       <button class="lnk" data-go="mine" type="button">Alle ${work.length} Aufgaben von dir</button>
       <button class="lnk" data-go="offen" type="button">Alle offenen Aufgaben im Projekt</button>
+      <button class="lnk" data-go="wer" type="button">Andere Person oder anderes Amt ansehen</button>
       ${watch.length ? `<button class="lnk" data-watch="1" type="button">${watch.length} Aufgaben, bei denen du nur gefragt oder informiert wirst</button>` : ""}
     </div>`;
 }
@@ -692,6 +695,7 @@ function renderTeam() {
   const nn = team.filter(p => !p.name || !p.name.trim()).length;
   return `<div class="hello"><h1 class="disp">Team</h1>
       <div class="sub">Position und Bereiche entscheiden, welche Aufgaben auf welchem Board landen.</div></div>
+    ${claudeBlock()}
     <div class="setup"><h4>So kommt der Rest des Teams rein</h4>
       <ol>
         <li>Oben rechts im Artifact auf <b>Teilen</b> — jede Person in der Organisation kann die Seite dann öffnen.</li>
@@ -746,6 +750,52 @@ function renderTeam() {
             ${p.name && p.name.trim() ? `<button class="btn sm gho" data-beid="${esc(p.id)}" type="button">Board ansehen</button>` : ""}</div>
         </div>`; }).join("")}</div>`;
     }).join("") + helferTeamBlock();
+}
+
+/** Anleitung, wie jede Person das Board in ihrer eigenen Claude-App
+ *  als Connector einhängt. Die Adresse trägt die Projektleitung einmal
+ *  ein, alle anderen kopieren sie nur. */
+function claudeBlock() {
+  const schritte = [
+    ["Adresse kopieren", "Den Knopf oben benutzen — die Adresse enthält bereits den Zugangstoken."],
+    ["In der Claude-App öffnen", "Einstellungen → Connectors → Connector hinzufügen."],
+    ["Adresse einfügen", "Als Namen etwas Eindeutiges wählen, z. B. „JCNetwork Days“."],
+    ["Authentifizierung: <b>Keine Anmeldung</b>", "Nicht „Jetzt anmelden“ — der Server kennt kein OAuth, der Schutz steckt im Token der Adresse."],
+    ["Hinzufügen und ausprobieren", "Frag zum Test: „Gib mir den Projektüberblick der JCNetwork Days.“"]
+  ];
+  return `<div class="setup" style="background:var(--card);border:1px solid var(--line)">
+    <h4>Claude an dieses Board hängen</h4>
+    <p style="font-size:13.5px;color:var(--ink-2);margin:0 0 14px;max-width:74ch">
+      Jede Person kann ihre <b>eigene</b> Claude-App auf diesen Planstand zugreifen lassen und dann
+      fragen: „Wo ist die größte Lücke?“, „Was ist in Logistik überfällig?“, „Wer hat Führerschein
+      und ist Donnerstag frei?“. Die Nutzung läuft über das jeweils eigene Abo — dieses Board ruft
+      selbst nie etwas auf und kostet niemanden etwas.
+    </p>
+    ${mcpUrl ? `<div style="display:flex;gap:9px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+        <code style="flex:1;min-width:200px;font:400 12.5px var(--mono);background:var(--card-2);
+          border:1px solid var(--line);border-radius:9px;padding:9px 12px;overflow-wrap:anywhere">${esc(mcpUrl)}</code>
+        <button class="btn pri" data-copymcp="1" type="button">Adresse kopieren</button>
+      </div>`
+      : `<div class="callout" style="cursor:default;margin-bottom:16px">
+        <span class="big num" style="color:var(--soon)">!</span>
+        <span class="tx"><b>Noch keine Adresse hinterlegt</b>
+        <span>Die Projektleitung trägt sie einmal ein — sie steht in Render beim Dienst
+        <code style="font-family:var(--mono)">jcnd-mcp</code>, zusammengesetzt aus dessen Adresse,
+        <code style="font-family:var(--mono)">/mcp/</code> und dem Token. Ohne eigenes Hosting
+        entfällt dieser Abschnitt.</span></span></div>`}
+    <ol class="steps" style="counter-reset:st;margin:0;padding:0;list-style:none">
+      ${schritte.map(([t, d]) => `<li class="step"><span class="no"></span>
+        <div class="sc"><h5 style="margin-bottom:3px">${t}</h5>
+        <p style="margin:0;font-size:13px;color:var(--ink-2)">${d}</p></div></li>`).join("")}
+    </ol>
+    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:4px">
+      <button class="btn" data-setmcp="1" type="button">${mcpUrl ? "Adresse ändern" : "Adresse eintragen"}</button>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-3);margin:13px 0 0;max-width:74ch">
+      Claude liest nur. Ändern lässt sich nichts über den Connector — das passiert hier im Board.
+      Der erste Aufruf nach einer längeren Pause kann eine halbe Minute dauern, weil der Dienst
+      dann erst hochfährt.</p>
+  </div>`;
 }
 
 /** Helfende stehen in der Personalplanung — im Team gehören sie trotzdem hin,
@@ -1543,6 +1593,29 @@ function personSheet(id, neuGrp) {
   };
 }
 
+function mcpSheet() {
+  openSheet(`<div class="sh-h"><div style="flex:1"><h3 class="disp">Connector-Adresse</h3>
+      <p style="font-size:13px;color:var(--ink-2);margin:6px 0 0">Sie steht in Render beim Dienst
+      <code style="font-family:var(--mono)">jcnd-mcp</code>: dessen Adresse, dann
+      <code style="font-family:var(--mono)">/mcp/</code>, dann der Token aus den
+      Umgebungsvariablen.</p></div>
+      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
+    <div class="sh-b">
+      <div class="fld"><label for="mu">Adresse</label>
+        <input id="mu" value="${esc(mcpUrl)}" placeholder="https://jcnd-mcp.onrender.com/mcp/TOKEN">
+        <div class="hint">Alle, die dieses Board öffnen dürfen, sehen die Adresse danach —
+        einschließlich des Tokens. Das ist beabsichtigt: Der Token ist der Teamzugang.</div></div>
+    </div>
+    <div class="sh-f">${mcpUrl ? '<button class="btn" data-mudel="1" type="button">Entfernen</button>' : ""}
+      <span style="flex:1"></span><button class="btn" data-close="1" type="button">Abbrechen</button>
+      <button class="btn pri" data-save="1" type="button">Speichern</button></div>`);
+  const o = document.getElementById("overlay");
+  o.querySelector("[data-save]").onclick = () => {
+    mcpUrl = o.querySelector("#mu").value.trim(); closeSheet(); writeTeam(); toast("Gespeichert"); };
+  const d = o.querySelector("[data-mudel]");
+  if (d) d.onclick = () => { mcpUrl = ""; closeSheet(); writeTeam(); toast("Entfernt"); };
+}
+
 function bereichSheet(i) {
   const list = bereicheList().map(b => ({ ...b })), b = list[i];
   if (!b) return;
@@ -1567,16 +1640,60 @@ function bereichSheet(i) {
   };
 }
 
+/** Dieselbe Auswahl als Seite statt als Dialog — von hier kommt man
+ *  jederzeit auf ein anderes Board, ohne etwas zu verlieren. */
+function renderWer() {
+  const karte = p => {
+    const hat = p.name && p.name.trim();
+    const w = tasksFor(p, "work");
+    const offen = w.filter(r => bucketOf(r.t) !== "done").length;
+    const spaet = w.filter(r => bucketOf(r.t) === "late").length;
+    const ich = me && me.id === p.id;
+    return `<button class="pick" data-pick="${esc(p.id)}" type="button"
+      style="${hat ? "" : "border-style:dashed;"}${ich ? "border-color:var(--accent);background:var(--accent-wash)" : ""}">
+      ${av(p)}<span style="min-width:0">
+      <span class="nm">${esc(hat ? p.name.trim() : p.role)}${ich ? " · du" : ""}</span>
+      <span class="rl">${esc(hat ? p.role : "Name noch offen")}</span>
+      <span class="rl" style="margin-top:2px">${offen} offen${spaet ? ` · <b style="color:var(--late)">${spaet} überfällig</b>` : ""}</span>
+      </span></button>`;
+  };
+  const hs = helferList().filter(h => !h.demo);
+  return `<div class="hello"><h1 class="disp">Wer bist du?</h1>
+      <div class="sub">Wähle dich aus — das Board zeigt danach, was <b>dein Amt</b> oder
+      <b>deine Rolle</b> in der RACI zu tun hat. Du kannst jederzeit hierher zurück.</div></div>
+    ${GRP_ORDER.map(g => {
+      const ps = team.filter(p => p.grp === g); if (!ps.length) return "";
+      return `<section><div class="sec-h"><h2 class="disp">${esc(GRP[g][0])}</h2>
+        <span class="n">${ps.length}</span>
+        <span style="font-size:12.5px;color:var(--ink-3);margin-left:auto">${esc(GRP[g][1])}</span></div>
+        <div class="pickgrid">${ps.map(karte).join("")}</div></section>`;
+    }).join("")}
+    ${hs.length ? `<section><div class="sec-h"><h2 class="disp">Helfende</h2><span class="n">${hs.length}</span>
+      <span style="font-size:12.5px;color:var(--ink-3);margin-left:auto">sehen nur ihre eigenen Schichten</span></div>
+      <div class="pickgrid">${hs.map(h => {
+        const n = schichtList().filter(x => x.helfer === h.id).length;
+        return `<button class="pick" data-pick="${esc(h.id)}" type="button">
+          <span class="av" style="background:var(--c3)">${esc(((h.vorname[0] || "") + (h.nachname[0] || "")).toUpperCase() || "?")}</span>
+          <span style="min-width:0"><span class="nm">${esc(helferName(h.id))}</span>
+          <span class="rl">${n} Schicht${n === 1 ? "" : "en"}</span></span></button>`;
+      }).join("")}</div></section>` : ""}`;
+}
+
 function pickerSheet() {
+  // Auch Ämter ohne Namen erscheinen — der Vorstand soll seine Zeilen sehen
+  // können, bevor jemand den Namen eingetragen hat.
   const blk = g => {
-    const ps = team.filter(p => p.grp === g && p.name && p.name.trim());
+    const ps = team.filter(p => p.grp === g);
     if (!ps.length) return "";
-    return `<div class="grp-h"><h3 class="disp">${esc(GRP[g][0])}</h3></div>
+    return `<div class="grp-h"><h3 class="disp">${esc(GRP[g][0])}</h3>
+      <p>${esc(GRP[g][1])}</p></div>
       <div class="pickgrid">${ps.map(p => {
-        const open = tasksFor(p, "work").filter(r => bucketOf(r.t) !== "done").length;
-        return `<button class="pick" data-pick="${esc(p.id)}" type="button">${av(p)}
-          <span style="min-width:0"><span class="nm">${esc(dispName(p))}</span>
-          <span class="rl">${esc(p.role)} · ${open} offen</span></span></button>`;
+        const hat = p.name && p.name.trim();
+        const offen = tasksFor(p, "work").filter(r => bucketOf(r.t) !== "done").length;
+        return `<button class="pick" data-pick="${esc(p.id)}" type="button"${hat ? "" : ' style="border-style:dashed"'}>
+          ${av(p)}<span style="min-width:0">
+          <span class="nm">${esc(hat ? p.name.trim() : p.role)}</span>
+          <span class="rl">${esc(hat ? p.role : "Name noch offen")} · ${offen} offen</span></span></button>`;
       }).join("")}</div>`;
   };
   const hs = helferList().filter(h => !h.demo);
@@ -1640,8 +1757,11 @@ function aboutSheet() {
    Rendern
    ====================================================================== */
 /* Helfende sehen nur ihren eigenen Einsatz, das Team die ganze Planung. */
-const TABS_TEAM = [["board", "Board"], ["mine", "Aufgaben"], ["personal", "Personal"],
-                   ["logistik", "Logistik"], ["raeume", "Räume"], ["team", "Team"]];
+/* „Wer bist du?" steht bewusst nicht in der Leiste — der Personenknopf oben
+   rechts führt dorthin, da sucht man ihn. */
+const TABS_TEAM = [["board", "Board"], ["mine", "Meine"], ["offen", "Alle Aufgaben"],
+                   ["personal", "Personal"], ["logistik", "Logistik"], ["raeume", "Räume"],
+                   ["team", "Team"]];
 const TABS_HELFER = [["board", "Mein Einsatz"]];
 const tabsFor = () => (me && me.isHelfer) ? TABS_HELFER : TABS_TEAM;
 function wireRows(scope) {
@@ -1680,9 +1800,10 @@ function render() {
         <div class="sub">Was die RACI von deiner Position verlangt.</div></div>` + aufgabenNav() + renderRolle()
     : route.v === "arbeit" ? `<div class="hello"><h1 class="disp">In Arbeit</h1>
         <div class="sub">Woran gerade jemand sitzt — und wo es klemmt.</div></div>` + aufgabenNav() + renderArbeit()
-    : route.v === "offen" ? `<div class="hello"><h1 class="disp">Alle offenen Aufgaben</h1>
+    : route.v === "wer" ? renderWer()
+    : route.v === "offen" ? `<div class="hello"><h1 class="disp">Alle Aufgaben</h1>
         <div class="sub">Das ganze Projekt auf einen Blick — nicht nur deine.</div></div>`
-        + aufgabenNav() + renderOffen()
+        + renderOffen()
     : route.v === "areas" ? `<div class="hello"><h1 class="disp">Aufgaben</h1>
         <div class="sub">Die RACI — alles, was vor der Veranstaltung passieren muss.</div></div>`
         + aufgabenNav() + renderAreas()
@@ -1703,7 +1824,7 @@ function render() {
 /* --- Unterumschalter der Aufgabenansicht -------------------------------- */
 function aufgabenNav() {
   return `<div class="seg-nav">${[["mine", "Meine"], ["rolle", "Meine Rolle"], ["arbeit", "In Arbeit"],
-      ["offen", "Alle offenen"], ["areas", "Bereiche"], ["plan", "Zeitplan"], ["matrix", "Matrix"]]
+      ["areas", "Bereiche"], ["plan", "Zeitplan"], ["matrix", "Matrix"]]
     .map(([k, l]) => `<button data-go="${k}" aria-pressed="${route.v === k || (k === "areas" && route.v === "area")}" type="button">${esc(l)}</button>`).join("")}</div>`;
 }
 
@@ -2095,6 +2216,20 @@ function wireAll(v) {
   v.querySelectorAll("[data-hschicht]").forEach(b => b.onclick = () => helferSchichtenSheet(b.dataset.hschicht));
   v.querySelectorAll("[data-bedarf]").forEach(b => b.onclick = bedarfSheet);
   v.querySelectorAll("[data-editber]").forEach(b => b.onclick = () => bereichSheet(+b.dataset.editber));
+  // Personenkarten gibt es im Dialog UND in der Ansicht — hier die Ansicht.
+  v.querySelectorAll("[data-pick]").forEach(b => b.onclick = () => {
+    me = resolveMe(b.dataset.pick); if (!me) return;
+    lsSet(LS.me, me.id);
+    filter = { q:"", flag:false, only:null };
+    route = { v:"board", area:null };
+    window.scrollTo(0, 0); render();
+    toast("Board von " + (me.name && me.name.trim() ? me.name.trim() : me.role));
+  });
+  v.querySelectorAll("[data-setmcp]").forEach(b => b.onclick = mcpSheet);
+  v.querySelectorAll("[data-copymcp]").forEach(b => b.onclick = async () => {
+    try { await navigator.clipboard.writeText(mcpUrl); toast("Adresse kopiert"); }
+    catch { toast("Kopieren ging nicht — Adresse von Hand markieren."); }
+  });
   v.querySelectorAll("[data-export]").forEach(b => b.onclick = () =>
     download("Plan-Liste_JCNetwork_Days_2026.csv", "\ufeff" + planListeCSV(), "Plan-Liste"));
   v.querySelectorAll("[data-exportmd]").forEach(b => b.onclick = () =>
@@ -2137,7 +2272,8 @@ function wireAll(v) {
   });
 }
 
-document.getElementById("meBtn").onclick = pickerSheet;
+document.getElementById("meBtn").onclick = () => { route = { v:"wer", area:null }; window.scrollTo(0, 0); render(); };
+document.getElementById("homeBtn").onclick = () => { route = { v:"board", area:null }; window.scrollTo(0, 0); render(); };
 
 (async function start() {
   await initStore();
