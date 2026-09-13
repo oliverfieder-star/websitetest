@@ -1,0 +1,1299 @@
+<title>JCNetwork Days RACI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  /* Akzent: Vereinsblau von Contact & Cooperation Wuerzburg, dem Ausrichter */
+  --accent:#226D94; --accent-deep:#174d69; --accent-soft:#e3edf3;
+  --ink:#1b2229; --ink-2:#48555f; --ink-3:#77848d;
+  --paper:#eef1f4; --surface:#ffffff; --surface-2:#f6f8f9;
+  --line:#d8dfe4; --line-soft:#e7ecef;
+  /* Semantik, bewusst getrennt vom Akzent */
+  --crit:#a83226; --crit-bg:#fbecea;
+  --warn:#a4750f; --warn-bg:#fbf3e2;
+  --ok:#39735a;   --ok-bg:#e8f2ec;
+  --sign:#6b4d9e; --sign-bg:#efeaf7;
+  --flag:#c2410c;
+  --shadow:0 1px 2px rgba(27,34,41,.06),0 4px 16px rgba(27,34,41,.06);
+  --r:10px;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --accent:#5aa8ce; --accent-deep:#8cc6e3; --accent-soft:#15303f;
+  --ink:#e6ecf1; --ink-2:#a8b6c0; --ink-3:#7d8c97;
+  --paper:#11161b; --surface:#181f26; --surface-2:#1e262e;
+  --line:#2c363f; --line-soft:#242d35;
+  --crit:#f0897c; --crit-bg:#3a1d19;
+  --warn:#e0b155; --warn-bg:#352a13;
+  --ok:#7cc09c;   --ok-bg:#18302463;
+  --sign:#b39ce0; --sign-bg:#2a2138;
+  --flag:#f5935f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  --accent:#5aa8ce; --accent-deep:#8cc6e3; --accent-soft:#15303f;
+  --ink:#e6ecf1; --ink-2:#a8b6c0; --ink-3:#7d8c97;
+  --paper:#11161b; --surface:#181f26; --surface-2:#1e262e;
+  --line:#2c363f; --line-soft:#242d35;
+  --crit:#f0897c; --crit-bg:#3a1d19;
+  --warn:#e0b155; --warn-bg:#352a13;
+  --ok:#7cc09c;   --ok-bg:#183024;
+  --sign:#b39ce0; --sign-bg:#2a2138;
+  --flag:#f5935f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ---------- Grundgeruest ---------- */
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}
+.rail{background:var(--surface);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:18px;padding:18px 14px;
+  position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand .kicker{font:600 10px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.brand h1{font:600 18px/1.2 var(--serif)}
+.brand .meta{font:400 11.5px/1.5 var(--mono);color:var(--ink-3)}
+.countdown{display:flex;align-items:baseline;gap:6px;margin-top:6px;
+  padding:8px 10px;border-radius:var(--r);background:var(--accent-soft)}
+.countdown b{font:600 20px/1 var(--mono);color:var(--accent-deep);font-variant-numeric:tabular-nums}
+.countdown span{font-size:11.5px;color:var(--ink-2)}
+
+.whoami{border:1px solid var(--line);border-radius:var(--r);padding:10px;background:var(--surface-2)}
+.whoami .lbl{font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:7px}
+.whoami .row{display:flex;align-items:center;gap:9px}
+.whoami .nm{font-weight:600;font-size:14px;line-height:1.2}
+.whoami .rl{font-size:11px;color:var(--ink-2);line-height:1.3}
+.whoami button{margin-top:9px;width:100%;background:none;border:1px solid var(--line);
+  border-radius:7px;padding:5px;font-size:11.5px;color:var(--ink-2);cursor:pointer}
+.whoami button:hover{border-color:var(--accent);color:var(--accent)}
+
+.av{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;
+  font:600 12px var(--mono);color:#fff;letter-spacing:0}
+.av.sm{width:22px;height:22px;font-size:9.5px}
+.av.lg{width:38px;height:38px;font-size:14px}
+
+nav{display:flex;flex-direction:column;gap:1px}
+nav .navitem{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:7px 10px;border-radius:7px;border:0;background:none;cursor:pointer;
+  font-size:13.5px;text-align:left;color:var(--ink-2);width:100%}
+nav .navitem:hover{background:var(--surface-2);color:var(--ink)}
+nav .navitem[aria-current="true"]{background:var(--accent-soft);color:var(--accent-deep);font-weight:600}
+nav .navitem .ct{font:500 11px var(--mono);color:var(--ink-3);font-variant-numeric:tabular-nums}
+nav .navitem[aria-current="true"] .ct{color:var(--accent-deep)}
+.navsep{font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);padding:12px 10px 5px}
+.railfoot{margin-top:auto;display:flex;flex-direction:column;gap:7px;
+  font-size:11px;color:var(--ink-3);border-top:1px solid var(--line-soft);padding-top:11px}
+.sync{display:flex;align-items:center;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--ink-3);flex:none}
+.dot.on{background:var(--ok)} .dot.off{background:var(--warn)}
+.linkbtn{background:none;border:0;padding:0;color:var(--ink-3);cursor:pointer;
+  text-decoration:underline;text-underline-offset:2px;font-size:11px;text-align:left}
+.linkbtn:hover{color:var(--accent)}
+
+main{min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  padding:14px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar h2{font:600 17px/1.25 var(--serif)}
+.topbar .sub{font-size:12px;color:var(--ink-2);margin-top:1px}
+.spacer{flex:1 1 auto;min-width:0}
+.wrap{padding:22px 26px 64px;max-width:1180px;width:100%}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:7px;cursor:pointer;
+  border:1px solid var(--line);background:var(--surface);padding:6px 11px;
+  font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+.btn.sm{padding:4px 9px;font-size:11.5px}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-deep)}
+.search{border:1px solid var(--line);background:var(--surface);border-radius:7px;
+  padding:6px 10px;font-size:12.5px;width:210px;max-width:100%}
+
+/* ---------- Kennzahlen ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:22px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:11px 13px;display:flex;flex-direction:column;gap:2px;position:relative;overflow:hidden;
+  cursor:pointer;text-align:left}
+.stat:hover{border-color:var(--accent)}
+.stat[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ink-3)}
+.stat.crit::before{background:var(--crit)} .stat.warn::before{background:var(--warn)}
+.stat.now::before{background:var(--accent)} .stat.ok::before{background:var(--ok)}
+.stat b{font:600 25px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.stat.crit b{color:var(--crit)} .stat.warn b{color:var(--warn)}
+.stat.now b{color:var(--accent)} .stat.ok b{color:var(--ok)}
+.stat .k{font-size:11.5px;color:var(--ink-2)}
+
+/* ---------- Aufgabenstrom ---------- */
+.grp{margin-bottom:26px}
+.grp-h{display:flex;align-items:baseline;gap:9px;margin-bottom:9px;padding-bottom:6px;
+  border-bottom:1px solid var(--line)}
+.grp-h h3{font:600 13px/1.3 var(--sans)}
+.grp-h .n{font:500 11px var(--mono);color:var(--ink-3)}
+.grp-h .hint{font-size:11.5px;color:var(--ink-3);margin-left:auto;text-align:right}
+.list{display:flex;flex-direction:column;gap:5px}
+.task{display:grid;grid-template-columns:4px 1fr auto;gap:0;align-items:stretch;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  cursor:pointer;overflow:hidden;text-align:left;width:100%;padding:0;font:inherit;color:inherit}
+.task:hover{border-color:var(--accent)}
+.task .stripe{background:var(--ink-3)}
+.task.t-crit .stripe{background:var(--crit)} .task.t-warn .stripe{background:var(--warn)}
+.task.t-now .stripe{background:var(--accent)} .task.t-ok .stripe{background:var(--ok)}
+.task.t-later .stripe{background:var(--line)}
+.task .body{padding:9px 12px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.task .ttl{font-size:13.5px;line-height:1.35;font-weight:500}
+.task.done .ttl{text-decoration:line-through;color:var(--ink-3);text-decoration-thickness:1px}
+.task .sub{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2)}
+.task .side{padding:9px 12px 9px 0;display:flex;align-items:center;gap:8px;flex:none}
+.due{font:500 11.5px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+.due.crit{color:var(--crit);font-weight:600} .due.warn{color:var(--warn);font-weight:600}
+
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:5px;padding:1px 6px;
+  font:500 10.5px/1.6 var(--mono);background:var(--surface-2);color:var(--ink-2);
+  border:1px solid var(--line-soft);white-space:nowrap}
+.chip.area{background:none;border-color:var(--line);color:var(--ink-2)}
+.chip.new{background:var(--accent-soft);color:var(--accent-deep);border-color:transparent}
+.chip.flag{background:var(--crit-bg);color:var(--flag);border-color:transparent;font-weight:600}
+.chip.st-laeuft{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.chip.st-erledigt{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.chip.st-blockiert{background:var(--crit-bg);color:var(--crit);border-color:transparent;font-weight:600}
+.rc{display:inline-grid;place-items:center;width:19px;height:19px;border-radius:4px;
+  font:600 10.5px var(--mono);flex:none}
+.rc.A{background:var(--accent);color:#fff}
+.rc.R{background:var(--accent-soft);color:var(--accent-deep)}
+.rc.C{background:var(--warn-bg);color:var(--warn)}
+.rc.I{background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line)}
+.rc.S{background:var(--sign-bg);color:var(--sign)}
+.rc.opt{opacity:.55}
+.rc.w{width:auto;padding:0 5px}
+
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:26px 18px;text-align:center;
+  color:var(--ink-3);font-size:13px;background:var(--surface-2)}
+.empty b{display:block;color:var(--ink-2);font-size:13.5px;margin-bottom:3px}
+
+/* ---------- Bereiche ---------- */
+.areagrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:11px}
+.areacard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:13px 14px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;
+  font:inherit;color:inherit}
+.areacard:hover{border-color:var(--accent)}
+.areacard h4{font:600 14.5px/1.25 var(--serif)}
+.areacard .lead{font-size:11.5px;color:var(--ink-2);display:flex;align-items:center;gap:5px}
+.bar{height:5px;border-radius:3px;background:var(--line-soft);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.bar i.done{background:var(--ok)} .bar i.run{background:var(--warn)} .bar i.over{background:var(--crit)}
+.areacard .figs{display:flex;gap:10px;font:500 11px var(--mono);color:var(--ink-3);
+  font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.areacard .figs b{color:var(--ink)}
+.areacard .figs .c{color:var(--crit)}
+
+/* ---------- Zeitstrahl ---------- */
+.phase{display:grid;grid-template-columns:170px minmax(0,1fr);gap:14px;padding:12px 0;
+  border-bottom:1px solid var(--line-soft);align-items:start}
+.phase:last-child{border-bottom:0}
+.phase .ph-l h4{font:600 13.5px/1.3 var(--sans)}
+.phase .ph-l .dt{font:400 11px var(--mono);color:var(--ink-3);margin-top:2px}
+.phase .ph-r{display:flex;flex-direction:column;gap:7px}
+.phbar{height:22px;border-radius:5px;background:var(--line-soft);display:flex;overflow:hidden}
+.phbar i{height:100%;display:grid;place-items:center;font:600 10px var(--mono);color:#fff}
+.phmeta{font-size:11.5px;color:var(--ink-2)}
+.phtasks{display:flex;flex-wrap:wrap;gap:4px}
+
+/* ---------- Matrix ---------- */
+.mx-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table.mx{border-collapse:separate;border-spacing:0;font-size:12px;min-width:760px;width:100%}
+table.mx th,table.mx td{padding:5px 6px;border-bottom:1px solid var(--line-soft);text-align:center}
+table.mx thead th{position:sticky;top:0;background:var(--surface-2);z-index:2;
+  font:600 10.5px var(--mono);color:var(--ink-2);border-bottom:1px solid var(--line);
+  padding:8px 5px;white-space:nowrap}
+table.mx th.tn,table.mx td.tn{text-align:left;min-width:280px;max-width:380px;
+  position:sticky;left:0;background:var(--surface);z-index:1;font-weight:400;font-size:12.5px}
+table.mx thead th.tn{z-index:3;background:var(--surface-2)}
+table.mx tbody tr:hover td{background:var(--surface-2)}
+table.mx tbody tr:hover td.tn{background:var(--surface-2)}
+table.mx td.wd{font:500 11px var(--mono);color:var(--ink-3);white-space:nowrap}
+.mx-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin:10px 2px 0}
+.mx-legend span{display:inline-flex;align-items:center;gap:5px}
+
+/* ---------- Team ---------- */
+.teamgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:11px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:13px}
+.pcard.nn{border-style:dashed}
+.pcard .top{display:flex;gap:10px;align-items:flex-start}
+.pcard .nm{font-weight:600;font-size:14.5px;line-height:1.25}
+.pcard .rl{font-size:11.5px;color:var(--ink-2);margin-top:1px}
+.pcard .areas{margin-top:9px;display:flex;flex-wrap:wrap;gap:4px}
+.pcard .figs{margin-top:9px;display:flex;gap:9px;font:500 11px var(--mono);
+  color:var(--ink-3);font-variant-numeric:tabular-nums;align-items:center}
+.pcard .figs b{color:var(--ink)} .pcard .figs .c{color:var(--crit)}
+.pcard .edit{margin-top:9px;display:flex;gap:6px}
+.grouphead{display:flex;align-items:baseline;gap:8px;margin:24px 0 10px}
+.grouphead h3{font:600 14px/1.3 var(--serif)}
+.grouphead p{font-size:11.5px;color:var(--ink-3);margin:0}
+.grouphead:first-child{margin-top:0}
+
+/* ---------- Overlays ---------- */
+.scrim{position:fixed;inset:0;background:rgba(16,22,28,.45);z-index:60;
+  display:flex;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
+.sheet{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);
+  width:100%;max-width:600px;border:1px solid var(--line);overflow:hidden;margin:auto}
+.sheet.wide{max-width:860px}
+.sheet-h{padding:16px 18px 13px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+.sheet-h h3{font:600 16px/1.3 var(--serif);flex:1}
+.sheet-b{padding:16px 18px}
+.sheet-f{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;
+  align-items:center;background:var(--surface-2);flex-wrap:wrap}
+.x{background:none;border:0;font-size:19px;line-height:1;color:var(--ink-3);cursor:pointer;padding:2px 5px;flex:none}
+.x:hover{color:var(--ink)}
+.fld{margin-bottom:13px}
+.fld label{display:block;font:600 9.5px/1 var(--mono);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;border:1px solid var(--line);border-radius:7px;
+  padding:7px 9px;font-size:13px;background:var(--surface)}
+.fld textarea{resize:vertical;min-height:66px;font-family:var(--sans)}
+.fld .hint{font-size:11px;color:var(--ink-3);margin-top:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{flex:1 1 auto;min-width:74px;border:1px solid var(--line);background:var(--surface);
+  border-radius:7px;padding:6px;font-size:12.5px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.seg.tabs button{flex:0 0 auto;min-width:0}
+.kv{display:grid;grid-template-columns:104px 1fr;gap:6px 12px;font-size:12.5px;align-items:baseline}
+.kv dt{font:600 9.5px/1.7 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.kv dd{margin:0}
+.people{display:flex;flex-direction:column;gap:6px}
+.prow{display:flex;align-items:center;gap:8px;font-size:12.5px}
+.prow .who{flex:1;min-width:0}
+.prow .who b{font-weight:600} .prow .who span{color:var(--ink-3);font-size:11.5px}
+.checks{display:flex;flex-wrap:wrap;gap:5px}
+.checks label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);
+  border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;background:var(--surface)}
+.checks label:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent-deep)}
+.checks input{margin:0;accent-color:var(--accent)}
+.note{background:var(--warn-bg);border-radius:7px;padding:9px 11px;font-size:12.5px;
+  color:var(--ink);border-left:3px solid var(--warn)}
+.note .by{font:400 11px var(--mono);color:var(--ink-2);margin-top:4px}
+.banner{background:var(--accent-soft);border-radius:var(--r);padding:11px 14px;
+  font-size:12.5px;color:var(--ink);margin-bottom:18px;display:flex;gap:10px;align-items:flex-start}
+.banner b{font-weight:600}
+.banner .x{margin-left:auto;font-size:16px}
+
+/* Personenwahl */
+.pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(182px,1fr));gap:9px}
+.pick{display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--surface);
+  border-radius:var(--r);padding:10px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.pick:hover{border-color:var(--accent);background:var(--accent-soft)}
+.pick .nm{font-weight:600;font-size:13.5px;line-height:1.2}
+.pick .rl{font-size:11px;color:var(--ink-2);line-height:1.3}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:80;
+  background:var(--ink);color:var(--paper);padding:9px 15px;border-radius:8px;
+  font-size:12.5px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+
+.mobonly{display:none}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .rail{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;
+    gap:11px;padding:11px 16px;border-right:0;border-bottom:1px solid var(--line)}
+  .rail nav{flex-direction:row;flex-wrap:wrap;width:100%;gap:4px}
+  nav .navitem{width:auto;padding:5px 9px;font-size:12.5px}
+  .navsep{display:none}
+  .brand{flex:1 1 auto} .countdown{margin-top:0}
+  .whoami{flex:1 1 180px} .whoami button{margin-top:6px}
+  .railfoot{flex-direction:row;flex-wrap:wrap;gap:12px;width:100%;margin-top:0}
+  .wrap,.topbar{padding-left:16px;padding-right:16px}
+  .phase{grid-template-columns:1fr;gap:7px}
+  .two{grid-template-columns:1fr}
+  .task{grid-template-columns:4px 1fr}
+  .task .side{grid-column:2;padding:0 12px 9px}
+  .mobonly{display:block}
+}
+</style>
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="kicker">Contact &amp; Cooperation e.V.</div>
+      <h1>JCNetwork Days 2026</h1>
+      <div class="meta">Würzburg · 3.–6. Dezember</div>
+      <div class="countdown"><b id="cd">–</b><span id="cdl">Tage bis Donnerstag</span></div>
+    </div>
+
+    <div class="whoami">
+      <div class="lbl">Angemeldet als</div>
+      <div class="row"><span class="av" id="meAv"></span>
+        <div style="min-width:0"><div class="nm" id="meNm">–</div><div class="rl" id="meRl"></div></div>
+      </div>
+      <button id="switchBtn" type="button">Person wechseln</button>
+    </div>
+
+    <nav id="nav"></nav>
+
+    <div class="railfoot">
+      <div class="sync"><span class="dot" id="syncDot"></span><span id="syncTxt">verbinde …</span></div>
+      <button class="linkbtn" id="themeBtn" type="button">Darstellung wechseln</button>
+      <button class="linkbtn" id="aboutBtn" type="button">Wie die RACI gelesen wird</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div style="min-width:0">
+        <h2 id="vTitle">Mein Board</h2>
+        <div class="sub" id="vSub"></div>
+      </div>
+      <div class="spacer"></div>
+      <input class="search" id="q" type="search" placeholder="Aufgabe suchen …" aria-label="Aufgabe suchen">
+      <button class="btn" id="flagFilter" type="button" aria-pressed="false">Nur geflaggt</button>
+      <button class="btn pri" id="addBtn" type="button">+ Aufgabe</button>
+    </div>
+    <div class="wrap" id="view"></div>
+  </main>
+</div>
+<div id="overlay"></div>
+<div id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+"use strict";
+/* ==========================================================================
+   JCNetwork Days 2026 — RACI-Planungsboard
+   Die Excel bleibt Quelle der Wahrheit (data.js, erzeugt aus der RACI).
+   Hier drauf liegt nur eine Overlay-Schicht: Status, Flags, Notizen und
+   ergaenzte Aufgaben. Die wird ueber die db-Capability geteilt.
+   ========================================================================== */
+
+const D = window.RACI_DATA;
+const AREAS = D.areas, POS = D.positions;
+const P = Object.fromEntries(POS.map((p, i) => [p, i]));      // "PL" -> 8
+
+/* --- Eckdaten der Veranstaltung ---------------------------------------- */
+const EVENT_START = new Date(2026, 11, 3);   // Donnerstag, 3. Dezember 2026
+const EVENT_END   = new Date(2026, 11, 6);   // Sonntag, 6. Dezember 2026
+const DAY = 864e5;
+
+const POS_LABEL = {
+  VV:"Vorstandsvorsitz", CR:"Customer Relations", "F&R":"Finanzen & Recht",
+  EM:"Eventmanagement", HR:"Human Resources", IM:"Informationsmanagement",
+  MK:"Marketing", WB:"Weiterbildung", PL:"Projektleitung", PT:"Projektteam",
+  VerV:"Vereinsvorstand Ausrichter", MV:"Mitgliederversammlung", Alumni:"JCNetwork Alumni e.V."
+};
+const CODE_LABEL = {
+  A:["Verantwortlich","Du trägst die Verantwortung, dass die Aufgabe erledigt wird."],
+  R:["Ausführend","Du erledigst die Aufgabe."],
+  C:["Wirst gefragt","Deine Meinung muss eingeholt werden, bevor entschieden wird."],
+  I:["Wirst informiert","Du wirst informiert, sobald die Aufgabe erledigt ist."],
+  S:["Unterschrift","Du unterschreibst – z. B. den Vertrag."]
+};
+
+/* --- Zeitcodes der Excel in echte Daten uebersetzen --------------------- */
+/* "3m" = 3 Monate vor der Veranstaltung, "2w" = 2 Wochen vorher,
+   "Mo/Di/Mi" = Vorbereitungswoche, "Do–So" = Veranstaltung,
+   "+1m" = 1 Monat danach. "Wahl" und "AnmS" sind Meilensteine mit
+   eigenem Datum – beide unter „Team & Eckdaten" einstellbar.          */
+const DEFAULT_MILESTONES = { wahl: "2025-12-06", anms: "2026-10-01" };
+let milestones = { ...DEFAULT_MILESTONES };
+
+const WEEKDAY = { Mo:-3, Di:-2, Mi:-1, Do:0, Fr:1, Sa:2, So:3 };
+
+function shiftMonths(d, n) {
+  const x = new Date(d.getTime());
+  const day = x.getDate();
+  x.setDate(1); x.setMonth(x.getMonth() + n);
+  x.setDate(Math.min(day, new Date(x.getFullYear(), x.getMonth() + 1, 0).getDate()));
+  return x;
+}
+function parseISO(s) { const [y, m, d] = String(s).split("-").map(Number); return new Date(y, m - 1, d); }
+
+/** Uebersetzt einen Zeitcode aus der Excel in ein Datum. */
+function codeToDate(code) {
+  if (!code) return null;
+  const c = String(code).trim();
+  if (c === "Wahl") return parseISO(milestones.wahl);
+  if (c === "AnmS") return parseISO(milestones.anms);
+  if (c in WEEKDAY) {
+    const d = new Date(EVENT_START.getTime());
+    d.setDate(d.getDate() + WEEKDAY[c]);
+    return d;
+  }
+  let m = c.match(/^\+(\d+)([dwm])?$/);          // nach der Veranstaltung
+  if (m) {
+    const n = +m[1], u = m[2] || "d";
+    if (u === "m") return shiftMonths(EVENT_END, n);
+    const d = new Date(EVENT_END.getTime());
+    d.setDate(d.getDate() + n * (u === "w" ? 7 : 1));
+    return d;
+  }
+  m = c.match(/^(\d+)([wm])$/);                   // vor der Veranstaltung
+  if (m) {
+    const n = +m[1];
+    if (m[2] === "m") return shiftMonths(EVENT_START, -n);
+    const d = new Date(EVENT_START.getTime());
+    d.setDate(d.getDate() - n * 7);
+    return d;
+  }
+  return null;
+}
+function codeText(code) {
+  if (!code) return "–";
+  const c = String(code).trim();
+  if (c === "Wahl") return "Wahl des Ausrichters";
+  if (c === "AnmS") return "Anmeldeschluss";
+  const wd = { Mo:"Montag", Di:"Dienstag", Mi:"Mittwoch", Do:"Donnerstag", Fr:"Freitag", Sa:"Samstag", So:"Sonntag" };
+  if (c in wd) return wd[c] + (WEEKDAY[c] < 0 ? " (Vorbereitungswoche)" : " (Veranstaltung)");
+  let m = c.match(/^\+(\d+)([dwm])?$/);
+  if (m) { const n = +m[1], u = { d:"Tag", w:"Woche", m:"Monat" }[m[2] || "d"];
+           return n === 0 ? "direkt danach" : `${n} ${u}${n > 1 ? (u === "Monat" ? "e" : "n") : ""} danach`; }
+  m = c.match(/^(\d+)([wm])$/);
+  if (m) { const n = +m[1], u = m[2] === "m" ? "Monat" : "Woche";
+           return `${n} ${u}${n > 1 ? (u === "Monat" ? "e" : "n") : ""} vorher`; }
+  return c;
+}
+const fmtD = new Intl.DateTimeFormat("de-DE", { day:"2-digit", month:"2-digit", year:"2-digit" });
+const fmtL = new Intl.DateTimeFormat("de-DE", { day:"numeric", month:"long", year:"numeric" });
+const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const daysTo = d => Math.round((d - today()) / DAY);
+
+function relText(d) {
+  if (!d) return "";
+  const n = daysTo(d);
+  if (n === 0) return "heute";
+  if (n === 1) return "morgen";
+  if (n === -1) return "gestern";
+  if (n < 0) return `${-n} Tage überfällig`;
+  if (n < 45) return `in ${n} Tagen`;
+  const mo = Math.round(n / 30.4);
+  return `in ${mo} Monat${mo > 1 ? "en" : ""}`;
+}
+
+/* --- Team: Position x Bereich ------------------------------------------
+   Die Excel verteilt Aufgaben auf Positionen (PL, PT, EM …), der Screenshot
+   verteilt Menschen auf Bereiche. Erst beides zusammen ergibt „meine
+   Aufgaben": eine Aufgabe gehoert dir, wenn deine Position in der Zeile
+   steht UND der Bereich in deinem Zustaendigkeitsbereich liegt.        */
+const ALL = "*";
+const A_WAHL="Wahl & Orga", A_HOTEL="Unterkünfte & Check-In", A_PLEN="Plenen, Messe & MV",
+      A_WS="Workshops", A_PARTY="Partys", A_PERS="Personal", A_LOG="Logistik",
+      A_FOOD="Verpflegung", A_FIN="Finanzen", A_KOM="Kommunikation",
+      A_ALU="Alumni", A_UN="Unternehmen";
+
+const DEFAULT_TEAM = [
+  /* Projektleitung ---------------------------------------------------- */
+  { id:"oliver",  name:"Oliver",     role:"Projektleitung gesamt",           pos:["PL"], areas:[A_WAHL,A_PERS,A_FIN,A_ALU], grp:"pl", color:"#1f2933" },
+  { id:"antonia", name:"Antonia",    role:"Projektleitung Logistik & Hotel", pos:["PL"], areas:[A_LOG,A_HOTEL,A_WS,A_FOOD], grp:"pl", color:"#0e9aa7" },
+  { id:"noah",    name:"Noah",       role:"Projektleitung Events & Messe",   pos:["PL"], areas:[A_PLEN,A_PARTY,A_KOM,A_UN], grp:"pl", color:"#d81b60" },
+  /* Bereichsverantwortliche im Projektteam ---------------------------- */
+  { id:"nyle",    name:"Nyle",       role:"Hotel & Check-In",      pos:["PT"], areas:[A_HOTEL], grp:"pt", color:"#0f9b8e" },
+  { id:"fabio",   name:"Fabio",      role:"Workshops",             pos:["PT"], areas:[A_WS], grp:"pt", color:"#7c4dff" },
+  { id:"jonas",   name:"Jonas",      role:"Logistik",              pos:["PT"], areas:[A_LOG], grp:"pt", color:"#2e9e4f" },
+  { id:"elias",   name:"Elias",      role:"Events",                pos:["PT"], areas:[A_PARTY,A_PLEN], grp:"pt", color:"#f09400" },
+  { id:"basti",   name:"Basti",      role:"Events",                pos:["PT"], areas:[A_PARTY,A_PLEN], grp:"pt", color:"#ef6c00" },
+  { id:"eileen",  name:"Eileen",     role:"Marketing",             pos:["PT"], areas:[A_KOM], grp:"pt", color:"#e53935" },
+  { id:"paul",    name:"Paul",       role:"Firmenkontaktmesse",    pos:["PT"], areas:[A_UN,A_PLEN], grp:"pt", color:"#5e35b1" },
+  { id:"anna",    name:"Anna",       role:"Finanzen",              pos:["PT"], areas:[A_FIN], grp:"pt", color:"#00897b" },
+  { id:"maxi",    name:"Maximilian", role:"Personal",              pos:["PT"], areas:[A_PERS], grp:"pt", color:"#7cb342" },
+  { id:"megan",   name:"Megan",      role:"Personal",              pos:["PT"], areas:[A_PERS], grp:"pt", color:"#d500f9" },
+  { id:"mehmet",  name:"Mehmet",     role:"Alumni",                pos:["PT"], areas:[A_ALU], grp:"pt", color:"#00acc1" },
+  { id:"lilly",   name:"Lilly",      role:"Alumni",                pos:["PT"], areas:[A_ALU], grp:"pt", color:"#26a69a" },
+  { id:"luis",    name:"Luis",       role:"Catering",              pos:["PT"], areas:[A_FOOD], grp:"pt", color:"#fb8c00" },
+  /* JCNetwork e.V. — Namen bitte unter „Team & Eckdaten" eintragen ----- */
+  { id:"vv",  name:"", role:"Vorstandsvorsitz",        pos:["VV"],   areas:ALL, grp:"jcn", color:"#37474f" },
+  { id:"cr",  name:"", role:"Customer Relations",      pos:["CR"],   areas:ALL, grp:"jcn", color:"#455a64" },
+  { id:"fr",  name:"", role:"Finanzen & Recht",        pos:["F&R"],  areas:ALL, grp:"jcn", color:"#546e7a" },
+  { id:"em",  name:"", role:"Eventmanagement",         pos:["EM"],   areas:ALL, grp:"jcn", color:"#226D94" },
+  { id:"hr",  name:"", role:"Human Resources",         pos:["HR"],   areas:ALL, grp:"jcn", color:"#607d8b" },
+  { id:"im",  name:"", role:"Informationsmanagement",  pos:["IM"],   areas:ALL, grp:"jcn", color:"#4e6a78" },
+  { id:"mk",  name:"", role:"Marketing",               pos:["MK"],   areas:ALL, grp:"jcn", color:"#3f5b6b" },
+  { id:"wb",  name:"", role:"Weiterbildung",           pos:["WB"],   areas:ALL, grp:"jcn", color:"#5a7382" },
+  /* Weitere Gremien ---------------------------------------------------- */
+  { id:"verv",  name:"", role:"Vereinsvorstand C&C Würzburg", pos:["VerV"],  areas:ALL, grp:"gr", color:"#174d69" },
+  { id:"alumni",name:"", role:"Vorstand Alumni e.V.",         pos:["Alumni"],areas:ALL, grp:"gr", color:"#00838f" }
+];
+const GRP_LABEL = {
+  pl:  ["Projektleitung", "Gesamtverantwortung und die drei Bereichsblöcke"],
+  pt:  ["Projektteam Würzburg", "Bereichsverantwortliche — sehen die Aufgaben ihrer Bereiche"],
+  jcn: ["Vorstand JCNetwork e.V.", "Namen eintragen, damit die Aufgaben zugeordnet werden"],
+  gr:  ["Weitere Gremien", "Vereinsvorstand des Ausrichters und Alumniverein"]
+};
+
+let team = DEFAULT_TEAM.map(p => ({ ...p, areas: p.areas === ALL ? ALL : [...p.areas] }));
+const personById = id => team.find(p => p.id === id);
+const displayName = p => p.name && p.name.trim() ? p.name.trim() : "N. N.";
+const initials = p => (p.name && p.name.trim())
+  ? p.name.trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()
+  : (POS_LABEL[p.pos[0]] || "?").slice(0, 1);
+const covers = (p, area) => p.areas === ALL || p.areas.includes(area);
+
+/* --- Aufgaben ----------------------------------------------------------- */
+const STATUS = { offen:"Offen", laeuft:"Läuft", erledigt:"Erledigt", blockiert:"Blockiert" };
+
+let baseTasks = D.tasks.map((t, i) => ({
+  key:"t" + i, area:AREAS[t[0]], title:t[1], max:t[2], min:t[3], raci:t[4], custom:false
+}));
+let customTasks = [];                       // ergaenzte Aufgaben aus der db
+let overlay = new Map();                    // key -> {status,flag,note,updatedBy,updatedAt}
+
+const allTasks = () => baseTasks.concat(customTasks);
+const ov = k => overlay.get(k) || {};
+const statusOf = k => ov(k).status || "offen";
+const isDone = k => statusOf(k) === "erledigt";
+
+/** Faellig-Datum: die Excel-Spalte „Min" ist die Deadline, „Max" der
+ *  fruehestmoegliche Zeitpunkt. Fehlt Min, ist die Aufgabe punktuell. */
+function windowOf(t) {
+  if (t.custom) return { start: t.startISO ? parseISO(t.startISO) : null, due: t.dueISO ? parseISO(t.dueISO) : null };
+  const a = codeToDate(t.max), b = codeToDate(t.min);
+  return { start: a, due: b || a };
+}
+function bucketOf(t) {
+  if (isDone(t.key)) return "done";
+  const { start, due } = windowOf(t);
+  if (!due) return "later";
+  const n = daysTo(due);
+  if (n < 0) return "overdue";
+  if (start && daysTo(start) <= 0) return "now";
+  if (start ? daysTo(start) <= 45 : n <= 45) return "soon";
+  return "later";
+}
+const BUCKET_RANK = { overdue:0, now:1, soon:2, later:3, done:4 };
+const BUCKET_CLASS = { overdue:"t-crit", now:"t-now", soon:"t-warn", later:"t-later", done:"t-ok" };
+
+/** Welche RACI-Buchstaben hat diese Person in dieser Zeile? */
+function involvement(t, p) {
+  if (!p) return null;
+  if (t.custom) {
+    if (t.owner === p.id) return { letters:["A"], opt:false };
+    if ((t.helpers || []).includes(p.id)) return { letters:["R"], opt:false };
+    return null;
+  }
+  if (!covers(p, t.area)) return null;
+  const letters = new Set(); let opt = true, any = false;
+  for (const pos of p.pos) {
+    const raw = t.raci[P[pos]];
+    if (!raw) continue;
+    any = true;
+    const o = raw.endsWith("?");
+    if (!o) opt = false;
+    for (const ch of raw.replace("?", "")) letters.add(ch);
+  }
+  return any ? { letters:[...letters], opt } : null;
+}
+const isWork  = inv => !!inv && (inv.letters.includes("R") || inv.letters.includes("A"));
+const isSign  = inv => !!inv && inv.letters.includes("S");
+
+function tasksFor(p, mode) {              // mode: "work" | "watch"
+  const out = [];
+  for (const t of allTasks()) {
+    const inv = involvement(t, p);
+    if (!inv) continue;
+    const work = isWork(inv);
+    const keep = mode === "work" ? work : (!work && (!inv.opt || isSign(inv)));
+    if (keep) out.push({ t, inv });
+  }
+  return out;
+}
+function sortTasks(rows) {
+  return rows.sort((x, y) => {
+    const bx = BUCKET_RANK[bucketOf(x.t)], by = BUCKET_RANK[bucketOf(y.t)];
+    if (bx !== by) return bx - by;
+    const dx = windowOf(x.t).due, dy = windowOf(y.t).due;
+    if (dx && dy && +dx !== +dy) return dx - dy;
+    if (!dx) return 1; if (!dy) return -1;
+    return x.t.area.localeCompare(y.t.area, "de");
+  });
+}
+
+/* --- Speicher: db-Capability, sonst lokal ------------------------------- */
+let db = null, online = false;
+const LS = { state:"jcnd.state.v1", custom:"jcnd.custom.v1", team:"jcnd.team.v1", me:"jcnd.me.v1" };
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+function setSync(state, txt) {
+  const d = document.getElementById("syncDot");
+  d.className = "dot " + state;
+  document.getElementById("syncTxt").textContent = txt;
+}
+function applyTeamDoc(doc) {
+  if (doc && Array.isArray(doc.people) && doc.people.length) {
+    team = doc.people.map(p => ({ ...p, areas: p.areas === ALL ? ALL : [...(p.areas || [])] }));
+  }
+  if (doc && doc.milestones) milestones = { ...DEFAULT_MILESTONES, ...doc.milestones };
+}
+
+async function initStore() {
+  // Lokaler Stand zuerst, damit die Seite sofort etwas zeigt.
+  overlay = new Map(Object.entries(lsGet(LS.state, {})));
+  customTasks = lsGet(LS.custom, []);
+  applyTeamDoc(lsGet(LS.team, null));
+
+  try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; }
+  catch { db = null; }
+
+  if (!db) {
+    online = false;
+    setSync("off", "nur auf diesem Gerät");
+    return;
+  }
+  online = true;
+  setSync("on", "geteilt mit dem Team");
+
+  const fail = e => { online = false; setSync("off", "Verbindung unterbrochen"); console.warn(e); };
+
+  db.collection("state").onSnapshot(snap => {
+    overlay = new Map(snap.docs.map(d => [d.id, d.data()]));
+    lsSet(LS.state, Object.fromEntries(overlay));
+    render();
+  }, fail);
+
+  db.collection("custom").onSnapshot(snap => {
+    customTasks = snap.docs.map(d => ({ ...d.data(), key:"c" + d.id, docId:d.id, custom:true }));
+    lsSet(LS.custom, customTasks);
+    render();
+  }, fail);
+
+  db.doc("config/team").onSnapshot(snap => {
+    if (snap.exists) { applyTeamDoc(snap.data()); lsSet(LS.team, snap.data()); render(); }
+  }, fail);
+}
+
+async function writeState(key, patch) {
+  const next = { ...ov(key), ...patch, updatedBy: me ? me.id : "", updatedAt: new Date().toISOString() };
+  overlay.set(key, next);
+  lsSet(LS.state, Object.fromEntries(overlay));
+  render();
+  if (db) { try { await db.doc("state/" + key).set(next); } catch (e) { toast("Konnte nicht gespeichert werden – lokal gemerkt."); } }
+}
+async function writeCustom(body) {
+  if (db) {
+    try { await db.collection("custom").add(body); return; }
+    catch { toast("Konnte nicht gespeichert werden – lokal gemerkt."); }
+  }
+  customTasks = customTasks.concat([{ ...body, key:"c" + Date.now(), docId:null, custom:true }]);
+  lsSet(LS.custom, customTasks);
+  render();
+}
+async function deleteCustom(t) {
+  customTasks = customTasks.filter(c => c.key !== t.key);
+  lsSet(LS.custom, customTasks);
+  overlay.delete(t.key);
+  render();
+  if (db && t.docId) { try { await db.doc("custom/" + t.docId).delete(); } catch {} }
+}
+async function writeTeam() {
+  const doc = { people: team, milestones, updatedAt: new Date().toISOString() };
+  lsSet(LS.team, doc);
+  render();
+  if (db) { try { await db.doc("config/team").set(doc); } catch { toast("Konnte nicht gespeichert werden – lokal gemerkt."); } }
+}
+
+/* --- Kleinkram ---------------------------------------------------------- */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const av = (p, cls) => `<span class="av ${cls || ""}" style="background:${esc(p.color || "#667")}">${esc(initials(p))}</span>`;
+let toastT;
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.innerHTML = `<div class="toast">${esc(msg)}</div>`;
+  clearTimeout(toastT); toastT = setTimeout(() => { el.innerHTML = ""; }, 3200);
+}
+function rcBadge(letters, opt) {
+  return letters.map(l => `<span class="rc ${l}${opt ? " opt" : ""}" title="${esc(CODE_LABEL[l] ? CODE_LABEL[l][0] : l)}${opt ? " (nur falls zutreffend)" : ""}">${l}</span>`).join("");
+}
+function closeOverlay() { document.getElementById("overlay").innerHTML = ""; document.body.style.overflow = ""; }
+function openSheet(html, wide) {
+  const o = document.getElementById("overlay");
+  o.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet${wide ? " wide" : ""}" role="dialog" aria-modal="true">${html}</div></div>`;
+  document.body.style.overflow = "hidden";
+  o.querySelector("[data-scrim]").addEventListener("mousedown", e => { if (e.target.dataset.scrim) closeOverlay(); });
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeOverlay(); });
+
+/* ======================================================================
+   Ansichten
+   ====================================================================== */
+let me = null;
+let route = { view:"board", area:null };
+let filter = { q:"", flag:false, bucket:null };
+
+function peopleWith(t, letter) {
+  return team.filter(p => { const i = involvement(t, p); return i && i.letters.includes(letter); });
+}
+function matchesFilter(t) {
+  if (filter.flag && !ov(t.key).flag) return false;
+  if (filter.q) {
+    const s = filter.q.toLowerCase();
+    if (!t.title.toLowerCase().includes(s) && !t.area.toLowerCase().includes(s)) return false;
+  }
+  if (filter.bucket && bucketOf(t) !== filter.bucket) return false;
+  return true;
+}
+
+function taskRow(t, inv, o = {}) {
+  const b = bucketOf(t), { due } = windowOf(t), st = statusOf(t.key), f = ov(t.key).flag;
+  const dueTxt = due ? fmtD.format(due) : "ohne Datum";
+  const rel = b === "overdue" ? relText(due) : (b === "now" || b === "soon" ? relText(due) : "");
+  const dueCls = b === "overdue" ? "crit" : (b === "soon" || b === "now" ? "warn" : "");
+  const owners = o.showOwners ? peopleWith(t, "A").slice(0, 3) : [];
+  return `<button class="task ${BUCKET_CLASS[b]}${st === "erledigt" ? " done" : ""}" data-task="${esc(t.key)}" type="button">
+    <span class="stripe"></span>
+    <span class="body">
+      <span class="ttl">${esc(t.title)}</span>
+      <span class="sub">
+        ${o.hideArea ? "" : `<span class="chip area">${esc(t.area)}</span>`}
+        ${t.custom ? '<span class="chip new">ergänzt</span>' : ""}
+        ${f ? '<span class="chip flag">geflaggt</span>' : ""}
+        ${st !== "offen" ? `<span class="chip st-${st}">${STATUS[st]}</span>` : ""}
+        ${owners.length ? `<span style="display:inline-flex;gap:3px;align-items:center">${owners.map(p => av(p, "sm")).join("")}</span>` : ""}
+        ${rel ? `<span>${esc(rel)}</span>` : ""}
+      </span>
+    </span>
+    <span class="side">
+      ${inv ? rcBadge(inv.letters, inv.opt) : ""}
+      <span class="due ${dueCls}">${esc(dueTxt)}</span>
+    </span>
+  </button>`;
+}
+function group(title, rows, hint, o) {
+  if (!rows.length) return "";
+  return `<section class="grp">
+    <div class="grp-h"><h3>${esc(title)}</h3><span class="n">${rows.length}</span>
+      ${hint ? `<span class="hint">${esc(hint)}</span>` : ""}</div>
+    <div class="list">${rows.map(r => taskRow(r.t, r.inv, o)).join("")}</div>
+  </section>`;
+}
+
+/* --- Mein Board --------------------------------------------------------- */
+function renderBoard() {
+  if (!me) return "";
+  const work = sortTasks(tasksFor(me, "work")).filter(r => matchesFilter(r.t));
+  const watch = sortTasks(tasksFor(me, "watch")).filter(r => matchesFilter(r.t));
+  const by = b => work.filter(r => bucketOf(r.t) === b);
+  const all = sortTasks(tasksFor(me, "work"));
+  const n = b => all.filter(r => bucketOf(r.t) === b).length;
+
+  const stat = (k, cls, val, lbl) => `<button class="stat ${cls}" data-bucket="${k}" type="button"
+      aria-pressed="${filter.bucket === k}"><b>${val}</b><span class="k">${esc(lbl)}</span></button>`;
+
+  const head = `<div class="stats">
+      ${stat("overdue","crit", n("overdue"), "überfällig")}
+      ${stat("now","now", n("now"), "jetzt dran")}
+      ${stat("soon","warn", n("soon"), "startet in 6 Wochen")}
+      ${stat("later","", n("later"), "später")}
+      ${stat("done","ok", n("done"), "erledigt")}
+    </div>`;
+
+  const body = work.length || watch.length ? [
+    group("Überfällig", by("overdue"), "Deadline aus der RACI ist vorbei"),
+    group("Jetzt dran", by("now"), "Zeitfenster ist offen"),
+    group("Als Nächstes", by("soon"), "startet in den nächsten 6 Wochen"),
+    group("Später", by("later")),
+    group("Erledigt", by("done")),
+    watch.length ? `<section class="grp">
+        <div class="grp-h"><h3>Rücksprache &amp; Info</h3><span class="n">${watch.length}</span>
+          <span class="hint">kein Arbeitsauftrag — du wirst gefragt (C), informiert (I) oder unterschreibst (S)</span></div>
+        <div class="list">${watch.slice(0, 60).map(r => taskRow(r.t, r.inv, { showOwners:true })).join("")}</div>
+        ${watch.length > 60 ? `<p style="font-size:11.5px;color:var(--ink-3);margin:8px 2px 0">… und ${watch.length - 60} weitere.</p>` : ""}
+      </section>` : ""
+  ].join("") : `<div class="empty"><b>Nichts gefunden</b>Für diese Filter gibt es keine Aufgaben.</div>`;
+
+  return head + body;
+}
+
+/* --- Bereiche ----------------------------------------------------------- */
+function areaStats(area) {
+  const ts = allTasks().filter(t => t.area === area);
+  let done = 0, run = 0, over = 0;
+  for (const t of ts) {
+    const b = bucketOf(t);
+    if (b === "done") done++;
+    else if (b === "overdue") over++;
+    else if (b === "now" && statusOf(t.key) === "laeuft") run++;
+  }
+  return { total:ts.length, done, run, over };
+}
+function renderAreas() {
+  const leadOf = area => team.filter(p => p.grp === "pl" && p.areas !== ALL && p.areas.includes(area));
+  const ownerOf = area => team.filter(p => p.grp === "pt" && p.areas !== ALL && p.areas.includes(area));
+  return `<div class="areagrid">` + AREAS.map(a => {
+    const s = areaStats(a), pct = x => s.total ? (x / s.total * 100).toFixed(1) + "%" : "0";
+    const who = ownerOf(a).concat(leadOf(a));
+    return `<button class="areacard" data-area="${esc(a)}" type="button">
+      <h4>${esc(a)}</h4>
+      <div class="lead">${who.length ? who.slice(0, 4).map(p => av(p, "sm")).join("") +
+        `<span>${esc(who.map(displayName).join(", "))}</span>` : "<span>niemand zugeordnet</span>"}</div>
+      <div class="bar"><i class="done" style="width:${pct(s.done)}"></i><i class="over" style="width:${pct(s.over)}"></i><i class="run" style="width:${pct(s.run)}"></i></div>
+      <div class="figs"><span><b>${s.total}</b> Aufgaben</span><span><b>${s.done}</b> erledigt</span>
+        ${s.over ? `<span class="c"><b class="c">${s.over}</b> überfällig</span>` : ""}</div>
+    </button>`;
+  }).join("") + `</div>`;
+}
+function renderArea(area) {
+  const rows = sortTasks(allTasks().filter(t => t.area === area && matchesFilter(t))
+    .map(t => ({ t, inv: me ? involvement(t, me) : null })));
+  const by = b => rows.filter(r => bucketOf(r.t) === b);
+  if (!rows.length) return `<div class="empty"><b>Nichts gefunden</b>Für diese Filter gibt es hier keine Aufgaben.</div>`;
+  return [
+    group("Überfällig", by("overdue"), null, { hideArea:true, showOwners:true }),
+    group("Jetzt dran", by("now"), null, { hideArea:true, showOwners:true }),
+    group("Als Nächstes", by("soon"), null, { hideArea:true, showOwners:true }),
+    group("Später", by("later"), null, { hideArea:true, showOwners:true }),
+    group("Erledigt", by("done"), null, { hideArea:true, showOwners:true })
+  ].join("");
+}
+
+/* --- Zeitstrahl --------------------------------------------------------- */
+const PHASES = [
+  { id:"wahl",  name:"Bewerbung & Wahl",   test:d => d > 365, when:"mehr als 12 Monate vorher" },
+  { id:"grund", name:"Grundsteine",        test:d => d > 180, when:"6–12 Monate vorher" },
+  { id:"ausbau",name:"Ausbau",             test:d => d > 90,  when:"3–6 Monate vorher" },
+  { id:"fein",  name:"Feinplanung",        test:d => d > 30,  when:"1–3 Monate vorher" },
+  { id:"end",   name:"Endspurt",           test:d => d > 3,   when:"letzter Monat" },
+  { id:"vorb",  name:"Vorbereitungswoche", test:d => d >= 0,  when:"Mo – Mi, 30. Nov – 2. Dez" },
+  { id:"event", name:"Veranstaltung",      test:d => d >= -3, when:"Do – So, 3. – 6. Dez 2026" },
+  { id:"nach",  name:"Nachbereitung",      test:() => true,   when:"nach der Veranstaltung" }
+];
+function phaseOf(t) {
+  const { due } = windowOf(t);
+  if (!due) return PHASES[PHASES.length - 1];
+  const d = Math.round((EVENT_START - due) / DAY);
+  return PHASES.find(p => p.test(d)) || PHASES[PHASES.length - 1];
+}
+function renderTimeline() {
+  const rows = allTasks().filter(matchesFilter);
+  const nowPhase = phaseOf({ area:"", title:"", custom:true, dueISO:
+    new Date().toISOString().slice(0, 10) }).id;
+  return `<p style="font-size:12.5px;color:var(--ink-2);margin:0 0 16px;max-width:66ch">
+      Alle ${rows.length} Aufgaben nach ihrer Deadline. Die Phase, in der wir heute stehen,
+      ist hervorgehoben.</p>` +
+    PHASES.map(ph => {
+      const ts = rows.filter(t => phaseOf(t).id === ph.id);
+      if (!ts.length) return "";
+      const done = ts.filter(t => bucketOf(t) === "done").length;
+      const over = ts.filter(t => bucketOf(t) === "overdue").length;
+      const open = ts.length - done - over;
+      const w = x => (x / ts.length * 100).toFixed(1) + "%";
+      const mine = me ? ts.filter(t => isWork(involvement(t, me))).length : 0;
+      return `<div class="phase"${ph.id === nowPhase ? ' style="background:var(--accent-soft);border-radius:10px;padding-left:12px;padding-right:12px"' : ""}>
+        <div class="ph-l"><h4>${esc(ph.name)}</h4><div class="dt">${esc(ph.when)}</div></div>
+        <div class="ph-r">
+          <div class="phbar">
+            ${done ? `<i class="done" style="width:${w(done)};background:var(--ok)">${done}</i>` : ""}
+            ${over ? `<i style="width:${w(over)};background:var(--crit)">${over}</i>` : ""}
+            ${open ? `<i style="width:${w(open)};background:var(--accent)">${open}</i>` : ""}
+          </div>
+          <div class="phmeta">${ts.length} Aufgaben · ${done} erledigt${over ? ` · <b style="color:var(--crit)">${over} überfällig</b>` : ""}${mine ? ` · <b>${mine} davon bei dir</b>` : ""}</div>
+        </div>
+      </div>`;
+    }).join("");
+}
+
+/* --- RACI-Matrix -------------------------------------------------------- */
+function renderMatrix() {
+  const area = route.area || AREAS[0];
+  const ts = allTasks().filter(t => t.area === area && matchesFilter(t));
+  const rows = ts.map(t => {
+    const { start, due } = windowOf(t);
+    const cells = POS.map(pos => {
+      const raw = t.custom
+        ? (t.owner && personById(t.owner) && personById(t.owner).pos.includes(pos) ? "A"
+          : (t.helpers || []).some(h => personById(h) && personById(h).pos.includes(pos)) ? "R" : null)
+        : t.raci[P[pos]];
+      if (!raw) return "<td></td>";
+      const opt = String(raw).endsWith("?");
+      return `<td>${rcBadge([...String(raw).replace("?", "")], opt)}</td>`;
+    }).join("");
+    return `<tr data-task="${esc(t.key)}" style="cursor:pointer">
+      <td class="tn">${esc(t.title)}${t.custom ? ' <span class="chip new">ergänzt</span>' : ""}</td>
+      <td class="wd">${start ? fmtD.format(start) : "–"}</td>
+      <td class="wd">${due ? fmtD.format(due) : "–"}</td>${cells}</tr>`;
+  }).join("");
+  return `<div class="seg tabs" style="margin-bottom:14px">${AREAS.map(a =>
+      `<button data-mxarea="${esc(a)}" aria-pressed="${a === area}" type="button">${esc(a)}</button>`).join("")}</div>
+    <div class="mx-wrap"><table class="mx">
+      <thead><tr><th class="tn">Aufgabe</th><th>Fenster ab</th><th>Deadline</th>
+        ${POS.map(p => `<th title="${esc(POS_LABEL[p])}">${esc(p)}</th>`).join("")}</tr></thead>
+      <tbody>${rows || `<tr><td class="tn" colspan="${POS.length + 3}">Keine Aufgaben für diese Filter.</td></tr>`}</tbody>
+    </table></div>
+    <div class="mx-legend">${["A","R","C","I","S"].map(l =>
+      `<span><span class="rc ${l}">${l}</span> ${esc(CODE_LABEL[l][0])}</span>`).join("")}
+      <span><span class="rc R opt">R</span> in Klammern in der Excel: nur falls zutreffend</span></div>`;
+}
+
+/* --- Team & Eckdaten ---------------------------------------------------- */
+function renderTeam() {
+  const groups = ["pl", "pt", "jcn", "gr"];
+  const nn = team.filter(p => !p.name || !p.name.trim()).length;
+  return (nn ? `<div class="banner"><div><b>${nn} Positionen haben noch keinen Namen.</b>
+      Solange dort „N. N." steht, landen die zugehörigen Aufgaben auf keinem persönlichen Board —
+      sie stehen aber in Bereichsansicht und Matrix.</div></div>` : "") +
+    `<div class="banner"><div><b>Eckdaten der Planung.</b>
+      Zwei Termine in der Excel sind keine festen Abstände, sondern Meilensteine —
+      daraus werden alle „Wahl"- und „AnmS"-Deadlines berechnet.</div></div>
+     <div class="two" style="max-width:520px;margin-bottom:8px">
+       <div class="fld"><label for="msWahl">Wahl des Ausrichters</label>
+         <input id="msWahl" type="date" value="${esc(milestones.wahl)}"></div>
+       <div class="fld"><label for="msAnms">Anmeldeschluss</label>
+         <input id="msAnms" type="date" value="${esc(milestones.anms)}"></div>
+     </div>` +
+    groups.map(g => {
+      const ps = team.filter(p => p.grp === g);
+      if (!ps.length) return "";
+      return `<div class="grouphead"><h3>${esc(GRP_LABEL[g][0])}</h3><p>${esc(GRP_LABEL[g][1])}</p></div>
+      <div class="teamgrid">${ps.map(p => {
+        const work = tasksFor(p, "work");
+        const over = work.filter(r => bucketOf(r.t) === "overdue").length;
+        const open = work.filter(r => bucketOf(r.t) !== "done").length;
+        return `<div class="pcard${!p.name || !p.name.trim() ? " nn" : ""}">
+          <div class="top">${av(p, "lg")}<div style="min-width:0">
+            <div class="nm">${esc(displayName(p))}</div>
+            <div class="rl">${esc(p.role)} · ${p.pos.map(x => esc(x)).join(", ")}</div></div></div>
+          <div class="areas">${p.areas === ALL
+            ? '<span class="chip">alle Bereiche</span>'
+            : p.areas.map(a => `<span class="chip area">${esc(a)}</span>`).join("")}</div>
+          <div class="figs"><span><b>${open}</b> offen</span>${over ? `<span class="c"><b class="c">${over}</b> überfällig</span>` : ""}
+            <span>${work.length} gesamt</span></div>
+          <div class="edit"><button class="btn sm" data-editp="${esc(p.id)}" type="button">Bearbeiten</button>
+            <button class="btn sm" data-beid="${esc(p.id)}" type="button">Board ansehen</button></div>
+        </div>`;
+      }).join("")}</div>`;
+    }).join("");
+}
+
+/* ======================================================================
+   Dialoge
+   ====================================================================== */
+function taskSheet(key) {
+  const t = allTasks().find(x => x.key === key); if (!t) return;
+  const o = ov(key), st = statusOf(key), { start, due } = windowOf(t), b = bucketOf(t);
+  const byPerson = l => peopleWith(t, l);
+  const section = (l) => {
+    const ps = byPerson(l); if (!ps.length) return "";
+    return `<div style="margin-bottom:11px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+        <span class="rc ${l}">${l}</span>
+        <b style="font-size:12.5px">${esc(CODE_LABEL[l][0])}</b>
+        <span style="font-size:11.5px;color:var(--ink-3)">${esc(CODE_LABEL[l][1])}</span></div>
+      <div class="people">${ps.map(p => `<div class="prow">${av(p, "sm")}
+        <span class="who"><b>${esc(displayName(p))}</b> <span>${esc(p.role)}</span></span></div>`).join("")}</div></div>`;
+  };
+  const updBy = o.updatedBy ? personById(o.updatedBy) : null;
+  openSheet(`
+    <div class="sheet-h">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+          <span class="chip area">${esc(t.area)}</span>
+          ${t.custom ? '<span class="chip new">ergänzt</span>' : ""}
+          ${o.flag ? '<span class="chip flag">geflaggt</span>' : ""}
+        </div>
+        <h3>${esc(t.title)}</h3>
+      </div>
+      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button>
+    </div>
+    <div class="sheet-b">
+      <dl class="kv" style="margin:0 0 15px">
+        <dt>Fenster ab</dt><dd>${start ? esc(fmtL.format(start)) : "–"}
+          ${t.custom ? "" : `<span style="color:var(--ink-3)"> · ${esc(codeText(t.max))} <code style="font-family:var(--mono)">${esc(t.max || "")}</code></span>`}</dd>
+        <dt>Deadline</dt><dd${b === "overdue" ? ' style="color:var(--crit);font-weight:600"' : ""}>${due ? esc(fmtL.format(due)) : "–"}
+          <span style="color:var(--ink-3);font-weight:400"> · ${esc(relText(due))}</span></dd>
+      </dl>
+
+      <div class="fld"><label>Status</label>
+        <div class="seg">${Object.entries(STATUS).map(([k, v]) =>
+          `<button data-st="${k}" aria-pressed="${st === k}" type="button">${esc(v)}</button>`).join("")}</div></div>
+
+      <div class="fld"><label for="tnote">Notiz für das Team</label>
+        <textarea id="tnote" placeholder="Was hakt, was ist abgestimmt, was fehlt noch?">${esc(o.note || "")}</textarea>
+        <div class="hint">Sichtbar für alle, die dieses Board öffnen.</div></div>
+
+      ${o.updatedAt ? `<p style="font:400 11px var(--mono);color:var(--ink-3);margin:-4px 0 15px">
+        zuletzt geändert ${esc(fmtD.format(new Date(o.updatedAt)))}${updBy ? " von " + esc(displayName(updBy)) : ""}</p>` : ""}
+
+      <div style="border-top:1px solid var(--line-soft);padding-top:13px">
+        <div class="lbl" style="font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px">Wer ist beteiligt</div>
+        ${["A","R","C","I","S"].map(section).join("") || '<p style="font-size:12.5px;color:var(--ink-3)">Für diese Aufgabe ist niemand aus dem Team zugeordnet.</p>'}
+      </div>
+    </div>
+    <div class="sheet-f">
+      <button class="btn" data-flag="1" type="button" aria-pressed="${!!o.flag}">${o.flag ? "Flag entfernen" : "Flaggen"}</button>
+      ${t.custom ? '<button class="btn" data-del="1" type="button">Löschen</button>' : ""}
+      <div class="spacer"></div>
+      <button class="btn pri" data-savenote="1" type="button">Notiz speichern</button>
+    </div>`);
+
+  const o2 = document.getElementById("overlay");
+  o2.querySelector("[data-close]").onclick = closeOverlay;
+  o2.querySelectorAll("[data-st]").forEach(b2 => b2.onclick = () => {
+    writeState(key, { status: b2.dataset.st }); closeOverlay();
+    toast("Status: " + STATUS[b2.dataset.st]);
+  });
+  o2.querySelector("[data-flag]").onclick = () => {
+    writeState(key, { flag: !o.flag }); closeOverlay();
+    toast(o.flag ? "Flag entfernt" : "Aufgabe geflaggt");
+  };
+  o2.querySelector("[data-savenote]").onclick = () => {
+    writeState(key, { note: o2.querySelector("#tnote").value.trim() }); closeOverlay(); toast("Notiz gespeichert");
+  };
+  const del = o2.querySelector("[data-del]");
+  if (del) del.onclick = () => { deleteCustom(t); closeOverlay(); toast("Aufgabe gelöscht"); };
+}
+
+function addSheet() {
+  const defArea = route.view === "area" ? route.area : (route.view === "matrix" ? (route.area || AREAS[0]) : AREAS[0]);
+  const iso = d => d.toISOString().slice(0, 10);
+  openSheet(`
+    <div class="sheet-h"><h3>Aufgabe ergänzen</h3>
+      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
+    <div class="sheet-b">
+      <div class="fld"><label for="nTitle">Aufgabe</label>
+        <input id="nTitle" placeholder="z. B. Shuttle zum Samstagabend-Location buchen"></div>
+      <div class="fld"><label for="nArea">Bereich</label>
+        <select id="nArea">${AREAS.map(a => `<option${a === defArea ? " selected" : ""}>${esc(a)}</option>`).join("")}</select></div>
+      <div class="fld"><label for="nOwner">Verantwortlich (A)</label>
+        <select id="nOwner">${team.filter(p => p.name && p.name.trim()).map(p =>
+          `<option value="${esc(p.id)}"${me && p.id === me.id ? " selected" : ""}>${esc(displayName(p))} — ${esc(p.role)}</option>`).join("")}</select>
+        <div class="hint">Trägt die Verantwortung, dass die Aufgabe erledigt wird.</div></div>
+      <div class="fld"><label>Ausführend (R)</label>
+        <div class="checks">${team.filter(p => p.name && p.name.trim()).map(p =>
+          `<label><input type="checkbox" data-helper="${esc(p.id)}">${esc(displayName(p))}</label>`).join("")}</div></div>
+      <div class="two">
+        <div class="fld"><label for="nStart">Fenster ab</label><input id="nStart" type="date" value="${iso(today())}"></div>
+        <div class="fld"><label for="nDue">Deadline</label><input id="nDue" type="date"></div>
+      </div>
+      <div class="fld"><label for="nNote">Notiz</label><textarea id="nNote" placeholder="Optional"></textarea></div>
+    </div>
+    <div class="sheet-f"><div class="spacer"></div>
+      <button class="btn" data-close="1" type="button">Abbrechen</button>
+      <button class="btn pri" data-save="1" type="button">Aufgabe anlegen</button></div>`);
+
+  const o = document.getElementById("overlay");
+  o.querySelectorAll("[data-close]").forEach(b => b.onclick = closeOverlay);
+  o.querySelector("[data-save]").onclick = async () => {
+    const title = o.querySelector("#nTitle").value.trim();
+    if (!title) { o.querySelector("#nTitle").focus(); toast("Die Aufgabe braucht einen Titel."); return; }
+    const helpers = [...o.querySelectorAll("[data-helper]:checked")].map(x => x.dataset.helper);
+    const body = {
+      area: o.querySelector("#nArea").value, title,
+      owner: o.querySelector("#nOwner").value, helpers,
+      startISO: o.querySelector("#nStart").value || null,
+      dueISO: o.querySelector("#nDue").value || null,
+      note: o.querySelector("#nNote").value.trim(),
+      createdBy: me ? me.id : "", createdAt: new Date().toISOString()
+    };
+    closeOverlay(); await writeCustom(body); toast("Aufgabe ergänzt");
+  };
+}
+
+function personSheet(id) {
+  const p = personById(id); if (!p) return;
+  openSheet(`
+    <div class="sheet-h"><h3>${esc(displayName(p))}</h3>
+      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
+    <div class="sheet-b">
+      <div class="two">
+        <div class="fld"><label for="pName">Name</label><input id="pName" value="${esc(p.name || "")}" placeholder="Vorname"></div>
+        <div class="fld"><label for="pRole">Funktion</label><input id="pRole" value="${esc(p.role || "")}"></div>
+      </div>
+      <div class="fld"><label>Position in der RACI</label>
+        <div class="checks">${POS.map(x =>
+          `<label><input type="checkbox" data-pos="${esc(x)}"${p.pos.includes(x) ? " checked" : ""}>${esc(x)} — ${esc(POS_LABEL[x])}</label>`).join("")}</div>
+        <div class="hint">Bestimmt, welche Spalte der Excel für diese Person gilt.</div></div>
+      <div class="fld"><label>Zuständige Bereiche</label>
+        <div class="checks" style="margin-bottom:6px">
+          <label><input type="checkbox" id="pAll"${p.areas === ALL ? " checked" : ""}>alle Bereiche</label></div>
+        <div class="checks" id="pAreas">${AREAS.map(a =>
+          `<label><input type="checkbox" data-area="${esc(a)}"${p.areas !== ALL && p.areas.includes(a) ? " checked" : ""}>${esc(a)}</label>`).join("")}</div>
+        <div class="hint">Zusammen mit der Position entscheidet das, welche Aufgaben auf dem Board landen.</div></div>
+    </div>
+    <div class="sheet-f"><div class="spacer"></div>
+      <button class="btn" data-close="1" type="button">Abbrechen</button>
+      <button class="btn pri" data-save="1" type="button">Speichern</button></div>`);
+
+  const o = document.getElementById("overlay");
+  const allBox = o.querySelector("#pAll"), areaWrap = o.querySelector("#pAreas");
+  const sync = () => { areaWrap.style.opacity = allBox.checked ? ".4" : "1";
+    areaWrap.querySelectorAll("input").forEach(i => i.disabled = allBox.checked); };
+  allBox.onchange = sync; sync();
+  o.querySelectorAll("[data-close]").forEach(b => b.onclick = closeOverlay);
+  o.querySelector("[data-save]").onclick = () => {
+    p.name = o.querySelector("#pName").value.trim();
+    p.role = o.querySelector("#pRole").value.trim() || p.role;
+    p.pos = [...o.querySelectorAll("[data-pos]:checked")].map(x => x.dataset.pos);
+    p.areas = allBox.checked ? ALL : [...o.querySelectorAll("[data-area]:checked")].map(x => x.dataset.area);
+    if (me && me.id === p.id) me = p;
+    closeOverlay(); writeTeam(); toast("Gespeichert");
+  };
+}
+
+function pickerSheet() {
+  const grp = g => {
+    const ps = team.filter(p => p.grp === g && (p.name && p.name.trim() || g === "pl"));
+    if (!ps.length) return "";
+    return `<div class="grouphead"><h3>${esc(GRP_LABEL[g][0])}</h3></div>
+      <div class="pickgrid">${ps.map(p => {
+        const work = tasksFor(p, "work");
+        const open = work.filter(r => bucketOf(r.t) !== "done").length;
+        return `<button class="pick" data-pick="${esc(p.id)}" type="button">${av(p)}
+          <span style="min-width:0"><span class="nm" style="display:block">${esc(displayName(p))}</span>
+          <span class="rl" style="display:block">${esc(p.role)} · ${open} offen</span></span></button>`;
+      }).join("")}</div>`;
+  };
+  openSheet(`
+    <div class="sheet-h"><div style="flex:1"><h3>Wer bist du?</h3>
+      <p style="font-size:12.5px;color:var(--ink-2);margin:4px 0 0">Dein Board zeigt danach nur die Aufgaben,
+      bei denen du in der RACI ausführend (R) oder verantwortlich (A) bist.</p></div>
+      ${me ? '<button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button>' : ""}</div>
+    <div class="sheet-b">${["pl", "pt", "jcn", "gr"].map(grp).join("")}
+      <p style="font-size:11.5px;color:var(--ink-3);margin:18px 0 0">Nicht dabei? Namen lassen sich unter
+      <b>Team &amp; Eckdaten</b> ergänzen.</p></div>`, true);
+  const o = document.getElementById("overlay");
+  const c = o.querySelector("[data-close]"); if (c) c.onclick = closeOverlay;
+  o.querySelectorAll("[data-pick]").forEach(b => b.onclick = () => {
+    me = personById(b.dataset.pick); lsSet(LS.me, me.id);
+    filter.bucket = null; closeOverlay(); route = { view:"board", area:null }; render();
+  });
+}
+
+function aboutSheet() {
+  openSheet(`
+    <div class="sheet-h"><h3>Wie die RACI gelesen wird</h3>
+      <button class="x" data-close="1" type="button" aria-label="Schließen">&times;</button></div>
+    <div class="sheet-b" style="font-size:13px;line-height:1.6">
+      <p style="margin-top:0">Die Excel verteilt ${allTasks().length} Aufgaben auf 13 <b>Positionen</b> —
+      nicht auf Personen. Dieses Board legt die Zuordnung aus dem Projektteam darüber:
+      eine Aufgabe landet auf deinem Board, wenn <b>deine Position in der Zeile steht</b> und
+      <b>der Bereich zu dir gehört</b>.</p>
+      <div style="margin:16px 0">${["A","R","C","I","S"].map(l =>
+        `<div class="prow" style="align-items:flex-start;margin-bottom:7px"><span class="rc ${l}">${l}</span>
+         <span class="who"><b>${esc(CODE_LABEL[l][0])}</b> <span style="display:block">${esc(CODE_LABEL[l][1])}</span></span></div>`).join("")}</div>
+      <p><b>Nur A und R sind Arbeit.</b> C und I stehen deshalb getrennt unter
+      „Rücksprache &amp; Info" — sonst hätte die Projektleitung mehrere hundert vermeintliche
+      Aufgaben, von denen die allermeisten nur Mitwissen bedeuten.</p>
+      <p><b>Zwei Spalten, zwei Bedeutungen.</b> In der Excel heißen sie „Max" und „Min“:
+      <i>Max</i> ist der früheste übliche Zeitpunkt, <i>Min</i> der späteste. Hier stehen sie
+      als <b>Fenster ab</b> und <b>Deadline</b> — und als echtes Datum, gerechnet vom
+      3. Dezember 2026.</p>
+      <p><b>Status gilt pro Aufgabe, nicht pro Person.</b> Jede Zeile hat in der RACI genau
+      eine verantwortliche Position (A). Wenn jemand eine Aufgabe auf „Erledigt" setzt,
+      sehen das alle Beteiligten.</p>
+      <p style="color:var(--ink-2);font-size:12.5px">Grundlage: RACI JCNetwork Days, erstellt 2016,
+      vollständig erneuert im Dezember 2024. Sie ist bewusst kein starres Gerüst —
+      ergänzte Aufgaben sind mit <span class="chip new">ergänzt</span> gekennzeichnet.</p>
+    </div>`);
+  document.getElementById("overlay").querySelector("[data-close]").onclick = closeOverlay;
+}
+
+/* ======================================================================
+   Rendern und Verdrahten
+   ====================================================================== */
+const NAV = [
+  { id:"board",    label:"Mein Board" },
+  { id:"areas",    label:"Bereiche" },
+  { id:"timeline", label:"Zeitstrahl" },
+  { id:"matrix",   label:"RACI-Matrix" },
+  { id:"team",     label:"Team & Eckdaten" }
+];
+function render() {
+  // Kopfzeile
+  const n = daysTo(EVENT_START);
+  document.getElementById("cd").textContent = n > 0 ? n : (n === 0 ? "0" : Math.abs(n));
+  document.getElementById("cdl").textContent = n > 0 ? "Tage bis Donnerstag" : (n === 0 ? "Es geht los" : "Tage danach");
+
+  if (me) {
+    const meAv = document.getElementById("meAv");
+    meAv.style.background = me.color || "#667";
+    meAv.textContent = initials(me);
+    document.getElementById("meNm").textContent = displayName(me);
+    document.getElementById("meRl").textContent = me.role;
+  }
+
+  const myOpen = me ? tasksFor(me, "work").filter(r => bucketOf(r.t) !== "done").length : 0;
+  const myOver = me ? tasksFor(me, "work").filter(r => bucketOf(r.t) === "overdue").length : 0;
+  document.getElementById("nav").innerHTML = NAV.map(x => {
+    const ct = x.id === "board" ? (myOver ? `${myOpen} · ${myOver}!` : String(myOpen))
+             : x.id === "areas" ? String(AREAS.length)
+             : x.id === "timeline" ? String(allTasks().length) : "";
+    const on = route.view === x.id || (x.id === "areas" && route.view === "area");
+    return `<button class="navitem" data-nav="${x.id}" aria-current="${on}" type="button">
+      <span>${esc(x.label)}</span>${ct ? `<span class="ct">${esc(ct)}</span>` : ""}</button>`;
+  }).join("");
+
+  const T = { board:["Mein Board", me ? `${me.role} · ${myOpen} offen${myOver ? `, ${myOver} überfällig` : ""}` : ""],
+              areas:["Bereiche", `${AREAS.length} Bereiche aus der RACI`],
+              area:[route.area || "", "alle Aufgaben dieses Bereichs"],
+              timeline:["Zeitstrahl", "Aufgaben nach Deadline, gerechnet vom 3. Dezember 2026"],
+              matrix:["RACI-Matrix", "die Excel-Ansicht — eine Zeile je Aufgabe"],
+              team:["Team & Eckdaten", "wer welche Position und welche Bereiche hat"] };
+  document.getElementById("vTitle").textContent = T[route.view][0];
+  document.getElementById("vSub").textContent = T[route.view][1];
+
+  const view = document.getElementById("view");
+  view.innerHTML =
+      route.view === "board"    ? renderBoard()
+    : route.view === "areas"    ? renderAreas()
+    : route.view === "area"     ? renderArea(route.area)
+    : route.view === "timeline" ? renderTimeline()
+    : route.view === "matrix"   ? renderMatrix()
+    : renderTeam();
+
+  // Verdrahtung der gerenderten Inhalte
+  document.querySelectorAll("[data-nav]").forEach(b => b.onclick = () => {
+    route = { view:b.dataset.nav, area: b.dataset.nav === "matrix" ? (route.area || AREAS[0]) : null };
+    filter.bucket = null; window.scrollTo(0, 0); render();
+  });
+  view.querySelectorAll("[data-task]").forEach(el => el.onclick = () => taskSheet(el.dataset.task));
+  view.querySelectorAll("[data-area]").forEach(el => el.onclick = () => {
+    route = { view:"area", area:el.dataset.area }; window.scrollTo(0, 0); render();
+  });
+  view.querySelectorAll("[data-mxarea]").forEach(el => el.onclick = () => { route.area = el.dataset.mxarea; render(); });
+  view.querySelectorAll("[data-bucket]").forEach(el => el.onclick = () => {
+    filter.bucket = filter.bucket === el.dataset.bucket ? null : el.dataset.bucket; render();
+  });
+  view.querySelectorAll("[data-editp]").forEach(el => el.onclick = () => personSheet(el.dataset.editp));
+  view.querySelectorAll("[data-beid]").forEach(el => el.onclick = () => {
+    me = personById(el.dataset.beid); lsSet(LS.me, me.id);
+    route = { view:"board", area:null }; filter.bucket = null; window.scrollTo(0, 0); render();
+  });
+  const mw = view.querySelector("#msWahl"), ma = view.querySelector("#msAnms");
+  if (mw) mw.onchange = () => { milestones.wahl = mw.value; writeTeam(); toast("Termin übernommen"); };
+  if (ma) ma.onchange = () => { milestones.anms = ma.value; writeTeam(); toast("Termin übernommen"); };
+}
+
+/* --- Statische Bedienelemente ------------------------------------------ */
+document.getElementById("switchBtn").onclick = pickerSheet;
+document.getElementById("aboutBtn").onclick = aboutSheet;
+document.getElementById("addBtn").onclick = addSheet;
+document.getElementById("flagFilter").onclick = e => {
+  filter.flag = !filter.flag; e.currentTarget.setAttribute("aria-pressed", String(filter.flag)); render();
+};
+let qT;
+document.getElementById("q").oninput = e => {
+  clearTimeout(qT); const v = e.target.value;
+  qT = setTimeout(() => { filter.q = v.trim(); render(); }, 160);
+};
+document.getElementById("themeBtn").onclick = () => {
+  const r = document.documentElement;
+  const cur = r.getAttribute("data-theme");
+  const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.setAttribute("data-theme", dark ? "light" : "dark");
+};
+
+/* --- Start -------------------------------------------------------------- */
+(async function start() {
+  render();                       // sofort etwas zeigen
+  await initStore();
+  const saved = lsGet(LS.me, null);
+  me = (saved && personById(saved)) || null;
+  render();
+  if (!me) pickerSheet();
+})();
+</script>
