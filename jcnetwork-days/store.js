@@ -20,8 +20,13 @@ const POLL_MS = 8000;
 
 function supabaseDb(cfg) {
   const base = String(cfg.supabaseUrl).replace(/\/+$/, "") + "/rest/v1/" + TABELLE;
-  const H = { apikey: cfg.supabaseKey, Authorization: "Bearer " + cfg.supabaseKey,
-              "Content-Type": "application/json" };
+  // Supabase gibt zwei Schlüsselformate aus: den älteren anon-Key (ein JWT,
+  // beginnt mit "eyJ") und den neueren publishable key ("sb_publishable_…").
+  // Der Bearer-Header gehört nur zum JWT — beim neuen Format würde ihn
+  // PostgREST als ungültiges Token abweisen.
+  const istJWT = /^eyJ/.test(String(cfg.supabaseKey));
+  const H = { apikey: cfg.supabaseKey, "Content-Type": "application/json" };
+  if (istJWT) H.Authorization = "Bearer " + cfg.supabaseKey;
   const watcher = [];
   let timer = null, letzte = null, tot = false;
 
