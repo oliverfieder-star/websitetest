@@ -65,11 +65,28 @@ Aufgabenstatus, Schichten, Material, Räume, Team.
 
 1. [render.com](https://render.com) öffnen, mit GitHub anmelden.
 2. Oben rechts **New**, dann **Blueprint**.
-3. Repository `oliverfieder-star/websitetest` auswählen. Falls es nicht in der
-   Liste steht: **Configure account** und Render Zugriff auf das Repository
-   geben.
-4. **Branch**: `claude/zen-faraday-13q37w` auswählen. Das ist wichtig — auf dem
-   Standardbranch liegt das Board noch nicht.
+3. Repository **`oliverfieder-star/websitetest`** auswählen.
+
+   > **Achtung, häufige Verwechslung:** Es gibt zwei GitHub-Konten mit einem
+   > gleichnamigen Repository. `olifie04/websitetest` ist **leer** — dort liegt
+   > nichts. Der Code liegt in `oliverfieder-star/websitetest`.
+   >
+   > Steht in Render oben `olifie04/websitetest`, ist das falsche Konto
+   > verbunden: **Configure account** anklicken und das Konto
+   > `oliverfieder-star` hinzufügen, oder in GitHub unter
+   > *Settings → Applications → Render* dem richtigen Konto Zugriff geben.
+
+4. Die drei Felder ausfüllen:
+
+   | Feld | Wert |
+   |---|---|
+   | *Blueprint Name* | `jcnetwork-days` (frei wählbar, Pflichtfeld) |
+   | *Branch* | `claude/zen-faraday-13q37w` |
+   | *Blueprint Path* | leer lassen |
+
+   Der Branch ist wichtig: Das Repository hat **keinen** `master`- oder
+   `main`-Branch. Alle Branches heißen `claude/…`, und nur auf
+   `claude/zen-faraday-13q37w` liegt das Board.
 5. Render findet `render.yaml` und zeigt zwei Dienste: **jcnd-board** und
    **jcnd-mcp**.
 
