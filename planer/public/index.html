@@ -9,7 +9,18 @@
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="app" id="app">
+<main class="login" id="login" hidden>
+  <div class="login-card">
+    <svg class="login-logo" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="5" width="26" height="24" rx="4" fill="#0f6cbd"/><rect x="3" y="5" width="26" height="7" rx="3" fill="#0a4f8c"/><path d="M10 20l4 4 8-9" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1>Planer</h1>
+    <p>Deine Google-Kalender, Top 3 für Tag und Woche, Aufgaben und Habits an einem Ort.</p>
+    <p class="login-error" id="login-error" hidden></p>
+    <a class="btn primary login-btn" id="login-btn" href="/auth/google?next=/">Mit Google anmelden</a>
+    <p class="login-note">Aufgaben, Ziele und Habits speichert der Planer in einem versteckten Ordner deines Google Drive. So hast du sie auf jedem Gerät.</p>
+  </div>
+</main>
+
+<div class="app" id="app" hidden>
 
   <nav class="rail" aria-label="Bereiche">
     <button class="rail-btn" data-screen="calendar" title="Kalender (1)" aria-label="Kalender"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg></button>
@@ -40,7 +51,7 @@
     </header>
 
     <div class="notice" id="sample-notice" hidden>
-      <span>Du siehst Beispieldaten, damit du die Funktionen ausprobieren kannst.</span>
+      <span>Demo mit Beispieldaten. Alles bleibt nur in diesem Browser.</span>
       <button class="link-btn" id="btn-clear-sample">Beispieldaten entfernen</button>
     </div>
 
@@ -50,7 +61,6 @@
         <div class="side-group">
           <h2 class="side-title">Kalender</h2>
           <ul class="check-list" id="cal-list"></ul>
-          <button class="link-btn small" id="btn-connect-side" hidden>Google-Konto verbinden</button>
         </div>
         <div class="side-group">
           <h2 class="side-title" title="Rechts: eingeplante Stunden im angezeigten Zeitraum">Lebensbereiche</h2>
@@ -127,18 +137,25 @@
     </header>
     <div class="page settings">
       <section class="set-block">
-        <h2>Google-Konto</h2>
-        <p class="muted">Verbinde ein Google-Konto. Der Planer zeigt alle Kalender an, die in diesem Konto sichtbar sind, also auch abonnierte Kalender (Uni, Arbeit, Outlook-Freigaben).</p>
-        <div class="field-row">
-          <label for="set-client-id">OAuth-Client-ID</label>
-          <input id="set-client-id" type="text" spellcheck="false" placeholder="123456789-abc.apps.googleusercontent.com" />
-        </div>
+        <h2>Konto</h2>
+        <p class="muted" id="set-account"></p>
         <div class="set-actions">
-          <button class="btn primary" id="set-connect">Verbinden</button>
-          <button class="btn" id="set-disconnect">Trennen</button>
-          <span class="muted" id="set-google-status"></span>
+          <button class="btn" id="set-logout">Abmelden</button>
         </div>
-        <p class="muted small">Die Client-ID richtest du einmalig in der Google Cloud Console ein. Die Anleitung steht in <code>planer/README.md</code>.</p>
+      </section>
+
+      <section class="set-block">
+        <h2>Mit Claude verbinden</h2>
+        <p class="muted">Claude kann deinen Planer lesen und ändern: Termine anlegen, Aufgaben einplanen, Top 3 setzen, Habits abhaken.</p>
+        <div class="copy-row">
+          <input id="set-mcp-url" type="text" readonly aria-label="Connector-Adresse" />
+          <button class="btn" id="set-copy-mcp">Kopieren</button>
+        </div>
+        <ol class="steps">
+          <li>In Claude <strong>Einstellungen → Konnektoren → Benutzerdefinierten Konnektor hinzufügen</strong> öffnen.</li>
+          <li>Einen Namen wie „Planer“ und die Adresse oben eintragen, speichern.</li>
+          <li>Auf <strong>Verbinden</strong> klicken, mit Google anmelden und den Zugriff erlauben.</li>
+        </ol>
       </section>
 
       <section class="set-block">
@@ -171,12 +188,12 @@
 
       <section class="set-block">
         <h2>Daten</h2>
-        <p class="muted">Ziele, Aufgaben, Habits und lokale Termine liegen nur in diesem Browser. Sichere sie ab und zu als Datei.</p>
+        <p class="muted" id="set-data-note"></p>
         <div class="set-actions">
           <button class="btn" id="set-export">Als Datei sichern</button>
           <label class="btn" for="set-import">Datei laden</label>
           <input id="set-import" type="file" accept="application/json" hidden />
-          <button class="btn danger" id="set-reset">Alle lokalen Daten löschen</button>
+          <button class="btn danger" id="set-reset">Alle Planer-Daten löschen</button>
         </div>
       </section>
     </div>
@@ -240,9 +257,9 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="config.js"></script>
+<script src="shared.js"></script>
 <script src="google.js"></script>
+<script src="sync.js"></script>
 <script src="app.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer onload="GCal.scriptLoaded()"></script>
 </body>
 </html>

@@ -45,46 +45,23 @@
 
   /* ───────── Speicher ───────── */
 
-  const STORE_KEY = 'planer.v1';
-  const PALETTE = ['#0f6cbd', '#7a4fc9', '#d0730c', '#2b9467', '#d13438', '#0f8a8f', '#b4459a', '#8a6a12', '#56687d'];
-  const DEFAULT_CATEGORIES = [
-    { id: 'uni', name: 'Universität', color: '#7a4fc9' },
-    { id: 'arbeit', name: 'Arbeit', color: '#0f6cbd' },
-    { id: 'selbst', name: 'Selbständigkeit', color: '#d0730c' },
-    { id: 'privat', name: 'Privates', color: '#2b9467' },
-    { id: 'sport', name: 'Sport', color: '#d13438' },
-  ];
+  const { PALETTE, defaults, migrate } = window.PlanerShared;
+  const DEMO_KEY = 'planer.demo.v1';
+  let mode = 'loading';   // 'remote': Server und Google Drive · 'demo': nur dieser Browser
+  let account = null;     // {email, mcpUrl}
 
-  function defaults() {
-    return {
-      version: 1,
-      categories: DEFAULT_CATEGORIES.map((c) => ({ ...c })),
-      todos: [],          // {id, title, date|null, start|null (Minuten), duration, categoryId, notes, done}
-      events: [],         // lokale Termine {id, title, allDay, start, end, categoryId, notes}
-      dayGoals: {},       // 'YYYY-MM-DD' -> [{text, done}] ×3
-      weekGoals: {},      // 'YYYY-Www'  -> [{text, done}] ×3
-      habits: [],         // {id, name, categoryId, target}
-      habitLog: {},       // habitId -> {'YYYY-MM-DD': true}
-      calendars: {},      // Google-Kalender-ID -> {visible, categoryId}
-      eventCats: {},      // 'kalenderId|terminId' -> categoryId (Einzelzuordnung)
-      hidden: { todos: false, local: false, cats: [] },
-      settings: { clientId: '', view: 'week', dayStart: 7, theme: 'system', lastType: 'todo', lastCal: '', lastCat: '' },
-      sample: false,
-    };
+  let demoTimer = 0;
+  function save(now) {
+    if (mode === 'remote') { PlanerSync.changed(now); return; }
+    if (mode !== 'demo') return;
+    clearTimeout(demoTimer);
+    const write = () => { try { localStorage.setItem(DEMO_KEY, JSON.stringify(db)); } catch { /* voll oder gesperrt */ } };
+    if (now) write(); else demoTimer = setTimeout(write, 250);
   }
 
-  function migrate(d) {
-    const base = defaults();
-    return {
-      ...base, ...d,
-      settings: { ...base.settings, ...(d.settings || {}) },
-      hidden: { ...base.hidden, ...(d.hidden || {}) },
-    };
-  }
-
-  function load() {
+  function loadDemo() {
     try {
-      const raw = localStorage.getItem(STORE_KEY);
+      const raw = localStorage.getItem(DEMO_KEY) || localStorage.getItem('planer.v1');
       if (raw) return migrate(JSON.parse(raw));
     } catch { /* gesperrt oder kaputt: neu anfangen */ }
     const d = defaults();
@@ -92,13 +69,11 @@
     return d;
   }
 
-  let saveTimer = 0;
-  function save(now) {
-    clearTimeout(saveTimer);
-    const write = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(db)); } catch { /* voll oder gesperrt */ } };
-    if (now) write(); else saveTimer = setTimeout(write, 250);
-  }
-  window.addEventListener('beforeunload', () => save(true));
+  // Einstellungen nur für dieses Gerät (z. B. Ansicht am Handy anders als am Laptop)
+  const pref = {
+    get(k, fallback) { try { return localStorage.getItem('planer.pref.' + k) || fallback; } catch { return fallback; } },
+    set(k, v) { try { localStorage.setItem('planer.pref.' + k, v); } catch { /* egal */ } },
+  };
 
   function seedSample(d) {
     const t = today();
@@ -167,14 +142,14 @@
     toast('Beispieldaten entfernt.');
   }
 
-  let db = load();
+  let db = defaults();
 
   /* ───────── Oberflächenzustand ───────── */
 
   const ui = {
     screen: 'calendar',
     date: today(),
-    view: db.settings.view,
+    view: pref.get('view', 'week'),
     habitWeek: startOfWeek(today()),
     scroll: null,
     tasksOpen: window.innerWidth > 1100,
@@ -324,8 +299,7 @@
   function setView(v, doRender = true) {
     ui.view = v;
     ui.scroll = null;
-    db.settings.view = v;
-    save();
+    pref.set('view', v);
     if (doRender) render();
   }
 
@@ -366,20 +340,18 @@
   /* Synchronisationsstatus in der Werkzeugleiste */
   function renderSync() {
     const el = $('#sync-state');
-    const st = GCal.status;
-    let html = '';
-    if (st === 'connected') {
-      const t = ui.lastSync ? ' · ' + hm(minutesOf(ui.lastSync)) : '';
-      html = `<span class="dot ok"></span><span class="sync-text">${GCal.loading ? 'Lädt …' : 'Google' + t}</span>
-        <button class="icon-btn small" data-action="sync" title="Jetzt aktualisieren" aria-label="Jetzt aktualisieren"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9M4 5v4h4M4 13a8 8 0 0 0 14.3 4.9M20 19v-4h-4"/></svg></button>`;
-    } else if (st === 'expired') {
-      html = `<span class="dot warn"></span><button class="link-btn" data-action="connect">Google neu verbinden</button>`;
-    } else if (st === 'disconnected' || st === 'unavailable') {
-      html = `<button class="link-btn" data-action="connect">Google verbinden</button>`;
+    if (mode === 'demo') { el.innerHTML = '<span class="dot"></span><span class="sync-text">Demo</span>'; return; }
+    let html;
+    if (GCal.status === 'expired') {
+      html = '<span class="dot warn"></span><a class="link-btn" href="/auth/google?next=/">Neu anmelden</a>';
     } else {
-      html = `<button class="link-btn" data-action="goto-settings">Google einrichten</button>`;
+      const saving = { pending: 'Nicht gespeichert', saving: 'Speichert …', offline: 'Offline, wird nachgeholt', error: 'Speichern fehlgeschlagen' }[PlanerSync.state];
+      const warn = PlanerSync.state === 'offline' || PlanerSync.state === 'error';
+      const text = saving || (GCal.loading ? 'Lädt …' : 'Synchron' + (ui.lastSync ? ' · ' + hm(minutesOf(ui.lastSync)) : ''));
+      html = `<span class="dot ${warn ? 'warn' : 'ok'}"></span><span class="sync-text">${text}</span>
+        <button class="icon-btn small" data-action="sync" title="Jetzt aktualisieren" aria-label="Jetzt aktualisieren"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9M4 5v4h4M4 13a8 8 0 0 0 14.3 4.9M20 19v-4h-4"/></svg></button>`;
     }
-    if (GCal.error && st !== 'unconfigured') html += `<span class="sync-error" title="${esc(GCal.error)}">!</span>`;
+    if (GCal.error && GCal.error !== 'login') html += `<span class="sync-error" title="Google-Kalender: ${esc(GCal.error)}">!</span>`;
     el.innerHTML = html;
   }
 
@@ -427,8 +399,6 @@
       }
     }
     $('#cal-list').innerHTML = cals;
-    $('#btn-connect-side').hidden = GCal.status === 'connected';
-    $('#btn-connect-side').textContent = GCal.status === 'expired' ? 'Google neu verbinden' : 'Google-Konto verbinden';
 
     // Stunden je Bereich im sichtbaren Zeitraum
     const from = days[0], to = addDays(days[days.length - 1], 1);
@@ -776,20 +746,21 @@
 
   function renderSettings() {
     const st = GCal.status;
-    const label = {
-      unconfigured: 'Noch keine Client-ID eingetragen.',
-      unavailable: 'Google-Anmeldung nicht erreichbar. Öffne den Planer über http(s), nicht als Datei.',
-      disconnected: 'Nicht verbunden.',
-      expired: 'Sitzung abgelaufen. Einmal auf „Verbinden“ klicken genügt.',
-      connected: `Verbunden${GCal.hint ? ' als ' + GCal.hint : ''} · ${GCal.calendars.length} Kalender`,
-    }[st];
-    $('#set-google-status').textContent = GCal.error ? `${label} ${GCal.error}` : label;
-    $('#set-disconnect').hidden = st !== 'connected' && st !== 'expired';
-    $('#set-connect').textContent = st === 'connected' ? 'Neu verbinden' : 'Verbinden';
+    const remote = mode === 'remote';
+    let acc = remote ? `Angemeldet als ${account.email}.` : 'Demo-Modus ohne Konto: Die Daten bleiben in diesem Browser.';
+    if (remote && GCal.calendars.length) acc += ` ${GCal.calendars.length} Kalender verbunden.`;
+    if (remote && GCal.error && GCal.error !== 'login') acc += ` Kalender: ${GCal.error}`;
+    $('#set-account').textContent = acc;
+    $('#set-logout').hidden = !remote;
+    $('#set-mcp-url').value = remote ? account.mcpUrl : 'Verfügbar, sobald der Planer auf dem Server läuft';
+    $('#set-copy-mcp').disabled = !remote;
+    $('#set-data-note').textContent = remote
+      ? 'Ziele, Aufgaben, Habits und lokale Termine liegen in einem versteckten Ordner deines Google Drive und sind auf allen Geräten gleich. Eine Sicherung als Datei schadet trotzdem nicht.'
+      : 'Im Demo-Modus liegen alle Daten nur in diesem Browser.';
 
     const cals = $('#set-calendars');
     if (st !== 'connected' || !GCal.calendars.length) {
-      cals.innerHTML = `<p class="muted small">Sobald ein Google-Konto verbunden ist, erscheinen hier alle Kalender.</p>`;
+      cals.innerHTML = `<p class="muted small">${remote ? (GCal.loading ? 'Kalender werden geladen …' : 'Keine Kalender gefunden.') : 'Nach der Anmeldung erscheinen hier alle Kalender deines Google-Kontos.'}</p>`;
     } else {
       cals.innerHTML = `<div class="set-table">${GCal.calendars.map((c) => `
         <div class="set-row">
@@ -1287,16 +1258,11 @@
     GCal.refresh(!GCal.calendars.length, min, max).then(() => { ui.lastSync = new Date(); });
   }
 
-  let lastStatus = null;
-  GCal.init(db.settings.clientId || (window.PLANER_CONFIG && window.PLANER_CONFIG.googleClientId) || '', (why) => {
+  GCal.onChange = (why) => {
     if (why === 'need-window') { ensureGoogleWindow(viewDays()); return; }
-    if (lastStatus !== GCal.status) {
-      if (GCal.status === 'connected' && lastStatus && lastStatus !== 'connected') toast('Google verbunden.');
-      lastStatus = GCal.status;
-    }
-    if (!GCal.loading && GCal.status === 'connected' && GCal.window) ui.lastSync = ui.lastSync || new Date();
+    if (!GCal.loading && GCal.status === 'connected' && GCal.window && !GCal.error) ui.lastSync = new Date();
     render();
-  });
+  };
 
   setInterval(() => {
     if (GCal.status === 'connected' && !GCal.loading && document.visibilityState === 'visible') {
@@ -1328,7 +1294,7 @@
   document.addEventListener('click', async (ev) => {
     const t = ev.target;
     let el;
-    if ((el = t.closest('[data-screen]'))) { ui.screen = el.dataset.screen; editingHabit = null; if (ui.screen === 'settings') $('#set-client-id').value = GCal.clientId; render(); return; }
+    if ((el = t.closest('[data-screen]'))) { ui.screen = el.dataset.screen; editingHabit = null; render(); return; }
     if ((el = t.closest('[data-check]'))) { toggleTodo(el.dataset.check); return; }
     if ((el = t.closest('[data-habit]'))) { toggleHabit(el.dataset.habit, el.dataset.date); return; }
     if ((el = t.closest('[data-goal-check]'))) {
@@ -1346,9 +1312,7 @@
     if ((el = t.closest('[data-view]')) && el.closest('#view-switch')) { setView(el.dataset.view); return; }
     if ((el = t.closest('[data-action]'))) {
       const a = el.dataset.action;
-      if (a === 'sync') GCal.refresh(true).then(() => { ui.lastSync = new Date(); render(); });
-      if (a === 'connect') GCal.connect();
-      if (a === 'goto-settings') { ui.screen = 'settings'; $('#set-client-id').value = GCal.clientId; render(); setTimeout(() => $('#set-client-id').focus(), 0); }
+      if (a === 'sync') { GCal.refresh(true); PlanerSync.flush().then(() => PlanerSync.pull()); }
       return;
     }
     if ((el = t.closest('.mcell')) && !t.closest('[data-drag]')) { selectDate(parseYmd(el.dataset.date)); return; }
@@ -1476,10 +1440,6 @@
   $('#btn-new').addEventListener('click', () => openEditor({}));
   $('#btn-tasks').addEventListener('click', () => { ui.tasksOpen = !ui.tasksOpen; render(); });
   $('#btn-clear-sample').addEventListener('click', clearSample);
-  $('#btn-connect-side').addEventListener('click', () => {
-    if (GCal.status === 'unconfigured') { ui.screen = 'settings'; $('#set-client-id').value = ''; render(); setTimeout(() => $('#set-client-id').focus(), 0); }
-    else GCal.connect();
-  });
 
   $('#quick-add').addEventListener('submit', (ev) => {
     ev.preventDefault();
@@ -1517,17 +1477,15 @@
     save(); render();
   });
 
-  $('#set-client-id').addEventListener('change', (ev) => {
-    db.settings.clientId = ev.target.value.trim();
-    save(true);
-    GCal.setClientId(db.settings.clientId || (window.PLANER_CONFIG && window.PLANER_CONFIG.googleClientId) || '');
+  $('#set-logout').addEventListener('click', async () => {
+    await PlanerSync.flush();
+    await fetch('/auth/logout', { method: 'POST', headers: { 'X-Planer': '1' } }).catch(() => {});
+    location.reload();
   });
-  $('#set-connect').addEventListener('click', () => {
-    const v = $('#set-client-id').value.trim();
-    if (v !== GCal.clientId) { db.settings.clientId = v; save(true); GCal.setClientId(v); }
-    GCal.connect();
+  $('#set-copy-mcp').addEventListener('click', () => {
+    const input = $('#set-mcp-url');
+    navigator.clipboard.writeText(input.value).then(() => toast('Adresse kopiert.'), () => { input.select(); toast('Adresse markiert, jetzt kopieren.'); });
   });
-  $('#set-disconnect').addEventListener('click', () => { GCal.disconnect(); toast('Google getrennt.'); });
   $('#set-add-cat').addEventListener('click', () => {
     const used = db.categories.map((c) => c.color);
     const color = PALETTE.find((p) => !used.includes(p)) || PALETTE[db.categories.length % PALETTE.length];
@@ -1546,12 +1504,13 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
   $('#set-reset').addEventListener('click', async () => {
-    if (!(await confirmDialog('Alle Ziele, Aufgaben, Habits und lokalen Termine in diesem Browser löschen? Google-Termine bleiben unberührt.', 'Alles löschen'))) return;
-    const keep = { clientId: db.settings.clientId, theme: db.settings.theme };
+    const where = mode === 'remote' ? 'auf allen Geräten' : 'in diesem Browser';
+    if (!(await confirmDialog(`Alle Ziele, Aufgaben, Habits und lokalen Termine ${where} löschen? Google-Termine bleiben unberührt.`, 'Alles löschen'))) return;
+    const keep = { theme: db.settings.theme };
     db = defaults();
     Object.assign(db.settings, keep);
     save(true); goalsKey = ''; render();
-    toast('Lokale Daten gelöscht.');
+    toast('Planer-Daten gelöscht.');
   });
 
   function importFile(file) {
@@ -1561,7 +1520,7 @@
       let data;
       try { data = JSON.parse(reader.result); } catch { toast('Die Datei ist kein gültiges Planer-Backup.', true); return; }
       if (!data || !Array.isArray(data.todos) || !Array.isArray(data.categories)) { toast('Die Datei ist kein gültiges Planer-Backup.', true); return; }
-      if (!(await confirmDialog('Aktuelle lokale Daten durch die Datei ersetzen?', 'Ersetzen'))) return;
+      if (!(await confirmDialog('Aktuelle Planer-Daten durch die Datei ersetzen?', 'Ersetzen'))) return;
       db = migrate(data);
       save(true); goalsKey = ''; applyTheme(); render();
       toast('Backup geladen.');
@@ -1592,6 +1551,58 @@
     if (d !== lastDay) { if (ymd(ui.date) === lastDay) ui.date = today(); lastDay = d; goalsKey = ''; render(); }
   }, 60 * 1000);
 
-  applyTheme();
-  render();
+  /* ───────── Start ───────── */
+
+  function showLogin(message) {
+    $('#app').hidden = true;
+    $('#login').hidden = false;
+    $('#login-error').hidden = !message;
+    $('#login-error').textContent = message || '';
+  }
+
+  async function boot() {
+    let me = null;
+    try {
+      const res = await fetch('/api/me', { headers: { 'X-Planer': '1' } });
+      if (res.status === 401) { showLogin(); return; }
+      if (res.ok && (res.headers.get('content-type') || '').includes('json')) me = await res.json();
+    } catch { /* kein Server: Demo */ }
+
+    if (me) {
+      mode = 'remote';
+      account = me;
+      try {
+        await PlanerSync.start({
+          get: () => db,
+          set: (d) => { db = d; },
+          onRemote: () => {
+            const a = document.activeElement;
+            if (!(a && a.matches && a.matches('[data-goal-input]'))) goalsKey = '';
+            applyTheme();
+            render();
+          },
+          onState: () => { if (ui.screen === 'calendar') renderSync(); },
+          onLogin: () => {
+            GCal.error = 'login';
+            render();
+            toast('Deine Anmeldung ist abgelaufen. Bitte oben auf „Neu anmelden“ klicken.', true);
+          },
+        });
+      } catch (e) {
+        showLogin('Deine Daten konnten nicht geladen werden: ' + e.message);
+        return;
+      }
+      GCal.enabled = true;
+    } else {
+      mode = 'demo';
+      db = loadDemo();
+      window.addEventListener('beforeunload', () => save(true));
+    }
+    $('#login').hidden = true;
+    $('#app').hidden = false;
+    applyTheme();
+    render();
+  }
+
+  boot();
 })();

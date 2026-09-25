@@ -1,0 +1,23 @@
+# Render Blueprint für den Planer (Ordner planer/).
+# In Render: New → Blueprint → dieses Repository wählen.
+services:
+  - type: web
+    name: planer
+    runtime: node
+    rootDir: planer
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: ALLOWED_EMAILS
+        sync: false
